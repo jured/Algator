@@ -1,0 +1,43 @@
+*****************************************************************************
+ALGator - izvajanje in analiza algoritmov
+*****************************************************************************
+ALGator je sistem za izvajanje algoritmov na podanih testnih podatkih ter analizo rezultatov izvajanja.  
+
+Sistem omogoča dodajanje in upravljanje s poljubnim številom projektov. V okviru enega projekta je definiran problem, testne množice vhodnih podatkov ter način reševanja nalog tega problema. Projekt lahko vsebuje poljubno število algoritmov, ki naloge rešujejo na predpisan način. Sistem omogoča analizo izvajanja posameznega algoritma ter primerjavo med algoritmi istega projekta. 
+
+
+
+*****************************************************************************
+Navodila za uporabo programa ALGator.jar
+*****************************************************************************
+1. Preveden program ALGator.jar se nahaja v mapi dist
+
+2. Program ALGator.jar (skupaj z mapo lib in njeno vsebino) namestimo na 
+    svoj računalnik v poljuben direktorij (<algator_root>).
+
+
+3. V CLASSPATH dodamo pot do programa ALGator.jar
+
+       set CLASSPATH=$CLASSPATH;<algator_root>/dist/ALGator.jar
+
+
+4. Nastavimo še spremenjlivko ALGATOR_DATA_ROOT, da kaže na mapo  
+    z ALGator podatki. 
+
+       set ALGATOR_DATA_ROOT=<algator_root>/data_root
+
+
+5. Izvajalni del ALGatorja poženemo z ukazom
+
+       java algator.Execute
+	
+    analizo rezultatov pa z 
+
+       java algator.Analyse
+
+
+
+*****************************************************************************
+Navodila za avtorje projektov
+*****************************************************************************
+Navodila za avtorje projektov so v datoteki doc/NovProjekt.txt. Pred implementacijo novega projekta je priporočljivo, da avtor prebere tudi opsi delovanja celotnega sistema, ki se nahaja v doc/ALGator.docx

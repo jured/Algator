@@ -10,7 +10,7 @@ Sistem omogoča dodajanje in upravljanje s poljubnim številom projektov. V okvi
 *****************************************************************************
 Navodila za uporabo programa ALGator.jar
 *****************************************************************************
-1. Preveden program ALGator.jar se nahaja v mapi dist
+1. Preveden program ALGator.jar se nahaja v mapi development/AlgoTest/dist
 
 2. Program ALGator.jar (skupaj z mapo lib in njeno vsebino) namestimo na 
     svoj računalnik v poljuben direktorij (<algator_root>).

@@ -1,0 +1,1 @@
+{"TestSet": {    "Description"      : "This testset contains simple quick tests for sorting problem",    "ShortName"        : "SortQ",    "N"                : 13,    "TestSetFiles"     : ["quick*"],    "DescriptionFile"  : "testset1.txt",    "TestRepeat"       : 10  }}

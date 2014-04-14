@@ -1,0 +1,47 @@
+{
+  "Name"     : "Project",
+  "Filename" : "PROJ-{}/proj/{}.atp",
+  
+  "properties":   {	
+      "Name" : {
+            "description": "Short name of the project", 
+            "type": "string",
+            "pattern": "[A-Za-z][A-Za-z0-9]{0-15}"       
+      },
+      "Description" :  {           
+            "description": "Project Description", 
+            "type": "string"       
+      },
+      "Date" : {
+            "description": "Date of last change", 
+            "type": "string"       
+      },
+      "Algorithms" : {
+            "description" : "Algorithms", 
+            "type" : "Entity []",
+            "eType": "Algorithm",
+            "parameters" : ["PROJ-{}"]       
+      },
+      "TestSets" : {
+            "description":  "Testsets", 
+            "type":  "Entity []",       
+            "eType": "TestSet",
+            "parameters" : ["PROJ-{}"]       
+      },
+      "AlgorithmTPL" : {
+            "description": "Algorithm template", 
+            "type": "File",
+            "root": "PROJ-{}/proj/src"       
+      },
+      "SortTestCase" : {
+            "description": "Testcase template", 
+            "type": "File",
+            "root": "PROJ-{}/proj/src"       
+      },
+      "SortTestSetIterator" : {
+            "description": "Set iterator template", 
+            "type": "File",
+            "root": "PROJ-{}/proj/src"       
+      }
+  }
+}

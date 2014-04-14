@@ -1,0 +1,12 @@
+{"Query" :
+  { 
+    "Algorithms"    : ["QuickSort AS QS", "BubbleSort AS BS"],
+    "TestSets"      : ["TestSet1 AS TS1", "TestSet2 AS TS2"],
+    "TestParameters"  : ["N"],
+    "ResultParameters" : ["Tmin", "Tmax"],
+    "GroupBy"          : ["N; Tmax:SUM; MIN"],
+    "Filter"           : ["N > 100", "N < 1000"],
+    "SortBy"           : ["N:-"]
+
+  }
+}

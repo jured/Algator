@@ -1,0 +1,13 @@
+QuickSort;TestSet1;Test-1;DONE;test1;INLINE;10;48;48;48;48;OK
+QuickSort;TestSet1;Test-2;DONE;test2;INLINE;10;11;11;11;11;OK
+QuickSort;TestSet1;Test-3;DONE;test3;RND;10;5;5;5;5;OK
+QuickSort;TestSet1;Test-4;DONE;test4;RND;100;40;40;40;40;OK
+QuickSort;TestSet1;Test-5;DONE;test5;RND;1000;443;443;443;443;OK
+QuickSort;TestSet1;Test-6;DONE;test6;SORTED;10;4;4;4;4;OK
+QuickSort;TestSet1;Test-7;DONE;test7;SORTED;100;13;13;13;13;OK
+QuickSort;TestSet1;Test-8;DONE;test8;SORTED;1000;10;10;10;10;OK
+QuickSort;TestSet1;Test-9;DONE;test9;INVERSED;10;7;7;7;7;OK
+QuickSort;TestSet1;Test-10;DONE;test10;INVERSED;100;19;19;19;19;OK
+QuickSort;TestSet1;Test-11;DONE;test11;INVERSED;1000;12;12;12;12;OK
+QuickSort;TestSet1;Test-12;DONE;test12;FILE;10;4;4;4;4;OK
+QuickSort;TestSet1;Test-13;DONE;test13;FILE;30;5;5;5;5;OK

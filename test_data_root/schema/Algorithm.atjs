@@ -1,0 +1,35 @@
+{
+  "Name"     : "Algorithm",
+  "Filename" : "$1/algs/ALG-{}/{}.atal",
+  
+  "properties":   {	
+      "Name" : {
+            "description": "Short name of the algorithm", 
+            "type": "string",
+            "pattern": "[A-Za-z][A-Za-z0-9]{0-15}"       
+      },
+      "Description" :  {           
+            "description": "Algorithm Description", 
+            "type": "string"       
+      },
+      "Date" : {
+            "description": "Date of last change", 
+            "type": "string"       
+      },
+      "ShortName" : {
+            "description": "Very short name of the algorithm that will be used in diagram legends", 
+            "type": "string",
+            "pattern": "[A-Za-z][A-Za-z0-9]{0-4}"       
+      },
+      "Author" : {
+            "description": "The author of the algorithm", 
+            "type": "string"       
+      },
+
+      "AlgorithmClass" : {
+            "description": "Algorithm class", 
+            "type": "File",
+            "root": "$1/algs/ALG-{}/src"       
+      }
+  }
+}

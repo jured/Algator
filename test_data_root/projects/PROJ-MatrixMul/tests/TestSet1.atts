@@ -1,0 +1,1 @@
+{"TestSet": {    "Description"      : "Simple testset",    "ShortName"        : "TS1",    "N"                : 15,    "TestSetFiles"     : ["testset1/*"],    "DescriptionFile"  : "testset1.txt",    "TestRepeat"       : 1  }}

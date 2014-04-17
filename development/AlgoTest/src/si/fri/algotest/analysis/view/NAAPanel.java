@@ -37,6 +37,23 @@ public class NAAPanel extends javax.swing.JPanel {
     return naa;
   }
   
+  public void setSelected(boolean selected) {
+    nameCB.setSelected(selected);
+  }
+
+  public void setValues(NameAndAbrev naa, boolean selected) {
+    nameCB.setText(naa.getName());
+    abrevTF.setText(naa.getAbrev());
+    setSelected(selected);
+  }
+  
+  /**
+   * This NAAPanel cerresponds to a given NameAndAbrev iff nameCB.getText.equals(naa.getName())
+   */
+  public boolean correspondsTo(NameAndAbrev naa) {
+    return nameCB.getText().equals(naa.getName());
+  }
+  
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always

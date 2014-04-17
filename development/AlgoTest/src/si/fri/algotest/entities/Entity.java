@@ -120,8 +120,13 @@ public class Entity implements Cloneable {
     }
     
   }
-  
+
   public String toJSONString() {
+    return toJSONString(false);
+  }
+  
+  
+  public String toJSONString(boolean wrapWithEntity) {
     JSONObject result = new JSONObject();
     for(String sp : fieldNames) {
       Object o = fields.get(sp);
@@ -132,9 +137,15 @@ public class Entity implements Cloneable {
       
       result.put(sp, o);
     }
-    
-    return result.toString(2);
+
+    if (wrapWithEntity) {
+      JSONObject wrapped = new JSONObject();
+      wrapped.put(entity_id, result);
+      return wrapped.toString(2);
+    } else
+      return result.toString(2);
   }
+  
   
   public Object get(String fieldKey) {
     if (fieldNames.contains(fieldKey))

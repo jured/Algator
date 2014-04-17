@@ -4,15 +4,25 @@
  */
 package si.fri.algotest.analysis.view;
 
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 import org.math.plot.Plot2DPanel;
 import si.fri.algotest.analysis.DataAnalyser;
@@ -26,6 +36,7 @@ import si.fri.algotest.entities.ParameterSet;
 import si.fri.algotest.entities.ParameterType;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.global.ATGlobal;
+import si.fri.algotest.global.ErrorStatus;
 
 /**
  *
@@ -33,6 +44,7 @@ import si.fri.algotest.global.ATGlobal;
  */
 public class Analyser extends javax.swing.JDialog {
 
+  SeriesSelect seriesSelect1;
   private Project project = null;
 
   Plot2DPanel plotPanel = null;
@@ -44,6 +56,21 @@ public class Analyser extends javax.swing.JDialog {
     super(parent, modal);
 
     initComponents();
+    
+    ActionListener onSeriesSelectButtonChange = new ActionListener() {
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        // ActionEvent has to be null (and not e) - see jButton4ActionPerformed for details
+        jButton4ActionPerformed(null);
+      }
+    };
+    
+    seriesSelect1 = new SeriesSelect(onSeriesSelectButtonChange);
+    
+    JScrollPane scp = new JScrollPane(seriesSelect1);
+    scp.setPreferredSize(new Dimension(100,90));
+    xypanel.add(scp);
 
     Toolkit tk = Toolkit.getDefaultToolkit();
     setSize(tk.getScreenSize().width, tk.getScreenSize().width);
@@ -215,6 +242,105 @@ public class Analyser extends javax.swing.JDialog {
   }
   
   /**
+   * Draw y.length graphs with X-axis be the x-th column and y-axis the y[i] column of td. 
+   */
+  private void drawGraph(TableData td, JPanel outPanel, int xAxis, int[] yAxes) {
+    if (td.data.size()==0 || td.data.get(0).size()<2)
+      return;
+    
+    if (plotPanel!=null) {
+      outPanel.remove(plotPanel);
+    }
+    
+    plotPanel = new Plot2DPanel();
+    double[] x = getDoubleArray(td.data, xAxis);
+    
+    for (int i = 0; i < yAxes.length; i++) {
+      double[] y = getDoubleArray(td.data, yAxes[i]);
+
+      plotPanel.addLinePlot((String) td.header.get(yAxes[i]), x, y);
+    }
+    
+    plotPanel.addLegend("SOUTH");
+    
+    outPanel.add(plotPanel);
+    jSplitPane2.revalidate();
+  }
+  
+  
+  void saveQuery() {
+    if (project==null) return;
+    JFileChooser jfc = new JFileChooser();
+    
+    String queryRoot = ATGlobal.getQUERIESroot(project.getProject().getProjectRootDir());
+    
+    jfc.setCurrentDirectory(new File(queryRoot));
+    jfc.setFileFilter(new FileFilter() {
+      @Override
+      public boolean accept(File f) {
+        return f.getAbsolutePath().endsWith(ATGlobal.AT_FILEEXT_query);
+      }
+
+      @Override
+      public String getDescription() {
+        return "ALGator query (*."+ATGlobal.AT_FILEEXT_query+")";
+      }
+    });
+    
+    int ans = jfc.showSaveDialog(this);
+    if (ans == JFileChooser.APPROVE_OPTION) {
+      File fileToSave = jfc.getSelectedFile();
+      if (!fileToSave.getPath().endsWith("." + ATGlobal.AT_FILEEXT_query))
+        fileToSave = new File(fileToSave.getPath() + "." + ATGlobal.AT_FILEEXT_query);
+      
+      String fileMsg = String.format("File %s exists. Overwrite?", fileToSave.getPath());
+      boolean save = !fileToSave.exists() || 
+        (JOptionPane.showConfirmDialog(this, fileMsg, "Save query warning", JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION);
+      
+      if (save) {
+        
+        try {
+          PrintWriter pw = new PrintWriter(fileToSave);
+          pw.println(queryComposer1.getQuery().toJSONString(true));
+          pw.close();
+        } catch (FileNotFoundException ex) {
+          JOptionPane.showMessageDialog(this, ex.toString(), "Save query error", JOptionPane.OK_OPTION);
+        }
+      }
+    }
+  }
+  
+  void openQuery() {
+    if (project==null) return;
+    JFileChooser jfc = new JFileChooser();
+    
+    String queryRoot = ATGlobal.getQUERIESroot(project.getProject().getProjectRootDir());
+    
+    jfc.setCurrentDirectory(new File(queryRoot));
+    jfc.setFileFilter(new FileFilter() {
+      @Override
+      public boolean accept(File f) {
+        return f.getAbsolutePath().endsWith(ATGlobal.AT_FILEEXT_query);
+      }
+
+      @Override
+      public String getDescription() {
+        return "ALGator query (*."+ATGlobal.AT_FILEEXT_query+")";
+      }
+    });
+    
+    int ans = jfc.showOpenDialog(this);
+    if (ans == JFileChooser.APPROVE_OPTION) {
+      File fileToOpen = jfc.getSelectedFile();
+      EQuery query = new EQuery();
+      query.initFromFile(fileToOpen);
+      if (ErrorStatus.getLastErrorStatus() == ErrorStatus.STATUS_OK) {
+        queryComposer1.setQuery(query);
+        jButton4ActionPerformed(new ActionEvent(new JCheckBox(), 0, "Re-run graph"));
+      }
+    }
+  }
+  /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
    * regenerated by the Form Editor.
@@ -248,6 +374,13 @@ public class Analyser extends javax.swing.JDialog {
     jButton4 = new javax.swing.JButton();
     jPanel13 = new javax.swing.JPanel();
     graphPanel = new javax.swing.JPanel();
+    xypanel = new javax.swing.JPanel();
+    jMenuBar1 = new javax.swing.JMenuBar();
+    jMenu1 = new javax.swing.JMenu();
+    jMenuItem1 = new javax.swing.JMenuItem();
+    jMenuItem2 = new javax.swing.JMenuItem();
+    jSeparator1 = new javax.swing.JPopupMenu.Separator();
+    jMenuItem3 = new javax.swing.JMenuItem();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -373,6 +506,10 @@ public class Analyser extends javax.swing.JDialog {
     jPanel13.setLayout(new java.awt.BorderLayout());
 
     graphPanel.setLayout(new java.awt.BorderLayout());
+
+    xypanel.setLayout(new java.awt.BorderLayout());
+    graphPanel.add(xypanel, java.awt.BorderLayout.PAGE_END);
+
     jPanel13.add(graphPanel, java.awt.BorderLayout.CENTER);
 
     jSplitPane2.setRightComponent(jPanel13);
@@ -395,6 +532,37 @@ public class Analyser extends javax.swing.JDialog {
     gridBagConstraints.weighty = 1.0;
     getContentPane().add(jTabbedPane1, gridBagConstraints);
 
+    jMenu1.setText("File");
+
+    jMenuItem1.setText("Open query...");
+    jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItem1ActionPerformed(evt);
+      }
+    });
+    jMenu1.add(jMenuItem1);
+
+    jMenuItem2.setText("Save query...");
+    jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItem2ActionPerformed(evt);
+      }
+    });
+    jMenu1.add(jMenuItem2);
+    jMenu1.add(jSeparator1);
+
+    jMenuItem3.setText("Quit");
+    jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItem3ActionPerformed(evt);
+      }
+    });
+    jMenu1.add(jMenuItem3);
+
+    jMenuBar1.add(jMenu1);
+
+    setJMenuBar(jMenuBar1);
+
     pack();
   }// </editor-fold>//GEN-END:initComponents
 
@@ -406,11 +574,17 @@ public class Analyser extends javax.swing.JDialog {
     TableData td = DataAnalyser.runQuery(project.getProject(), query);
     if (td==null) return;
 
+    // this action is triggered by many events; to prevent changing the contenet 
+    // if seriesSelect panel, addFields is callsed only  when CheckBox is the trigger 
+    // (one of the Fields is chenged)
+    if (evt !=null && evt.getSource() instanceof JCheckBox)
+      seriesSelect1.addFields(td.header, 1);
+    
     DefaultTableModel dtm = new DefaultTableModel(td.getDataAsArray(), td.header.toArray());
     jTable1.setModel(dtm);
 
     if (td.data != null && td.data.size() > 0 && td.data.get(0).size() >= 2)
-    drawGraph(td, graphPanel);
+    drawGraph(td, graphPanel, seriesSelect1.getXFieldID(), seriesSelect1.getYFieldsID());
   }//GEN-LAST:event_jButton4ActionPerformed
 
   private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -420,6 +594,18 @@ public class Analyser extends javax.swing.JDialog {
   private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
     showTable();
   }//GEN-LAST:event_jButton2ActionPerformed
+
+  private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+    System.exit(0);
+  }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+  private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    saveQuery();
+  }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+  private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    openQuery();
+  }//GEN-LAST:event_jMenuItem1ActionPerformed
 
   
   
@@ -478,6 +664,11 @@ public class Analyser extends javax.swing.JDialog {
   private javax.swing.JButton jButton2;
   private javax.swing.JButton jButton3;
   private javax.swing.JButton jButton4;
+  private javax.swing.JMenu jMenu1;
+  private javax.swing.JMenuBar jMenuBar1;
+  private javax.swing.JMenuItem jMenuItem1;
+  private javax.swing.JMenuItem jMenuItem2;
+  private javax.swing.JMenuItem jMenuItem3;
   private javax.swing.JPanel jPanel13;
   private javax.swing.JPanel jPanel2;
   private javax.swing.JPanel jPanel3;
@@ -490,6 +681,7 @@ public class Analyser extends javax.swing.JDialog {
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JScrollPane jScrollPane3;
+  private javax.swing.JPopupMenu.Separator jSeparator1;
   private javax.swing.JSplitPane jSplitPane1;
   private javax.swing.JSplitPane jSplitPane2;
   private javax.swing.JTabbedPane jTabbedPane1;
@@ -497,5 +689,6 @@ public class Analyser extends javax.swing.JDialog {
   private javax.swing.JPanel qPanel;
   private si.fri.algotest.analysis.view.QueryComposer queryComposer1;
   private javax.swing.JEditorPane selectPane;
+  private javax.swing.JPanel xypanel;
   // End of variables declaration//GEN-END:variables
 }

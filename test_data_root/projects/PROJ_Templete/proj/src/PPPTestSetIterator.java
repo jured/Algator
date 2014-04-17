@@ -8,7 +8,7 @@ import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.execute.DefaultTestSetIterator;
 import si.fri.algotest.global.ATLog;
 import si.fri.algotest.tools.ATTools;
-import si.fri.algotest.tools.ErrorStatus;
+import si.fri.algotest.global.ErrorStatus;
 
 
 /**

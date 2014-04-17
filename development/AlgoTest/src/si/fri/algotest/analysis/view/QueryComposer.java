@@ -4,12 +4,12 @@
  */
 package si.fri.algotest.analysis.view;
 
-import si.fri.algotest.analysis.view.NAAPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.EQuery;
+import si.fri.algotest.entities.NameAndAbrev;
 import si.fri.algotest.entities.Project;
 
 /**
@@ -84,6 +84,20 @@ public class QueryComposer extends javax.swing.JPanel {
     return result;
   }
   
+  private void setNAAPanelValues(NameAndAbrev[] naas, NAAPanel [] naaPanel) {
+    for (int i = 0; i < naaPanel.length; i++) {
+      naaPanel[i].setSelected(false);
+    }
+    for (NameAndAbrev naa : naas) {
+      for (NAAPanel naaPanel1 : naaPanel) {
+        if (naaPanel1.correspondsTo(naa)) {
+          naaPanel1.setValues(naa, true);
+          break;
+        }
+      }
+    }
+  }
+  
   private void setAlgsAndFields() {
     if (project == null) return;
     
@@ -108,10 +122,31 @@ public class QueryComposer extends javax.swing.JPanel {
     String [] inf  = getNAAsAsStringArray(infieldNAAs);
     String [] outf = getNAAsAsStringArray(outfieldNAAs);
     
+    // currently only one GropuBy, one filter and one sortby is suported
+    
     return new EQuery(algs, tsts, inf, outf, new String[] {groupbyTF.getText()}, 
                       new String[] {filterTF.getText()}, new String[] {sortbyTF.getText()});
   }
   
+  public void setQuery(EQuery query) {
+    try {
+      setNAAPanelValues(query.getNATabFromJSONArray(EQuery.ID_Algorithms), algNAAs);
+      setNAAPanelValues(query.getNATabFromJSONArray(EQuery.ID_TestSets), tstsNAAs);
+      setNAAPanelValues(query.getNATabFromJSONArray(EQuery.ID_inParameters), infieldNAAs);
+      setNAAPanelValues(query.getNATabFromJSONArray(EQuery.ID_outParameters), outfieldNAAs);
+    
+    // currently only one GropuBy, one Filter and one SortBy is supported
+      String[] gb = query.getStringArray(EQuery.ID_GroupBy);
+      groupbyTF.setText(gb.length > 0 ? gb[0] : "");
+  
+      String[] ft = query.getStringArray(EQuery.ID_Filter);
+      filterTF.setText(ft.length > 0 ? ft[0] : "");
+      
+      String[] sb = query.getStringArray(EQuery.ID_SortBy);
+      sortbyTF.setText(sb.length > 0 ?sb[0] : "");
+      
+    } catch (Exception e) {}
+  }
   
   
   /**

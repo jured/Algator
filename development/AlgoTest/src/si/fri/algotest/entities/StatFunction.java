@@ -90,16 +90,21 @@ public enum StatFunction {
 //    }
 //  }
 
-  public static Number getFunctionValue(StatFunction function, ArrayList<? extends Comparable> values) {
-    if (values == null || values.size() == 0 || !(values.get(0) instanceof Number)) {
+  public static Object getFunctionValue(StatFunction function, ArrayList<? extends Comparable> values) {
+    if (values == null || values.size() == 0) {
       return -1;
     }
 
+    // For non-numbers only FIRST and LAST are exceptable; FIRST is default.
+    if (!(values.get(0) instanceof Number)) 
+      if (!function.equals(StatFunction.LAST))          
+        function = StatFunction.FIRST;
+    
     switch (function) {
       case FIRST:
-        return (Number) values.get(0);
+        return  values.get(0);
       case LAST:
-        return (Number) values.get(values.size()-1);
+        return  values.get(values.size()-1);
       case MIN:
       case MAX:
         Comparable val = values.get(0);
@@ -108,7 +113,7 @@ public enum StatFunction {
             val = values.get(i);
           }
         }
-        return (Number) val;
+        return val;
       case SUM:
       case AVG:
         try {

@@ -88,10 +88,10 @@ public class TableData {
   /**
    * Find a statistical function for a given field in a given groupBy string. If 
    * a function for given field is not prescribed, the default function is returned. 
-   * If default is not given, AVG is returned.  
+   * If default is not given, FIRST is returned.  
    */
   private static StatFunction getFunctionForField(String groupBy, String field) {
-    StatFunction result = StatFunction.AVG;
+    StatFunction result = StatFunction.FIRST;
     
     StatFunction defaultFunc = StatFunction.UNKNOWN;
     
@@ -117,13 +117,13 @@ public class TableData {
   /**
    * Sqeezes group  - from array of lines it returns one line that contains 
    * a summary of all lines; a function that is used to summarize each column
-   * can be given in groupBy parameter; default function: AVG.
+   * can be given in groupBy parameter; default function: FIRST.
    */
   private ArrayList<Object> squeezeGroup(ArrayList<ArrayList<Object>> group, String groupBy) {
     ArrayList<Object> result = new ArrayList<>();
     for (int i = 0; i < header.size(); i++) {
       String colName = header.get(i);
-      ArrayList<Integer> values = getColumn(group,i, new Integer(1));
+      ArrayList<Integer> values = getColumn(group,i, 1);
       StatFunction function = getFunctionForField(groupBy, colName);
       Object rezultat = StatFunction.getFunctionValue(function,values);
       result.add(rezultat);
@@ -136,7 +136,7 @@ public class TableData {
    * Group data by a given field
    */
   public void groupBy(String groupby) {
-    if (data.size() == 0 || groupby == null || groupby.isEmpty()) return;
+    if (data.isEmpty() || groupby == null || groupby.isEmpty()) return;
     
     String [] gb = groupby.split(";");
     String field = gb[0];
@@ -146,7 +146,14 @@ public class TableData {
       return;
     }
     
-    sort(field);
+    // detect if the values of this filed are Srtings -> adjust sorting
+    String type = "+";
+    try {
+      // check the first entry in this column
+      if (data.get(0).get(fieldNo) instanceof String)
+        type = ">";
+    } catch (Exception e) {}
+    sort(field+":"+type);
     
     ArrayList<ArrayList<Object>> newData = new ArrayList<>();
 

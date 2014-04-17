@@ -1,8 +1,9 @@
 package si.fri.algotest.analysis;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
+import si.fri.algotest.entities.ParameterType;
 import si.fri.algotest.entities.StatFunction;
 
 /**
@@ -133,6 +134,109 @@ public class TableData {
   }
   
   /**
+   * REturns the position of the field in the header table; if field does not exist, method returns -1
+   * @param fieldName
+   * @return 
+   */
+  private int getFieldPos(String fieldName) {
+    for (int i = 0; i < header.size(); i++) {
+      if (header.get(i).equals(fieldName))
+        return i;
+    }
+    return -1;
+  }
+  
+  /**
+   * Filter out rows that do not satisfy the filter condition
+   * @param groupby 
+   */
+  public void filter(String filter) {
+    if (data == null || data.size() == 0) return;
+    
+    String operators = "<=|<|>=|>|==|!=";
+    String[] flt = filter.split(operators);
+    
+    // if filter is correct, the result should contain 2 values (field name and value)
+    if (flt.length!=2) 
+      return; // cant make this filer
+    
+    int opStart = flt[0].length();
+    int opEnd   = filter.indexOf(flt[1]);
+    if (opStart < 0 || opStart >=filter.length() || opEnd < opStart || opEnd >= filter.length())
+      return;
+    
+    String filedName = flt[0].trim();
+    String operator  = filter.substring(opStart, opEnd).trim();
+    String value  = flt[1].trim();
+    
+    // empty "field_name" value
+    if (filedName.length()==0)
+      return;
+    
+    int fieldPos = getFieldPos(filedName);
+    if (fieldPos == -1)
+      return;
+    
+    // detect the type of data in corresponding column
+    ParameterType  type = ParameterType.UNKNOWN;
+    if (data.get(0).get(fieldPos) instanceof String)
+      type = ParameterType.STRING;
+    if (data.get(0).get(fieldPos) instanceof Integer)
+      type = ParameterType.INT;
+    if (data.get(0).get(fieldPos) instanceof Double)
+      type = ParameterType.DOUBLE;
+    
+    if (type.equals(ParameterType.UNKNOWN))
+      return;
+    
+    Iterator<ArrayList<Object>> iterator = data.iterator();
+    while (iterator.hasNext()) {
+      ArrayList<Object> line = iterator.next();
+      boolean remove = false;
+      
+      Comparable curValue = (Comparable) line.get(fieldPos);
+      Comparable refValue = "";
+      switch (type) {
+        case STRING:
+          refValue = value;
+          break;
+        case INT: 
+          refValue = Integer.parseInt(value);
+          break;
+        case DOUBLE: 
+          refValue = Double.parseDouble(value);
+          break;
+      }
+
+      int cmp = refValue.compareTo(curValue);
+      
+      switch(operator) {
+        case "==":
+          remove = !(refValue.compareTo(curValue) == 0);
+          break;
+        case "!=":
+          remove = !(refValue.compareTo(curValue) != 0);
+          break;
+        case "<":
+          remove =  (refValue.compareTo(curValue) <= 0);
+          break;
+        case "<=":
+          remove =  (refValue.compareTo(curValue) <  0);
+          break;
+        case ">":
+          remove =  (refValue.compareTo(curValue) >= 0);
+          break;
+        case ">=":
+          remove =  (refValue.compareTo(curValue) >  0);
+          break;
+      }
+      
+      if (remove)
+        iterator.remove();
+    }    
+  }
+  
+  /**
    * Group data by a given field
    */
   public void groupBy(String groupby) {
@@ -210,5 +314,17 @@ public class TableData {
     }
     return result;
   }
+  
+  
+  public static void main(String[] args) {
+    String operators = "<|<=|>|>=|==|!=";
+    String izraz="a <= b";
+    String [] f = izraz.split(operators);
+    String operator = izraz.substring(f[0].length(),izraz.indexOf(f[1]));
+    System.out.printf("'%s'\n", operator);
+    
+    System.out.println("abc".substring(-1,5));
+  }
+  
   
 }

@@ -319,6 +319,13 @@ public class DataAnalyser {
       td.data.add(line);
     }
     
+    
+    String [] filter = query.getStringArray(EQuery.ID_Filter);
+    for (int i = 0; i < filter.length; i++) {
+      td.filter(filter[i]); 
+    }
+    
+    
     String [] groupby = query.getStringArray(EQuery.ID_GroupBy);
     for (int i = 0; i < groupby.length; i++) {
       td.groupBy(groupby[i]); 

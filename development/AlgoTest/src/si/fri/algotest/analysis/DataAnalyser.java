@@ -216,17 +216,27 @@ public class DataAnalyser {
 	  // sets the value of test parameters
 	  for (int i = 0; i < testOrder.length; i++) {
 	    EParameter tP = algPS.getParamater(testOrder[i]);
-	    if (tP != null && lineFiledsPos < lineFields.length) {
-	      tP.set(EParameter.ID_Value, lineFields[lineFiledsPos++]);
-	    }
+            
+	    if (tP != null)
+              if (lineFiledsPos < lineFields.length) 
+	        tP.set(EParameter.ID_Value, lineFields[lineFiledsPos]);
+              else
+                tP.set(EParameter.ID_Value, tP.getType().getDefaultValue()); 
+            
+	    lineFiledsPos++;
 	  }
 
 	  // sets the value of result parameters
 	  for (int i = 0; i < resultOrder.length; i++) {
 	    EParameter tP = algPS.getParamater(resultOrder[i]);
-	    if (tP != null && lineFiledsPos < lineFields.length) {
-	      tP.set(EParameter.ID_Value, lineFields[lineFiledsPos++]);
-	    }
+            
+	    if (tP != null)
+              if (lineFiledsPos < lineFields.length) 
+	        tP.set(EParameter.ID_Value, lineFields[lineFiledsPos]);
+              else
+                tP.set(EParameter.ID_Value, tP.getType().getDefaultValue());            
+            
+            lineFiledsPos++;
 	  }
 
 	  // add this ParameterSet to the ResultPack

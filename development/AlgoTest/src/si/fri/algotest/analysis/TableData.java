@@ -269,7 +269,7 @@ public class TableData {
       group.add(data.get(kjeVData++));
       
       // put into a group all elements that are equal to the first group element
-      while(kjeVData < data.size() && data.get(kjeVData).get(fieldNo).equals(group.get(0).get(fieldNo))) 
+      while(kjeVData < data.size() && data.get(kjeVData).get(fieldNo)!= null && data.get(kjeVData).get(fieldNo).equals(group.get(0).get(fieldNo))) 
         group.add(data.get(kjeVData++));
       
       newData.add(squeezeGroup(group, groupby));

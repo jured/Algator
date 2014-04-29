@@ -48,4 +48,19 @@ public enum ParameterType {
     return UNKNOWN;
   }
   
+  /**
+   * The default value for parameters of this type
+   */
+  public Object getDefaultValue() {
+    switch(this) {
+      case TIMER: case COUNTER: case INT:
+        return 0;
+      case DOUBLE:
+        return 0.0;
+      case STRING:
+        return "";
+    }
+    return null;
+  }
+  
 }

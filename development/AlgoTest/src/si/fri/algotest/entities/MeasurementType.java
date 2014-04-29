@@ -8,7 +8,7 @@ public enum MeasurementType {
   EM {
     @Override
     public String toString() {
-      return "Regular mesurement parameters and timers";
+      return "Regular mesurement of parameters and timers";
     }
     
   }, 
@@ -21,7 +21,7 @@ public enum MeasurementType {
     
   }, 
   
-  COUNT {
+  CNT {
     @Override
     public String toString() {
       return "Measurement of user defined counters";
@@ -35,11 +35,10 @@ public enum MeasurementType {
    */
   public String getExtension() {
     switch (this) {
-      case EM:    return "em";
-      case JVM:   return "jvm";
-      case COUNT: return "cnt";	
+      case EM:  return "em";
+      case JVM: return "jvm";
+      case CNT: return "cnt";	
     }
     return "";
   }
-
 }

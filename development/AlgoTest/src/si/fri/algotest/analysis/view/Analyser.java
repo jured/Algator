@@ -340,6 +340,26 @@ public class Analyser extends javax.swing.JDialog {
       }
     }
   }
+  
+  public void run(ActionEvent evt) {
+     EQuery query = queryComposer1.getQuery();
+    System.out.println(query.toJSONString());
+
+    TableData td = DataAnalyser.runQuery(project.getProject(), query);
+    if (td==null) return;
+
+    // this action is triggered by many events; to prevent changing the contenet 
+    // if seriesSelect panel, addFields is callsed only  when CheckBox is the trigger 
+    // (one of the Fields is chenged)
+    if (evt !=null && evt.getSource() instanceof JCheckBox)
+      seriesSelect1.addFields(td.header, 1);
+    
+    DefaultTableModel dtm = new DefaultTableModel(td.getDataAsArray(), td.header.toArray());
+    jTable1.setModel(dtm);
+
+    if (td.data != null && td.data.size() > 0 && td.data.get(0).size() >= 2)
+    drawGraph(td, graphPanel, seriesSelect1.getXFieldID(), seriesSelect1.getYFieldsID());
+  }
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -367,11 +387,11 @@ public class Analyser extends javax.swing.JDialog {
     jPanel9 = new javax.swing.JPanel();
     jSplitPane2 = new javax.swing.JSplitPane();
     jSplitPane1 = new javax.swing.JSplitPane();
-    jScrollPane3 = new javax.swing.JScrollPane();
-    jTable1 = new javax.swing.JTable();
     qPanel = new javax.swing.JPanel();
     queryComposer1 = new si.fri.algotest.analysis.view.QueryComposer();
     jButton4 = new javax.swing.JButton();
+    jScrollPane3 = new javax.swing.JScrollPane();
+    jTable1 = new javax.swing.JTable();
     jPanel13 = new javax.swing.JPanel();
     graphPanel = new javax.swing.JPanel();
     xypanel = new javax.swing.JPanel();
@@ -467,6 +487,35 @@ public class Analyser extends javax.swing.JDialog {
 
     jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
+    qPanel.setMinimumSize(new java.awt.Dimension(650, 400));
+    qPanel.setPreferredSize(new java.awt.Dimension(500, 400));
+    qPanel.setLayout(new java.awt.GridBagLayout());
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.gridwidth = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.ipadx = 338;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    qPanel.add(queryComposer1, gridBagConstraints);
+
+    jButton4.setText("Run!");
+    jButton4.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jButton4ActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridwidth = 2;
+    gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+    qPanel.add(jButton4, gridBagConstraints);
+
+    jSplitPane1.setLeftComponent(qPanel);
+
     jTable1.setModel(new javax.swing.table.DefaultTableModel(
       new Object [][] {
         {null, null, null, null},
@@ -481,25 +530,6 @@ public class Analyser extends javax.swing.JDialog {
     jScrollPane3.setViewportView(jTable1);
 
     jSplitPane1.setRightComponent(jScrollPane3);
-
-    qPanel.setLayout(new java.awt.GridBagLayout());
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.weightx = 1.0;
-    qPanel.add(queryComposer1, gridBagConstraints);
-
-    jButton4.setText("Run!");
-    jButton4.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        jButton4ActionPerformed(evt);
-      }
-    });
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    qPanel.add(jButton4, gridBagConstraints);
-
-    jSplitPane1.setLeftComponent(qPanel);
 
     jSplitPane2.setLeftComponent(jSplitPane1);
 
@@ -567,24 +597,7 @@ public class Analyser extends javax.swing.JDialog {
   }// </editor-fold>//GEN-END:initComponents
 
   private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-
-    EQuery query = queryComposer1.getQuery();
-    System.out.println(query.toJSONString());
-
-    TableData td = DataAnalyser.runQuery(project.getProject(), query);
-    if (td==null) return;
-
-    // this action is triggered by many events; to prevent changing the contenet 
-    // if seriesSelect panel, addFields is callsed only  when CheckBox is the trigger 
-    // (one of the Fields is chenged)
-    if (evt !=null && evt.getSource() instanceof JCheckBox)
-      seriesSelect1.addFields(td.header, 1);
-    
-    DefaultTableModel dtm = new DefaultTableModel(td.getDataAsArray(), td.header.toArray());
-    jTable1.setModel(dtm);
-
-    if (td.data != null && td.data.size() > 0 && td.data.get(0).size() >= 2)
-    drawGraph(td, graphPanel, seriesSelect1.getXFieldID(), seriesSelect1.getYFieldsID());
+    run(evt);
   }//GEN-LAST:event_jButton4ActionPerformed
 
   private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed

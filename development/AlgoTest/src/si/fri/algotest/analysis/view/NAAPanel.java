@@ -71,6 +71,8 @@ public class NAAPanel extends javax.swing.JPanel {
     setLayout(new java.awt.GridBagLayout());
 
     nameCB.setText("jCheckBox1");
+    nameCB.setMinimumSize(new java.awt.Dimension(150, 23));
+    nameCB.setPreferredSize(new java.awt.Dimension(150, 23));
     nameCB.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         nameCBActionPerformed(evt);
@@ -78,15 +80,14 @@ public class NAAPanel extends javax.swing.JPanel {
     });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridwidth = 2;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
     add(nameCB, gridBagConstraints);
 
     jLabel1.setText("AS");
     gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.insets = new java.awt.Insets(5, 10, 5, 5);
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
     add(jLabel1, gridBagConstraints);
 
     abrevTF.setColumns(6);
@@ -96,9 +97,11 @@ public class NAAPanel extends javax.swing.JPanel {
       }
     });
     gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridx = 3;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.weightx = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
     add(abrevTF, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
@@ -114,7 +117,7 @@ public class NAAPanel extends javax.swing.JPanel {
   }//GEN-LAST:event_abrevActionPerformed
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JTextField abrevTF;
+  public javax.swing.JTextField abrevTF;
   private javax.swing.JLabel jLabel1;
   private javax.swing.JCheckBox nameCB;
   // End of variables declaration//GEN-END:variables

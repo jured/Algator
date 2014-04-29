@@ -4,8 +4,8 @@ import si.fri.algotest.entities.ParameterSet;
 import si.fri.algotest.entities.ParameterType;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.execute.AbsAlgorithm;
+import si.fri.algotest.global.ErrorStatus;
 import si.fri.algotest.tools.ATTools;
-import si.fri.algotest.tools.ErrorStatus;
 
 
 /**

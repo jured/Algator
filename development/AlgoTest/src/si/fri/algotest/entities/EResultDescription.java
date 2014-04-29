@@ -84,7 +84,7 @@ public class EResultDescription extends Entity {
     String [] orderB = getStringArray(EResultDescription.ID_ResultParOrder);
     if (!ErrorStatus.getLastErrorStatus().isOK()) {
       ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_INVALID_RESULTDESCRIPTION, ErrorStatus.getLastErrorMessage());
-      return null;
+      //return null;
     }
 
     String [] order = new String[orderA.length + orderB.length + FIXNUM];

@@ -4,9 +4,11 @@
  */
 package si.fri.algotest.analysis.view;
 
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.EQuery;
 import si.fri.algotest.entities.NameAndAbrev;
@@ -38,7 +40,7 @@ public class QueryComposer extends javax.swing.JPanel {
 	if (outerChangeListener != null)
 	outerChangeListener.actionPerformed(e);
       }
-    };
+    };    
   }
 
   public void setProject(Project project) {
@@ -58,12 +60,16 @@ public class QueryComposer extends javax.swing.JPanel {
   }
   
   private NAAPanel [] createNAAPanels(String [] names, JPanel panel) {
+    JPanel p = new JPanel(new GridLayout(100, 1));
+    JScrollPane jsp = new JScrollPane(p);
+    panel.add(jsp);
+    
     NAAPanel [] result = new NAAPanel[names.length];
     if (names == null) return result;
     
     for(int i=0; i<names.length;i++) {
       result[i] = new NAAPanel(names[i], names[i], innerChangeListner);
-      panel.add(result[i]);
+      p.add(result[i]);
     }
     return result;
   }
@@ -173,14 +179,6 @@ public class QueryComposer extends javax.swing.JPanel {
 
     jPanel4 = new javax.swing.JPanel();
     jPanel2 = new javax.swing.JPanel();
-    jLabel2 = new javax.swing.JLabel();
-    algPanel = new javax.swing.JPanel();
-    jLabel3 = new javax.swing.JLabel();
-    infieldPanel = new javax.swing.JPanel();
-    jLabel1 = new javax.swing.JLabel();
-    outfieldPanel = new javax.swing.JPanel();
-    jLabel4 = new javax.swing.JLabel();
-    tstsPanel = new javax.swing.JPanel();
     jLabel6 = new javax.swing.JLabel();
     groupByPanel = new javax.swing.JPanel();
     groupbyTF = new javax.swing.JTextField();
@@ -193,6 +191,11 @@ public class QueryComposer extends javax.swing.JPanel {
     jLabel5 = new javax.swing.JLabel();
     jLabel9 = new javax.swing.JLabel();
     jLabel10 = new javax.swing.JLabel();
+    jPanel1 = new javax.swing.JPanel();
+    algPanel = new javax.swing.JPanel();
+    tstsPanel = new javax.swing.JPanel();
+    infieldPanel = new javax.swing.JPanel();
+    outfieldPanel = new javax.swing.JPanel();
 
     org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
     jPanel4.setLayout(jPanel4Layout);
@@ -209,84 +212,10 @@ public class QueryComposer extends javax.swing.JPanel {
 
     jPanel2.setLayout(new java.awt.GridBagLayout());
 
-    jLabel2.setText("Algorithms");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridwidth = 2;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-    jPanel2.add(jLabel2, gridBagConstraints);
-
-    algPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-    algPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-    jPanel2.add(algPanel, gridBagConstraints);
-
-    jLabel3.setText("Input Fields");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 2;
-    gridBagConstraints.gridwidth = 2;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-    jPanel2.add(jLabel3, gridBagConstraints);
-
-    infieldPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-    infieldPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 2;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-    jPanel2.add(infieldPanel, gridBagConstraints);
-
-    jLabel1.setText("Output Fields");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 3;
-    gridBagConstraints.gridwidth = 2;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-    jPanel2.add(jLabel1, gridBagConstraints);
-
-    outfieldPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-    outfieldPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 3;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-    jPanel2.add(outfieldPanel, gridBagConstraints);
-
-    jLabel4.setText("Testsets");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.gridwidth = 2;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-    jPanel2.add(jLabel4, gridBagConstraints);
-
-    tstsPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-    tstsPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-    jPanel2.add(tstsPanel, gridBagConstraints);
-
     jLabel6.setText("GroupBy");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 5;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
     jPanel2.add(jLabel6, gridBagConstraints);
@@ -297,7 +226,7 @@ public class QueryComposer extends javax.swing.JPanel {
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 5;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
@@ -306,7 +235,7 @@ public class QueryComposer extends javax.swing.JPanel {
     jLabel7.setText("Filter");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 4;
+    gridBagConstraints.gridy = 1;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
     jPanel2.add(jLabel7, gridBagConstraints);
@@ -317,7 +246,7 @@ public class QueryComposer extends javax.swing.JPanel {
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 4;
+    gridBagConstraints.gridy = 1;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
@@ -326,7 +255,7 @@ public class QueryComposer extends javax.swing.JPanel {
     jLabel8.setText("SortBy");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 6;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
     jPanel2.add(jLabel8, gridBagConstraints);
@@ -337,35 +266,63 @@ public class QueryComposer extends javax.swing.JPanel {
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 6;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
     jPanel2.add(groupByPanel2, gridBagConstraints);
 
-    jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/info.png"))); // NOI18N
+    jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/info.png"))); // NOI18N
     jLabel5.setToolTipText("<html>\nTo enter more than one SortBy value, use the separator  |. Example: <br><br>\n\n&nbsp; &nbsp; N | QS.TMin\n</html>\n");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 6;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
     jPanel2.add(jLabel5, gridBagConstraints);
 
-    jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/info.png"))); // NOI18N
+    jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/info.png"))); // NOI18N
     jLabel9.setToolTipText("<html>\nTo enter more than one GroupBy, use the separator  |. Example: <br><br>\n\n&nbsp; &nbsp; N; Tmax:MAX; MIN | Group\n</html>\n");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 5;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
     jPanel2.add(jLabel9, gridBagConstraints);
 
-    jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/info.png"))); // NOI18N
+    jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/info.png"))); // NOI18N
     jLabel10.setToolTipText("<html>\nTo enter more than one filter, use the separator  |. Example: <br><br>\n\n&nbsp; &nbsp; N>=100  | Group == RND\n</html>\n");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 4;
+    gridBagConstraints.gridy = 1;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
     jPanel2.add(jLabel10, gridBagConstraints);
+
+    jPanel1.setLayout(new java.awt.GridLayout(2, 2));
+
+    algPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Algorithms"));
+    algPanel.setPreferredSize(new java.awt.Dimension(250, 34));
+    algPanel.setLayout(new java.awt.BorderLayout());
+    jPanel1.add(algPanel);
+
+    tstsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Testsets"));
+    tstsPanel.setLayout(new java.awt.BorderLayout());
+    jPanel1.add(tstsPanel);
+
+    infieldPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Input fields"));
+    infieldPanel.setLayout(new java.awt.BorderLayout());
+    jPanel1.add(infieldPanel);
+
+    outfieldPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Output fields"));
+    outfieldPanel.setLayout(new java.awt.BorderLayout());
+    jPanel1.add(outfieldPanel);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.gridwidth = 3;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    jPanel2.add(jPanel1, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -384,16 +341,13 @@ public class QueryComposer extends javax.swing.JPanel {
   private javax.swing.JPanel groupByPanel2;
   private javax.swing.JTextField groupbyTF;
   private javax.swing.JPanel infieldPanel;
-  private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel10;
-  private javax.swing.JLabel jLabel2;
-  private javax.swing.JLabel jLabel3;
-  private javax.swing.JLabel jLabel4;
   private javax.swing.JLabel jLabel5;
   private javax.swing.JLabel jLabel6;
   private javax.swing.JLabel jLabel7;
   private javax.swing.JLabel jLabel8;
   private javax.swing.JLabel jLabel9;
+  private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
   private javax.swing.JPanel jPanel4;
   private javax.swing.JPanel outfieldPanel;

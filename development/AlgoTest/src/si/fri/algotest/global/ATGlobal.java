@@ -31,6 +31,9 @@ public class ATGlobal {
   private static final String ATDIR_algsDir = "algs";
   private static final String ATDIR_algDir = "ALG-%s";
   private static final String ATDIR_queryDir = "queries";
+  
+  
+  public static final String COUNTER_CLASS_EXTENSION = "_COUNT"; 
 
   /**
    * Returns the root of the project

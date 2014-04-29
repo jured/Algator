@@ -60,7 +60,7 @@ public enum ErrorStatus {
   
   ERROR_NOT_A_STRING_ARRAY       {
     public String toString() {
-      return "Error: The filed is not a String array.";
+      return "Warning: The filed is not a String array.";
     }
   },
   
@@ -108,7 +108,7 @@ public enum ErrorStatus {
 
   ERROR_INVALID_RESULTDESCRIPTION {
     public String toString() {
-      return "Error: Invalid result description file.";
+      return "Warning: Invalid result description file.";
     }
   },
 
@@ -137,7 +137,12 @@ public enum ErrorStatus {
     lastErrorMerrage = msg;
     lastErrorStatus  = status;
     
-    if (!lastErrorStatus.isOK() || !lastErrorMerrage.isEmpty()) {
+    if (msg.isEmpty())
+      return status;
+    
+    if (status.isOK())
+      ATLog.log(msg);
+    else {      
       String where = String.format(" (Class: %s, Method: %s, line: %d)", 
 	      Thread.currentThread().getStackTrace()[2].getClassName(), 
 	      Thread.currentThread().getStackTrace()[2].getMethodName(),

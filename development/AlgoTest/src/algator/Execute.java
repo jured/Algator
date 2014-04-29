@@ -11,6 +11,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import si.fri.algotest.entities.EAlgorithm;
 import si.fri.algotest.entities.ETestSet;
+import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.execute.Executor;
 import si.fri.algotest.execute.Notificator;
@@ -47,6 +48,12 @@ public class Execute {
 	    .withDescription("the name of the testset to use; if the testset is not given, all the testsets of a given project are used")
 	    .create("t");
 
+    Option measurement = OptionBuilder.withArgName("mtype_name")
+	    .withLongOpt("mtype")
+	    .hasArg(true)
+	    .withDescription("the name of the measurement type to use (EM, COUNT or JVM); if the measurement type is not given, the EM measurement type is used")
+	    .create("m");
+    
 
     Option data_root = OptionBuilder.withArgName("data_root_folder")
 	    .withLongOpt("data_root")
@@ -58,6 +65,8 @@ public class Execute {
     options.addOption(algorithm);
     options.addOption(testset);
     options.addOption(data_root);
+    options.addOption(measurement);
+    
 
     options.addOption("h", "help", false,
 	    "print this message");
@@ -141,13 +150,20 @@ public class Execute {
       if (line.hasOption("list_jobs")) {
 	listOnly = true;
       }
+      
+      MeasurementType mType = MeasurementType.EM;
+      if (line.hasOption("mtype")) {
+	try {
+          mType = MeasurementType.valueOf(line.getOptionValue("mtype").toUpperCase());
+        } catch (Exception e) {}  
+      }
 
       ATLog.setLogLevel(ATLog.LOG_LEVEL_OFF);
       if (line.hasOption("verbose")) {
         ATLog.setLogLevel(ATLog.LOG_LEVEL_STDOUT);
       }
 
-      runAlgorithms(dataRoot, projectName, algorithmName, testsetName, alwaysCompile, alwaysRunTests, listOnly);
+      runAlgorithms(dataRoot, projectName, algorithmName, testsetName, mType, alwaysCompile, alwaysRunTests, listOnly);
 
 
     } catch (ParseException ex) {
@@ -159,7 +175,7 @@ public class Execute {
   }
 
   private static void runAlgorithms(String dataRoot, String projName, String algName,
-	  String testsetName, boolean alwaysCompile, boolean alwaysRun, boolean printOnly) {
+	  String testsetName, MeasurementType mType, boolean alwaysCompile, boolean alwaysRun, boolean printOnly) {
     
     Project projekt = new Project(dataRoot, projName);
     if (!projekt.getErrors().get(0).equals(ErrorStatus.STATUS_OK)) {
@@ -211,11 +227,8 @@ public class Execute {
     } else {
       for (int i = 0; i < eAlgs.size(); i++) {
 	for (int j = 0; j < eTests.size(); j++) {
-	  System.out.printf("Running test set '%s' with algorithm '%s' \n", eTests.get(j).getName(), eAlgs.get(i).getName());
-	  ErrorStatus error = Executor.algorithmRun(dataRoot, projName, eAlgs.get(i).getName(), 
-		  eTests.get(j).getName(),  notificator, alwaysCompile, alwaysRun);
-	  //if (!error.isOK())
-	    System.out.println(ErrorStatus.getLastErrorMessage() + "\n");
+	  ErrorStatus error = Executor.algorithmRun(projekt, eAlgs.get(i).getName(), 
+		  eTests.get(j).getName(),  mType, notificator, alwaysCompile, alwaysRun);          
 	}
       }
       

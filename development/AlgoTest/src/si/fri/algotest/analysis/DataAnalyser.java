@@ -256,14 +256,13 @@ public class DataAnalyser {
     if (algs == null || algs.length < 1 || testsets == null || testsets.length < 1)
       return td;
 
-    //TODO: dodati je treba measurement v query
-
     HashMap<String, ResultPack> results = new HashMap<>();
 
     for (NameAndAbrev alg : algs) {
       ResultPack rPack = new ResultPack();
       for (NameAndAbrev ts : testsets) {
 	readResults(rPack, project, alg.getName(), ts.getName(), MeasurementType.EM);
+        readResults(rPack, project, alg.getName(), ts.getName(), MeasurementType.CNT);
       }
       results.put(alg.getName(), rPack);
     }

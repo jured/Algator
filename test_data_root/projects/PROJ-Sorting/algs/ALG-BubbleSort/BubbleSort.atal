@@ -1,9 +1,0 @@
-{
-  "Algorithm" : {	
-   "ShortName"      : "BS",             
-   "Description"    : "Classic BubbleSort",
-   "Author"         : "Tomaž",
-   "Date"           : "07/30/2013",
-   "Classes"        : "BubblesortSortAlgorithm"
-  }
-} 

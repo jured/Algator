@@ -1,9 +1,0 @@
-{
-  "Algorithm" : {	
-   "ShortName"      : "Strassen",             
-   "Description"    : "Strassen matrix multiplication",
-   "Author"         : "td",
-   "Date"           : "March 2014",
-   "Classes"        : "StrassenAlgorithm"
-  }
-} 

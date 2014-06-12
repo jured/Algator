@@ -1,1 +1,0 @@
-{  "Project" : {    "Description"          : "...",    "Author"               : "...",    "Date"                 : "...",        "Algorithms"           : ["AAAPPPAlgorithm"],         "TestSets"             : ["TestSet1"],    "AlgorithmClass"       : "PPPAbsAlgorithm",    "TestCaseClass"	       : "PPPTestCase",    "TestSetIteratorClass" : "PPPTestSetIterator"  }}

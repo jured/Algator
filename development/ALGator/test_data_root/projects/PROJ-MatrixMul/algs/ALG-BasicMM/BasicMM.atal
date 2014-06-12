@@ -1,0 +1,9 @@
+{
+  "Algorithm" : {	
+   "ShortName"      : "BasicMM",             
+   "Description"    : "Basic O(n3) matrix multiplication",
+   "Author"         : "td",
+   "Date"           : "March 2014",
+   "Classes"        : "BasicMMAlgorithm"
+  }
+} 

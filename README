@@ -21,8 +21,8 @@ Navodila za uporabo programa ALGator.jar
        set CLASSPATH=$CLASSPATH;<algator_root>/dist/ALGator.jar
 
 4. V direktoriju <algator_root> ustvarimo mapo data_root s podatki o ALGator 
-   projektih (za test delovanja programa lahko mapo  development/AlgoTest/test_data_root 
-   prekopiramo v <algator_root>/data_root).
+   projektih (za test delovanja programa je dovolj, če mapo  
+   development/AlgoTest/test_data_root prekopiramo v <algator_root>/data_root).
 
 4. Nastavimo še spremenjlivko ALGATOR_DATA_ROOT, da kaže na mapo z ALGator podatki. 
 

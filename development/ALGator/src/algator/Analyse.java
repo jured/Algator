@@ -98,8 +98,9 @@ public class Analyse {
 
       String dataRoot = System.getenv("ALGATOR_DATA_ROOT");
       if (line.hasOption("data_root")) {
-        dataRoot = line.getOptionValue("data_root");
+        dataRoot = line.getOptionValue("data_root");        
       }
+      System.out.println("Data root = " + dataRoot);
       
       ATLog.setLogLevel(ATLog.LOG_LEVEL_OFF);
       if (line.hasOption("verbose")) {
@@ -120,7 +121,8 @@ public class Analyse {
         String origin = line.getOptionValue("query_origin");
         if (origin == null) origin = "R";
         
-        runQuery(projekt, line.getOptionValue("query"), origin);
+        String result = runQuery(projekt, line.getOptionValue("query"), origin);
+        System.out.println(result);
       } else {
         // ...else run a GUI analizer
         new Analyser(projekt);
@@ -131,7 +133,7 @@ public class Analyse {
     }
   }
   
-  static void runQuery(Project project, String queryName, String origin) {
+  public static String runQuery(Project project, String queryName, String origin) {
     EQuery query = new EQuery();
     switch (origin) {
       case "S":
@@ -151,14 +153,16 @@ public class Analyse {
         query.initFromFile(new File(fileName));
         break;
     }
-    if (query == null || query.toJSONString().equals("{}")) {
-      System.out.println("Invalid query.");
-    } else {
+    
+    String result = "Invalid query.";
+    if (query != null & !query.toJSONString().equals("{}")) {
       // run query ...
       TableData td = DataAnalyser.runQuery(project.getProject(), query);
       // ... and print table to screen
-      System.out.println(td);
+      result = td.toString();
     }
+
+    return result;
   }
   
 }

@@ -31,16 +31,18 @@ public class TableData {
     }
   }
 
-  private Comparator<ArrayList<Object>> getComparator(final int fieldNo, String type) {
+  private Comparator<Object> getComparator(final int fieldNo, String type) {
     final int predznak = (type.equals("-") || type.equals("<")) ? -1 : 1;
     
     switch (type) {
       case ">": case "<":
-        return new Comparator<ArrayList<Object>>() {
+        return new Comparator<Object>() {
           @Override
-          public int compare(ArrayList<Object> o1, ArrayList<Object> o2) {
+          public int compare(Object o1, Object o2) {
             try {
-              return predznak * ((String) o1.get(fieldNo)).compareTo((String) o2.get(fieldNo));
+              ArrayList<Object> ao1 = (ArrayList<Object>) o1;
+              ArrayList<Object> ao2 = (ArrayList<Object>) o2;
+              return predznak * ((String) ao1.get(fieldNo)).compareTo((String) ao2.get(fieldNo));
             } catch (Exception e) {
               return 0;
             }
@@ -48,11 +50,13 @@ public class TableData {
         };
         
       default: // "+", "-", or anything else
-        return new Comparator<ArrayList<Object>>() {
+        return new Comparator<Object>() {
           @Override
-          public int compare(ArrayList<Object> o1, ArrayList<Object> o2) {
+          public int compare(Object o1, Object o2) {
             try {
-              return predznak * new Double(((Number) o1.get(fieldNo)).doubleValue()).compareTo(((Number) o2.get(fieldNo)).doubleValue());
+              ArrayList<Object> ao1 = (ArrayList<Object>) o1;
+              ArrayList<Object> ao2 = (ArrayList<Object>) o2;
+              return predznak * new Double(((Number) ao1.get(fieldNo)).doubleValue()).compareTo(((Number) ao2.get(fieldNo)).doubleValue());
             } catch (Exception e) {
               return 0;
             }
@@ -299,6 +303,14 @@ public class TableData {
 
     // TODO - uredi to tabelo! V javi 1.8 je šlo, v 1.7 pa ne gre tako preprosto!
     //Arrays.sort(data, getComparator(fieldNo, type));
+    
+    Object [] dataTable = data.toArray();
+    Arrays.sort(dataTable, getComparator(fieldNo, type));
+    
+    data = new ArrayList<>();
+    for (Object object : dataTable) {
+      data.add((ArrayList<Object>)object);
+    }
   }
 
   @Override

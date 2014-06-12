@@ -5,7 +5,7 @@
     "TestParameters"  : ["N"],
     "ResultParameters" : ["Tmin", "Tmax"],
     "GroupBy"          : ["N; Tmax:SUM; MIN"],
-    "Filter"           : ["N > 100", "N < 1000"],
+    "Filter"           : ["N < 20"],
     "SortBy"           : ["N:-"]
 
   }

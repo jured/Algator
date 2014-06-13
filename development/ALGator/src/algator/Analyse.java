@@ -1,6 +1,7 @@
 package algator;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Scanner;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -60,6 +61,9 @@ public class Analyse {
     options.addOption("v", "verbose", false,
             "print additional information on error");
 
+    options.addOption("u", "usage", false,
+            "print usage guide");
+    
     return options;
   }
 
@@ -71,6 +75,14 @@ public class Analyse {
     System.exit(0);
   }
 
+  private static void printUsage() {
+    Scanner sc = new Scanner((new Analyse()).getClass().getResourceAsStream("/data/AnalyserUsage.txt")); 
+    while (sc.hasNextLine())
+      System.out.println(sc.nextLine());
+    
+    System.exit(0);
+  }
+  
   /**
    * Used to run the system. Parameters are given trought the arguments
    *
@@ -89,6 +101,11 @@ public class Analyse {
         printMsg(options);
       }
 
+      if (line.hasOption("u")) {
+        printUsage();
+      }
+      
+      
       String[] curArgs = line.getArgs();
       if (curArgs.length != 1) {
         printMsg(options);
@@ -116,11 +133,12 @@ public class Analyse {
 
       ATGlobal.ALGatorDataRoot = dataRoot;
    
-      if (line.hasOption("query")) {
+      
+      String origin = line.getOptionValue("query_origin");
+      if (origin == null) origin = "R";
+      
+      if (line.hasOption("query") || "S".equals(origin)) {  
         // if a query is given, run a query and print result ...
-        String origin = line.getOptionValue("query_origin");
-        if (origin == null) origin = "R";
-        
         String result = runQuery(projekt, line.getOptionValue("query"), origin);
         System.out.println(result);
       } else {

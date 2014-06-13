@@ -1,6 +1,7 @@
 package algator;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -77,10 +78,10 @@ public class Execute {
     options.addOption("l", "list_jobs", false,
 	    "list the jobs (i.e. the pairs (algorithm, testset)) that are to be executed");
     
-    options.addOption("v", "verbose", false,
-	    "print additional information on error");
+    options.addOption("v", "verbose", false, "print additional information on error");
     
-
+    options.addOption("u", "usage", false, "print usage guide");
+    
     return options;
   }
 
@@ -92,6 +93,14 @@ public class Execute {
     System.exit(0);
   }
 
+  private static void printUsage() {
+    Scanner sc = new Scanner((new Analyse()).getClass().getResourceAsStream("/data/ExecutorUsage.txt")); 
+    while (sc.hasNextLine())
+      System.out.println(sc.nextLine());
+    
+    System.exit(0);
+  }
+  
   /**
    * Used to run the system. Parameters are given trought the arguments
    *
@@ -110,6 +119,9 @@ public class Execute {
 	printMsg(options);
       }
 
+      if (line.hasOption("u")) {
+        printUsage();
+      }
 
       String[] curArgs = line.getArgs();
       if (curArgs.length != 1) {

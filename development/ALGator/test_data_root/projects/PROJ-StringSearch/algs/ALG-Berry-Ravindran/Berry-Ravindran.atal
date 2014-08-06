@@ -1,9 +1,0 @@
-{
-  "Algorithm" : {	
-   "ShortName"      : "BR",
-   "Description"    : "Berry-Ravindran Algorithm for searching in strings",
-   "Author"         : "Anze Pratnemer",
-   "Date"           : "20/07/2014",
-   "Classes"        : "BRStringSearchAlgorithm"
-  }
-} 

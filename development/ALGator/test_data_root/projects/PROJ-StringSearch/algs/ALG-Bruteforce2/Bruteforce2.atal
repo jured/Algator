@@ -1,9 +1,0 @@
-{
-  "Algorithm" : {	
-   "ShortName"      : "BF2",             
-   "Description"    : "BruteForce 2 Algorithm for searching in strings",
-   "Author"         : "Anze Pratnemer",
-   "Date"           : "07/07/2014",
-   "Classes"        : "BF2StringSearchAlgorithm"
-  }
-} 

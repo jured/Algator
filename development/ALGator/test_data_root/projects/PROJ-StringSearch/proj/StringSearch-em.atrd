@@ -1,0 +1,50 @@
+{
+  "ResultDescription":
+  { 
+    "Format"           : "CSV",
+    "Delimiter"        : ";",
+    "TestParameters"   : ["Test", "N"],    	
+    "ResultParameters" : ["Tmin", "Check", "Offset", "TextLen", PattLen],    	
+  
+    "Parameters":   [	    
+      {
+       "Name":        "Group",             
+       "Description": "The name of the test group", 
+       "Type":        "string"       
+      },
+      {
+       "Name":        "N",             
+       "Description": "The size of the test (number of elements to be checked)", 
+       "Type":        "int"       
+      },
+    
+      {
+       "Name"        : "Tmin",             
+       "Description" : "Algorithm MIN time",             
+       "Type"        : "timer",          
+       "Subtype"     : "0 MIN"    
+      },
+      {
+       "Name"        : "Check",             
+       "Description" : "The correctness of the algorithm (OK or NOK)", 
+       "Type"        : "string"       
+      },
+      {
+       "Name":        "Offset",             
+       "Description": "Search offset", 
+       "Type":        "int"       
+      },
+      {
+       "Name":        "TextLen",             
+       "Description": "Length of text", 
+       "Type":        "int"       
+      },
+      {
+       "Name":        "PattLen",             
+       "Description": "Lenth of pattern", 
+       "Type":        "int"       
+      }
+    ]
+  }
+}
+ 

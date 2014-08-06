@@ -1,0 +1,9 @@
+{
+  "Algorithm" : {	
+   "ShortName"      : "HP",             
+   "Description"    : "Horsepool Algorithm for searching in strings",
+   "Author"         : "Anze Pratnemer",
+   "Date"           : "20/07/2014",
+   "Classes"        : "HPStringSearchAlgorithm"
+  }
+} 

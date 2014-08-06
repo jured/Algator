@@ -1,0 +1,9 @@
+{
+  "Algorithm" : {	
+   "ShortName"      : "BM",             
+   "Description"    : "Boyer-Moore Algorithm for searching in strings",
+   "Author"         : "Anze Pratnemer",
+   "Date"           : "07/07/2014",
+   "Classes"        : "BMStringSearchAlgorithm"
+  }
+} 

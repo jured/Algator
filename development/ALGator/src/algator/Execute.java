@@ -52,7 +52,7 @@ public class Execute {
     Option measurement = OptionBuilder.withArgName("mtype_name")
 	    .withLongOpt("mtype")
 	    .hasArg(true)
-	    .withDescription("the name of the measurement type to use (EM, COUNT or JVM); if the measurement type is not given, the EM measurement type is used")
+	    .withDescription("the name of the measurement type to use (EM, CNT or JVM); if the measurement type is not given, the EM measurement type is used")
 	    .create("m");
     
 

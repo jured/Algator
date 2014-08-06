@@ -14,6 +14,7 @@ public class EProject extends Entity {
   public static final String ID_Description           ="Description";	       // String
   public static final String ID_Author                ="Author";	       // String
   public static final String ID_Date                  ="Date";		       // String
+  public static final String ID_HtmlDescFile          ="HtmlDescriptionFile";  // String
   public static final String ID_Algorithms            ="Algorithms";	       // String []
   public static final String ID_TestSets              ="TestSets";	       // String []
   public static final String ID_AlgorithmTPL          ="AlgorithmClass";       // String
@@ -24,7 +25,7 @@ public class EProject extends Entity {
   
   public EProject() {
    super(ID_Project, 
-	 new String [] {ID_Description, ID_Author, ID_Date, 
+	 new String [] {ID_Description, ID_Author, ID_Date, ID_HtmlDescFile, 
 	                ID_Algorithms, ID_AlgorithmTPL,
 	                ID_TestSets, ID_AlgorithmTPL, ID_TestCaseClass,
 			ID_TestSetIteratorClass}

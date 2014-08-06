@@ -1,0 +1,18 @@
+{
+  "ResultDescription":
+  { 
+    "Format"           : "CSV",
+    "Delimiter"        : ";",
+    "ResultParameters" : ["CMP"],    	
+  
+    "Parameters":   [	
+    
+      {
+       "Name":        "CMP",             
+       "Description": "The number of compares", 
+       "Type":        "counter"       
+      }
+    ]
+  }
+}
+ 

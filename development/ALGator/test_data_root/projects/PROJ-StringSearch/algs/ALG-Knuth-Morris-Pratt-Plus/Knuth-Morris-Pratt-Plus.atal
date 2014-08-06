@@ -1,0 +1,9 @@
+{
+  "Algorithm" : {	
+   "ShortName"      : "KMPP",             
+   "Description"    : "Knuth-Morris-Pratt optimized Algorithm for searching in strings",
+   "Author"         : "Anze Pratnemer",
+   "Date"           : "20/07/2014",
+   "Classes"        : "KMPPStringSearchAlgorithm"
+  }
+} 

@@ -1,9 +1,15 @@
 *****************************************************************************
 ALGator - izvajanje in analiza algoritmov
 *****************************************************************************
-ALGator je sistem za izvajanje algoritmov na podanih testnih podatkih ter analizo rezultatov izvajanja.  
+ALGator je sistem za izvajanje algoritmov na podanih testnih podatkih ter 
+analizo rezultatov izvajanja.  
 
-Sistem omogoča dodajanje in upravljanje s poljubnim številom projektov. V okviru enega projekta je definiran problem, testne množice vhodnih podatkov ter način reševanja nalog tega problema. Projekt lahko vsebuje poljubno število algoritmov, ki naloge rešujejo na predpisan način. Sistem omogoča analizo izvajanja posameznega algoritma ter primerjavo med algoritmi istega projekta. 
+Sistem omogoča dodajanje in upravljanje s poljubnim številom projektov. V 
+okviru enega projekta je definiran problem, testne množice vhodnih podatkov 
+ter način reševanja nalog tega problema. Projekt lahko vsebuje poljubno 
+število algoritmov, ki naloge rešujejo na predpisan način. Sistem omogoča 
+analizo izvajanja posameznega algoritma ter primerjavo med algoritmi istega 
+projekta. 
 
 
 
@@ -24,7 +30,8 @@ Navodila za uporabo programa ALGator.jar
    projektih (za test delovanja programa je dovolj, če mapo  
    development/AlgoTest/test_data_root prekopiramo v <algator_root>/data_root).
 
-4. Nastavimo še spremenjlivko ALGATOR_DATA_ROOT, da kaže na mapo z ALGator podatki. 
+4. Nastavimo še spremenjlivko ALGATOR_DATA_ROOT, da kaže na mapo z ALGator 
+   podatki. 
 
        set ALGATOR_DATA_ROOT=<algator_root>/data_root
 
@@ -41,8 +48,12 @@ Navodila za uporabo programa ALGator.jar
 *****************************************************************************
 Navodila za avtorje projektov
 *****************************************************************************
-Navodila za avtorje projektov so v datoteki doc/NovProjekt.txt. Pred implementacijo novega projekta je priporočljivo, da avtor prebere tudi opsi delovanja celotnega sistema, ki se nahaja v doc/ALGator.docx
+Navodila za avtorje projektov so v datoteki doc/NovProjekt.txt. Pred 
+implementacijo novega projekta je priporočljivo, da avtor prebere tudi opis 
+delovanja celotnega sistema, ki se nahaja v doc/ALGator.docx
 
 
 
+*****************************************************************************
 https://github.com/ALGatorDevel/Algator
+*****************************************************************************

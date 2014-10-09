@@ -25,8 +25,8 @@ in jo odpakirajte v poljuben direktorij (<algator_root>).
 
        set CLASSPATH=$CLASSPATH;<algator_root>/ALGator.jar
 
-3. Nastavimo premenjlivko ALGATOR_DATA_ROOT, da kaže na mapo z ALGator 
-   podatki. 
+3. Nastavimo premenjlivko ALGATOR_DATA_ROOT, da kaže na <data_root> (mapa s 
+   podatki o ALGator projektih)
 
        set ALGATOR_DATA_ROOT=<algator_root>/test_data_root
 

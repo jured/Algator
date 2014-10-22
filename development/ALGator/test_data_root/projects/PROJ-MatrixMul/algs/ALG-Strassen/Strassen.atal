@@ -2,8 +2,10 @@
   "Algorithm" : {	
    "ShortName"      : "Strassen",             
    "Description"    : "Strassen matrix multiplication",
+   "HTMLDescFile"   : "Strassen.html",
    "Author"         : "td",
    "Date"           : "March 2014",
-   "Classes"        : "StrassenAlgorithm"
+   "Classes"        : ["StrassenAlgorithm.java"],
+   "MainClassName"  : "StrassenAlgorithm"
   }
 } 

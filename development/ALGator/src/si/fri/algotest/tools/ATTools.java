@@ -281,7 +281,15 @@ public class ATTools {
     pos = fileName.lastIndexOf(".");
     return (pos != -1) ? fileName.substring(0,pos) : fileName;
   } 
-  
+
+  /**
+   * Strips the file extension
+   */
+  public static String stripFilenameExtension(String fileName) {        
+    int pos = fileName.lastIndexOf(".");
+    return (pos != -1) ? fileName.substring(0,pos) : fileName;
+  } 
+
   
   /**
    * Returns true is an aray is sorted

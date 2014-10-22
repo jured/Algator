@@ -2,8 +2,10 @@
   "Algorithm" : {	
    "ShortName"      : "BS",             
    "Description"    : "Classic BubbleSort",
+   "HTMLDescFile"   : "bubblesort.html",
    "Author"         : "Tomaž",
    "Date"           : "07/30/2013",
-   "Classes"        : "BubblesortSortAlgorithm"
+   "Classes"        : ["BubblesortSortAlgorithm.java"],
+   "MainClassName"  : "BubblesortSortAlgorithm"
   }
 } 

@@ -10,6 +10,7 @@ import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ATLog;
+import si.fri.algotest.tools.ATTools;
 
 /**
  *
@@ -54,7 +55,7 @@ public class New {
     AbsAlgorithm result = null;
     try {
       URLClassLoader classLoader = getClassloader(project, algName);
-      String algClassName = project.getAlgorithms().get(algName).getField(EAlgorithm.ID_Classes);
+      String algClassName = project.getAlgorithms().get(algName).getField(EAlgorithm.ID_MainClassName);
       
       if (mType.equals(MeasurementType.CNT))
         algClassName += ATGlobal.COUNTER_CLASS_EXTENSION;
@@ -71,7 +72,8 @@ public class New {
     AbstractTestSetIterator result = null;
     try {
       URLClassLoader classLoader = getClassloader(project, algName);
-      String testSetIteratorClassName = project.getProject().getField(EProject.ID_TestSetIteratorClass);
+      String testSetIteratorClassName = 
+              ATTools.stripFilenameExtension((String)project.getProject().getField(EProject.ID_TestSetIteratorClass));
 
       Class tsClass = Class.forName(testSetIteratorClassName, true, classLoader);
       result = (AbstractTestSetIterator) tsClass.newInstance();

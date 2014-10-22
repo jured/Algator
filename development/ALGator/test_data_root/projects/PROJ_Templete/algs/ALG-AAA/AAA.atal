@@ -2,8 +2,10 @@
   "Algorithm" : {	
    "ShortName"      : "...",             
    "Description"    : "...",
+   "HTMLDescFile"   : "...",
    "Author"         : "...",
    "Date"           : "...",
-   "Classes"        : "..."
+   "Classes"        : ["AAAAPPPlgorithm.java"],
+   "MainClassname"  : "AAAAPPPlgorithm"
   }
 } 

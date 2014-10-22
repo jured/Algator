@@ -185,9 +185,9 @@ public class Executor {
     String projRoot = projekt.getProjectRootDir();
 
     // the classes to be compiled
-    String algTPL = projekt.getField(EProject.ID_AlgorithmTPL);
-    String testCase = projekt.getField(EProject.ID_TestCaseClass);
-    String tsIterator = projekt.getField(EProject.ID_TestSetIteratorClass);
+    String algTPL     = ATTools.stripFilenameExtension((String)projekt.getField(EProject.ID_AlgorithmClass));
+    String testCase   = ATTools.stripFilenameExtension((String)projekt.getField(EProject.ID_TestCaseClass));
+    String tsIterator = ATTools.stripFilenameExtension((String)projekt.getField(EProject.ID_TestSetIteratorClass));
 
     // java src and bin dir
     String projSrc = ATGlobal.getPROJECTsrc(projRoot);
@@ -226,7 +226,7 @@ public class Executor {
 
     String algSrc = ATGlobal.getALGORITHMsrc(projRoot, algName);
     String algBin = ATGlobal.getALGORITHMbin(projRoot, algName);
-    String algClass = eAlgorithm.getField(EAlgorithm.ID_Classes);
+    String algClass = eAlgorithm.getField(EAlgorithm.ID_MainClassName);
 
     if (mType.equals(MeasurementType.CNT)) {
       testAndCreateCOUNTClass(algSrc, algClass);

@@ -14,14 +14,17 @@ public class EAlgorithm extends Entity {
   //Fields
   public static final String ID_ShortName      ="ShortName";      // String
   public static final String ID_Description    ="Description";    // String
+  public static final String ID_HtmlDescFile   ="HtmlDescFile";         // Filename
   public static final String ID_Author         ="Author";	  // String
   public static final String ID_Date           ="Date";	          // String
   public static final String ID_Classes        ="Classes";        // String []
+  public static final String ID_MainClassName  ="MainClassName";  // String []
+  
   
   public EAlgorithm() {
    super(ID_Algorithm, 
-	 new String [] {ID_ShortName, ID_Description, ID_Author,
-	                ID_Date, ID_Classes});
+	 new String [] {ID_ShortName, ID_Description, ID_HtmlDescFile, 
+                        ID_Author, ID_Date, ID_Classes, ID_MainClassName});
   }
   
   public EAlgorithm(File fileName) {

@@ -1,0 +1,35 @@
+{
+  "ResultDescription":
+  { 
+    "Format"           : "CSV",
+    "Delimiter"        : ";",
+    "TestParameters"   : ["N", "Group"],    	
+    "ResultParameters" : ["Tmin", "Check"],    	
+  
+    "Parameters":   [	    
+      {
+       "Name":        "Group",             
+       "Description": "The name of the test group", 
+       "Type":        "string"       
+      },
+      {
+       "Name":        "N",             
+       "Description": "The size of the test (number of elements to be sorted)", 
+       "Type":        "int"       
+      },
+    
+      {
+       "Name"        : "Tmin",             
+       "Description" : "Algorithm MIN time",             
+       "Type"        : "timer",          
+       "Subtype"     : "0 MIN"    
+      },
+      {
+       "Name"        : "Check",             
+       "Description" : "The correctness of the algorithm (OK or NOK)", 
+       "Type"        : "string"       
+      }
+    ]
+  }
+}
+ 

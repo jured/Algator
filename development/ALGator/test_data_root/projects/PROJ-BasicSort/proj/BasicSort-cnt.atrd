@@ -1,0 +1,28 @@
+{
+  "ResultDescription":
+  { 
+    "Format"           : "CSV",
+    "Delimiter"        : ";",
+    "ResultParameters" : ["CMP", "SWAP", "CALL"],    	
+  
+    "Parameters":   [	
+    
+      {
+       "Name":        "CMP",             
+       "Description": "The number of compares", 
+       "Type":        "counter"       
+      },
+      {
+       "Name":        "SWAP",             
+       "Description": "The number of swaps", 
+       "Type":        "counter"       
+      },
+      {
+       "Name":        "CALL",             
+       "Description": "The number of recursive calls", 
+       "Type":        "counter"       
+      }
+    ]
+  }
+}
+ 

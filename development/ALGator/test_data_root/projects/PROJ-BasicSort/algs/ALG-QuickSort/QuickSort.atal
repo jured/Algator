@@ -1,0 +1,11 @@
+{
+  "Algorithm" : {	
+   "ShortName"      : "QS7",             
+   "Description"    : "Java7 Yaroslavski QuickSort",
+   "HTMLDescFile"   : "quicksort.html",
+   "Author"         : "Java7 and Tomaž",
+   "Date"           : "07/30/2013",
+   "Classes"        : ["QuicksortSortAlgorithm.java"],
+   "MainClassName"  : "QuicksortSortAlgorithm"
+  }
+} 

@@ -1,8 +1,9 @@
 {
   "Name"     : "Project",
   "Filename" : "PROJ-{}/proj/{}.atp",
-  "Order"    : ["Name", "Description", "HTMLDescFile", "Author", "Date", "Algorithms", 
-                "TestSets", "AlgorithmClass", "TestCaseClass", "TestSetIteratorClass"],
+  "Order"    : ["Name", "Description", "HTMLDescFile", "Author", "Date", "AlgDescHTML", 
+                "AlgTechDescHTML", "Algorithms", "TestSetDescHTML", "TestSets", 
+                "AlgorithmClass", "TestCaseClass", "TestSetIteratorClass"],
   
   "properties":   {	
       "Name" : {

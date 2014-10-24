@@ -46,7 +46,7 @@ public class Executor {
     if (mType.equals(MeasurementType.EM)) {
       try {
         ETestSet testSet = it.testSet;
-        timesToExecute = (Integer) testSet.getField(ETestSet.ID_TestRepeat);
+        timesToExecute = Integer.parseInt((String) testSet.getField(ETestSet.ID_TestRepeat));
       } catch (Exception e) {
         System.out.println(e);
       }

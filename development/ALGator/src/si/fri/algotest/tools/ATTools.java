@@ -191,8 +191,14 @@ public class ATTools {
   public static boolean resultsAreUpToDate(Project project, String algName, String testsetName) {
     if (project==null) return false;
     ETestSet eTestSet = project.getTestSets().get(testsetName);
-    int instances = eTestSet.getField(ETestSet.ID_N);
     
+    int instances;
+    try {
+      instances = Integer.parseInt((String)eTestSet.getField(ETestSet.ID_N));
+    } catch (Exception e) {
+      instances=1;
+    }
+      
     return resultsAreUpToDate(project.getProject().getProjectRootDir(), algName, testsetName, instances);
   }
     

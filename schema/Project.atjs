@@ -1,0 +1,72 @@
+{
+  "Name"     : "Project",
+  "Filename" : "PROJ-{}/proj/{}.atp",
+  "Order"    : ["Name", "Description", "HTMLDescFile", "Author", "Date", "Algorithms", 
+                "TestSets", "AlgorithmClass", "TestCaseClass", "TestSetIteratorClass"],
+  
+  "properties":   {	
+      "Name" : {
+            "description": "Project name", 
+            "type": "entity_name"      
+      },
+      "Description" :  {           
+            "description": "Short description", 
+            "type": "string"       
+      },
+      "HTMLDescFile" : {
+            "description": "Project description (HTML)", 
+            "type": "File",
+            "root": "PROJ-{}/proj/doc"       
+      },
+      "Author" :  {           
+            "description": "Author", 
+            "type": "string"       
+      },
+      "Date" : {
+            "description": "Date of last change", 
+            "type": "string"       
+      },
+      "AlgDescHTML" : {
+            "description": "Algorithms non-technical description (HTML)", 
+            "type": "File",
+            "root": "PROJ-{}/proj/doc"       
+      },
+      "AlgTechDescHTML" : {
+            "description": "Algorithms technical description (HTML)", 
+            "type": "File",
+            "root": "PROJ-{}/proj/doc"       
+      },
+      "Algorithms" : {
+            "description" : "Algorithms", 
+            "type" : "Entity []",
+            "eType": "Algorithm",
+            "parameters" : ["PROJ-{}"]       
+      },
+      "TestSetDescHTML" : {
+            "description": "TestSets description (HTML)", 
+            "type": "File",
+            "root": "PROJ-{}/proj/doc"       
+      },
+      "TestSets" : {
+            "description":  "Test sets", 
+            "type":  "Entity []",       
+            "eType": "TestSet",
+            "parameters" : ["PROJ-{}"]       
+      },
+      "AlgorithmClass" : {
+            "description": "Algorithm template", 
+            "type": "File",
+            "root": "PROJ-{}/proj/src"       
+      },
+      "TestCaseClass" : {
+            "description": "Testcase template", 
+            "type": "File",
+            "root": "PROJ-{}/proj/src"       
+      },
+      "TestSetIteratorClass" : {
+            "description": "Set iterator template", 
+            "type": "File",
+            "root": "PROJ-{}/proj/src"       
+      }
+  }
+}

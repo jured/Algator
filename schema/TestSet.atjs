@@ -1,0 +1,49 @@
+{
+  "Name"     : "TestSet",
+  "Filename" : "$1/tests/{}.atts",
+  "Order"    : ["Name", "ShortName", "Description", "HTMLDescFile",
+                "N", "TestRepeat", "QuickTest", "TestSetFiles", "DescriptionFile"],
+  
+  "properties":   {	
+      "Name" : {
+            "description": "Testset name", 
+            "type": "entity_name"
+      },
+      "ShortName" : {
+            "description": "Short name (label)",
+            "type": "string",
+            "pattern": "[A-Za-z][A-Za-z]{0-8}"       
+      },
+      "Description" :  {           
+            "description": "TestSet Description", 
+            "type": "string"       
+      },
+      "HTMLDescFile" : {
+            "description": "HTML description file", 
+            "type": "File",
+            "root": "$1/tests/doc"      
+      },  
+      "N" : {
+            "description": "Number of tests in this testset", 
+            "type": "string"
+      },
+      "TestRepeat" : {
+            "description": "Number of repetitions", 
+            "type": "string"
+      },
+      "QuickTest" : {
+            "description": "This testset is a quicktest (0/1)?", 
+            "type": "string"
+      },      
+      "TestSetFiles" : {
+            "description": "Files used for test", 
+            "type": "Files",
+            "root": "$1/tests"       
+      },
+      "DescriptionFile" : {
+            "description": "Project dependant test description file", 
+            "type": "File",
+            "root": "$1/tests"      
+      }
+  }
+}

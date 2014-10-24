@@ -172,6 +172,21 @@ public class Entity implements Cloneable {
     return result; 
   }   
     
+  public int getFieldAsInt(String fieldKey) {
+    int result = 0;
+    if (fieldNames.contains(fieldKey)) {
+      try {
+        result = (Integer) fields.get(fieldKey);
+      } catch (Exception e1) {
+        try {
+          result = Integer.parseInt((String) fields.get(fieldKey));
+        } catch (Exception e2) {}
+      }
+      
+    }
+    return result; 
+  }
+  
   /**
    * Method return an String array obtained from corresponding field. If fieldKey 
    * does not exist or if jason field is not an string array, an array with length==0

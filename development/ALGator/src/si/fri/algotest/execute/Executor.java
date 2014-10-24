@@ -328,7 +328,7 @@ public class Executor {
       return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_INVALID_TESTSET, "");
     }
 
-    int numberOfInstances = eTestSet.getField(ETestSet.ID_N);
+    int numberOfInstances = eTestSet.getFieldAsInt(ETestSet.ID_N);
     boolean resultsAreUptodate = ATTools.resultsAreUpToDate(projRoot, algName, testSetName, numberOfInstances);
     if (!(alwaysRun || alwaysCompile) && resultsAreUptodate) {
       return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg +  " - nothing to be done.");

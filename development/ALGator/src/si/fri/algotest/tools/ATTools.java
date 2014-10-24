@@ -192,13 +192,8 @@ public class ATTools {
     if (project==null) return false;
     ETestSet eTestSet = project.getTestSets().get(testsetName);
     
-    int instances;
-    try {
-      instances = Integer.parseInt((String)eTestSet.getField(ETestSet.ID_N));
-    } catch (Exception e) {
-      instances=1;
-    }
-      
+    int instances = eTestSet.getFieldAsInt(ETestSet.ID_N);
+
     return resultsAreUpToDate(project.getProject().getProjectRootDir(), algName, testsetName, instances);
   }
     

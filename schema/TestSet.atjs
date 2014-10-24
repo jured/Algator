@@ -25,11 +25,11 @@
       },  
       "N" : {
             "description": "Number of tests in this testset", 
-            "type": "string"
+            "type": "integer"
       },
       "TestRepeat" : {
             "description": "Number of repetitions", 
-            "type": "string"
+            "type": "integer"
       },
       "QuickTest" : {
             "description": "This testset is a quicktest (0/1)?", 

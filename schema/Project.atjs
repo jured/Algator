@@ -15,7 +15,7 @@
             "type": "string"       
       },
       "HTMLDescFile" : {
-            "description": "Project description (HTML)", 
+            "description": "Project description (.html)", 
             "type": "File",
             "root": "PROJ-{}/proj/doc"       
       },
@@ -28,12 +28,12 @@
             "type": "string"       
       },
       "AlgDescHTML" : {
-            "description": "Algorithms non-technical description (HTML)", 
+            "description": "Algorithms non-technical description (.html)", 
             "type": "File",
             "root": "PROJ-{}/proj/doc"       
       },
       "AlgTechDescHTML" : {
-            "description": "Algorithms technical description (HTML)", 
+            "description": "Algorithms technical description (.html)", 
             "type": "File",
             "root": "PROJ-{}/proj/doc"       
       },
@@ -44,7 +44,7 @@
             "parameters" : ["PROJ-{}"]       
       },
       "TestSetDescHTML" : {
-            "description": "TestSets description (HTML)", 
+            "description": "TestSets description (.html)", 
             "type": "File",
             "root": "PROJ-{}/proj/doc"       
       },
@@ -55,17 +55,17 @@
             "parameters" : ["PROJ-{}"]       
       },
       "AlgorithmClass" : {
-            "description": "Algorithm template", 
+            "description": "Algorithm template (.java)", 
             "type": "File",
             "root": "PROJ-{}/proj/src"       
       },
       "TestCaseClass" : {
-            "description": "Testcase template", 
+            "description": "Testcase template (.java)", 
             "type": "File",
             "root": "PROJ-{}/proj/src"       
       },
       "TestSetIteratorClass" : {
-            "description": "Set iterator template", 
+            "description": "Set iterator template (.java)", 
             "type": "File",
             "root": "PROJ-{}/proj/src"       
       }

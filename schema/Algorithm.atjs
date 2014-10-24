@@ -19,7 +19,7 @@
             "type": "string"       
       },
       "HTMLDescFile" : {
-            "description": "HTML description file", 
+            "description": "Algorithm description (.html)", 
             "type": "File",
             "root": "$1/algs/ALG-{}/doc"      
       },      
@@ -33,7 +33,7 @@
             "type": "string"       
       },
       "Classes" : {
-            "description": "Algorithm classes", 
+            "description": "Algorithm classes (.java)", 
             "type": "Files",
             "root": "$1/algs/ALG-{}/src"       
       }, 

@@ -1,8 +1,9 @@
 {
   "Name"     : "Project",
   "Filename" : "PROJ-{}/proj/{}.atp",
-  "Order"    : ["Name", "Description", "HTMLDescFile", "Author", "Date", "AlgDescHTML", 
-                "AlgTechDescHTML", "Algorithms", "TestSetDescHTML", "TestSets", 
+  "Order"    : ["Name", "Description", "HTMLDescFile", "Author", "Date", 
+                "TestSetDescHTML", "TestSetTechDescHTML", "TestSets",
+                "AlgDescHTML", "AlgTechDescHTML", "Algorithms",  
                 "AlgorithmClass", "TestCaseClass", "TestSetIteratorClass"],
   
   "properties":   {	
@@ -28,7 +29,7 @@
             "type": "string"       
       },
       "AlgDescHTML" : {
-            "description": "Algorithms non-technical description (.html)", 
+            "description": "Algorithms description (.html)", 
             "type": "File",
             "root": "PROJ-{}/proj/doc"       
       },
@@ -45,6 +46,11 @@
       },
       "TestSetDescHTML" : {
             "description": "TestSets description (.html)", 
+            "type": "File",
+            "root": "PROJ-{}/proj/doc"       
+      },
+      "TestSetTechDescHTML" : {
+            "description": "TestSets technical description (.html)", 
             "type": "File",
             "root": "PROJ-{}/proj/doc"       
       },

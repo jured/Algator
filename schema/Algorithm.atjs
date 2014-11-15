@@ -1,0 +1,46 @@
+{
+  "Name"     : "Algorithm",
+  "Filename" : "$1/algs/ALG-{}/{}.atal",
+  "Order"    : ["Name", "ShortName", "Description", "HTMLDescFile",    
+                "Author", "Date", "Classes", "MainClassName"],
+  
+  "properties":   {	
+      "Name" : {
+            "description": "Algorithm name", 
+            "type": "entity_name" 
+      },
+      "ShortName" : {
+            "description": "Short name (label)", 
+            "type": "string",
+            "pattern": "[A-Za-z][A-Za-z]{0-8}"       
+      },      
+      "Description" :  {           
+            "description": "Description", 
+            "type": "string"       
+      },
+      "HTMLDescFile" : {
+            "description": "Algorithm description (.html)", 
+            "type": "File",
+            "root": "$1/algs/ALG-{}/doc"      
+      },      
+      "Date" : {
+            "description": "Date of last change", 
+            "type": "string"       
+      },
+
+      "Author" : {
+            "description": "Author", 
+            "type": "string"       
+      },
+      "Classes" : {
+            "description": "Algorithm classes (.java)", 
+            "type": "Files",
+            "root": "$1/algs/ALG-{}/src"       
+      }, 
+      "MainClassName" : {
+            "description": "Algorithm class name", 
+            "type": "string"
+      }
+
+  }
+}

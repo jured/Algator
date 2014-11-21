@@ -29,19 +29,26 @@ public class New {
     String projBin = ATGlobal.getPROJECTbin(project.getProject().getProjectRootDir());
     String algBin = ATGlobal.getALGORITHMbin(project.getProject().getProjectRootDir(), algName);
     
+    URL[] proJARs = ATTools.getURLsFromJARs(project.getProject().getStringArray(EProject.ID_ProjectJARs),   ATGlobal.getPROJECTlib(project.getProject().getProjectRootDir()));
+    URL[] algJARs = ATTools.getURLsFromJARs(project.getProject().getStringArray(EProject.ID_AlgorithmJARs), ATGlobal.getPROJECTlib(project.getProject().getProjectRootDir()));
+    
     if (result == null) {
       try {
         URLClassLoader parentclassLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
         URL[] parentURLs = parentclassLoader.getURLs();
 
-        URL[] urls = new URL[parentURLs.length + 2];
-        for (int i = 0; i < urls.length - 2; i++) {
-          urls[i] = parentURLs[i];
-        }
-        urls[urls.length - 2] = new File(projBin).toURI().toURL();
-        urls[urls.length - 1] = new File(algBin).toURI().toURL();
-
+        URL[] urls = new URL[parentURLs.length + 2 + proJARs.length + algJARs.length];
+        int stevec=0;
         
+        for (int j=0; j < parentURLs.length ; j++) 
+          urls[stevec++] = parentURLs[j];
+        for (int j=0; j < proJARs.length ; j++) 
+          urls[stevec++] = proJARs[j];
+        for (int j=0; j < algJARs.length ; j++) 
+          urls[stevec++] = algJARs[j];
+
+        urls[stevec++] = new File(projBin).toURI().toURL();
+        urls[stevec++] = new File(algBin).toURI().toURL();        
         classloaders.put(key, (result = URLClassLoader.newInstance(urls)));
     } catch (Exception e) {
       ATLog.log("Error creating class loader: " + e.toString());
@@ -60,6 +67,7 @@ public class New {
       if (mType.equals(MeasurementType.CNT))
         algClassName += ATGlobal.COUNTER_CLASS_EXTENSION;
        
+      
       Class algClass = Class.forName(algClassName, true, classLoader);
       result = (AbsAlgorithm) algClass.newInstance();  
     } catch (Exception e) {

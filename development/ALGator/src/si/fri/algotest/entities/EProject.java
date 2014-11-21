@@ -24,7 +24,8 @@ public class EProject extends Entity {
   public static final String ID_AlgorithmClass        = "AlgorithmClass";       // String
   public static final String ID_TestCaseClass         = "TestCaseClass";        // String
   public static final String ID_TestSetIteratorClass  = "TestSetIteratorClass"; // String
-
+  public static final String ID_ProjectJARs           = "ProjectJARs";          // Filename[]
+  public static final String ID_AlgorithmJARs         = "AlgorithmJARs";        // Filename[]
   
   
   public EProject() {
@@ -32,7 +33,8 @@ public class EProject extends Entity {
 	 new String [] {ID_Description, ID_HtmlDescFile, ID_Author, ID_Date,  
 	                ID_Algorithms, ID_AlgDescHTML, ID_AlgTechDescHTML,
                         ID_TestSets, ID_TestSetDescHTML, ID_TestSetTechDescHTML,
-                        ID_AlgorithmClass, ID_TestCaseClass, ID_TestSetIteratorClass}
+                        ID_AlgorithmClass, ID_TestCaseClass, ID_TestSetIteratorClass,
+                        ID_ProjectJARs, ID_AlgorithmJARs}
 	);
    setRepresentatives(ID_Author);
   }

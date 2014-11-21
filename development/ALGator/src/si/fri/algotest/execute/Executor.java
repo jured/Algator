@@ -2,6 +2,7 @@ package si.fri.algotest.execute;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Scanner;
 import org.apache.commons.io.FileUtils;
@@ -35,7 +36,8 @@ public class Executor {
 
     ArrayList<ParameterSet> parameterSets = new ArrayList();
 
-    Timer timer = new Timer();
+    final Timer timer = new Timer();
+    
 
     AbsAlgorithm curAlg;
     TestCase testCase = null;
@@ -88,9 +90,12 @@ public class Executor {
             //!!! TODO
             // Test should be run in a separate thread with limited time available. 
             // If time is exceeded set PASS=KILLED and return form the method! 
+           
+            
             timer.start();
               curAlg.run();
-            timer.stop();
+            timer.stop();                
+            
 
             for (int tID = 0; tID < Timer.MAX_TIMERS; tID++) {
               times[tID][i] = timer.time(tID);
@@ -101,6 +106,9 @@ public class Executor {
           result = curAlg.done();
 
           result.addParameter(EResultDescription.getPassParameter(true), true);
+          
+          long nanos = ManagementFactory.getThreadMXBean().getThreadCpuTime(java.lang.Thread.currentThread().getId());
+          result.addParameter(new EParameter("CPUTime", "Bla", ParameterType.INT, nanos), true);
 
           switch (mType) {
             case EM:
@@ -204,8 +212,9 @@ public class Executor {
               String.format("Compile project '%s' - nothing to be done.", projekt.getName()));
     }
 
+    String projJARs = ATTools.buildJARList(projekt.getStringArray(EProject.ID_ProjectJARs), ATGlobal.getPROJECTlib(projRoot));
     ErrorStatus err = compile(projSrc, new String[]{algTPL + ".java", testCase + ".java", tsIterator + ".java"},
-            projBin, new String[]{}, String.format("project '%s'", projekt.getName()));
+            projBin, new String[]{}, projJARs, String.format("project '%s'", projekt.getName()));
 
     return ErrorStatus.setLastErrorMessage(err, "");
   }
@@ -245,8 +254,9 @@ public class Executor {
               String.format("Compiling algorithm  '%s' - nothing to be done.", algName));
     }
 
+    String algJARs = ATTools.buildJARList(eProjekt.getStringArray(EProject.ID_AlgorithmJARs), ATGlobal.getPROJECTlib(projRoot));
     ErrorStatus err = compile(algSrc, new String[]{algClass + ".java"},
-            algBin, new String[]{projBin}, String.format("algorithm '%s'", algName));
+            algBin, new String[]{projBin}, algJARs, String.format("algorithm '%s'", algName));
 
     return err;
   }

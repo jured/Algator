@@ -1,0 +1,9 @@
+ChangeLog for project ALGator since November 2014
+
+
+C1		Two new atributes added to the project entity:
+			ProjectJARs   ... the JAR files needed to compile the project
+			AlgorithmJARs ... the JAR files provided by project administrator
+			                  that are alowed to be used in algorithms 
+	    Note: the filenames for these atributes are relative to the projects 
+	          lib folder (<project_root>/proj/lib)

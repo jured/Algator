@@ -1,4 +1,4 @@
-package si.fri.algotest.entities;
+  package si.fri.algotest.entities;
 
 import java.io.File;
 import si.fri.algotest.global.ErrorStatus;

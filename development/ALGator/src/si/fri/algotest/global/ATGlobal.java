@@ -32,6 +32,8 @@ public class ATGlobal {
   private static final String ATDIR_algDir = "ALG-%s";
   private static final String ATDIR_queryDir = "queries";
   
+  private static final String ATDIR_libDir = "lib";
+  
   
   public static final String COUNTER_CLASS_EXTENSION = "_COUNT"; 
 
@@ -78,6 +80,12 @@ public class ATGlobal {
     return projectRoot + File.separator + ATDIR_projConfDir + File.separator + ATDIR_binDir;
   }
 
+  
+  public static String getPROJECTlib(String projectRoot) {
+    return projectRoot + File.separator + ATDIR_projConfDir + File.separator + ATDIR_libDir;
+  }
+
+  
   public static String getALGORITHMroot(String projectRoot, String algName) {
     return projectRoot + File.separator + ATDIR_algsDir + File.separator
             + String.format(ATDIR_algDir, algName);
@@ -130,5 +138,5 @@ public class ATGlobal {
   public static String getQUERYfilename(String projectRoot, String query) {
     return getQUERIESroot(projectRoot) + File.separator + query + "." + AT_FILEEXT_query;
   }
-
+    
 }

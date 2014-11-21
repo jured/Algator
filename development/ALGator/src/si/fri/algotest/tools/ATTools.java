@@ -100,7 +100,7 @@ public class ATTools {
    * @return 
    */
   public static ErrorStatus compile(String srcPath,  String [] sources, String destPath, 
-	  String [] classpaths, String msg) {
+	  String [] classpaths, String jars, String msg) {
     // a path has to be at least 10 charaters long to prevent errors (i.e deleting root folder)
     if (destPath.length() < 10) 
       return ErrorStatus. ERROR_INVALID_DESTPATH;
@@ -121,6 +121,9 @@ public class ATTools {
       sb.append(url.getFile()).append(File.pathSeparator);
     for(String cp: classpaths)
       sb.append(cp).append(File.pathSeparator);
+    
+    // add a project/algorithm specific jars
+    sb.append(File.pathSeparator).append(jars);
     
     ArrayList<File> srcFiles = new ArrayList(); int i=0;
     for(String src : sources)
@@ -329,4 +332,30 @@ public class ATTools {
       tab[i] = array[i];
     return arrarToString(tab);
   }   
+  
+  
+  /**
+   * Builds a list of JARs in the following format: jar_0:jar_1:..., where
+   * jar_i is i-th element of jars prepended with tha path
+   *  
+   */
+  public static String buildJARList(String [] jars, String path) {
+    String result = "";
+    for (String jar : jars) {
+      result += (result.isEmpty() ? "" : File.pathSeparator) + path + File.separator + jar;
+    }
+    return result;
+  }
+  
+  public static URL[] getURLsFromJARs(String [] jars, String path) {
+    try {
+      URL [] urls = new URL[jars.length]; int i=0;
+      for (String jar : jars) {
+        urls[i++] = new File(path + File.separator + jar).toURI().toURL();
+      }
+      return urls;
+    } catch (Exception e) {
+      return new URL[0];
+    }
+  }
 }

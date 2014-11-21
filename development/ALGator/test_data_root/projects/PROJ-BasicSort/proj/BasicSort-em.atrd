@@ -4,7 +4,7 @@
     "Format"           : "CSV",
     "Delimiter"        : ";",
     "TestParameters"   : ["Test", "Group", "N"],    	
-    "ResultParameters" : ["Tmax", "Tmin", "Tavg", "Tsum", "Check"],    	
+    "ResultParameters" : ["Tmax", "Tmin", "Tavg", "Tsum", "CPUTime", "Check"],    	
   
     "Parameters":   [	
     
@@ -52,7 +52,13 @@
        "Name"        : "Check",             
        "Description" : "The correctness of the algorithm (OK or NOK)", 
        "Type"        : "string"       
+      },
+      {
+       "Name":        "CPUTime",             
+       "Description": "TThe CPU time used", 
+       "Type":        "int"       
       }
+    
     ]
   }
 }

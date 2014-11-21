@@ -6,7 +6,7 @@
   
   "properties":   {	
       "Name" : {
-            "description": "Algorithm name-.", 
+            "description": "Algorithm name", 
             "type": "entity_name" 
       },
       "ShortName" : {

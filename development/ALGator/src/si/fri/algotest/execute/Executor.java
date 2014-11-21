@@ -19,7 +19,6 @@ import si.fri.algotest.entities.Project;
 import si.fri.algotest.entities.StatFunction;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.global.ATGlobal;
-import si.fri.algotest.global.ATLog;
 import si.fri.algotest.timer.Timer;
 import si.fri.algotest.tools.ATTools;
 import static si.fri.algotest.tools.ATTools.compile;

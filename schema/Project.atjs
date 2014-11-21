@@ -4,7 +4,8 @@
   "Order"    : ["Name", "Description", "HTMLDescFile", "Author", "Date", 
                 "TestSetDescHTML", "TestSetTechDescHTML", "TestSets",
                 "AlgDescHTML", "AlgTechDescHTML", "Algorithms",  
-                "AlgorithmClass", "TestCaseClass", "TestSetIteratorClass"],
+                "AlgorithmClass", "TestCaseClass", "TestSetIteratorClass",
+                "ProjectJARs", "AlgorithmJARs"],
   
   "properties":   {	
       "Name" : {
@@ -74,6 +75,16 @@
             "description": "Set iterator template (.java)", 
             "type": "File",
             "root": "PROJ-{}/proj/src"       
+      },
+      "ProjectJARs" : {
+            "description": "Projects' JARs (.jar)", 
+            "type": "Files",
+            "root": "PROJ-{}/proj/lib"       
+      },
+      "AlgorithmJARs" : {
+            "description": "Algorithms' JARs (.jar)", 
+            "type": "Files",
+            "root": "PROJ-{}/proj/lib"       
       }
   }
 }

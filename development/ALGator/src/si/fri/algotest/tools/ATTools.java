@@ -128,8 +128,12 @@ public class ATTools {
     ArrayList<File> srcFiles = new ArrayList(); int i=0;
     for(String src : sources)
       srcFiles.add(new File(srcPath + File.separator + src));
-    
+ 
     List<String> options = new ArrayList<String>();
+    
+    options.add("-sourcepath");
+    options.add(srcPath);
+    
     options.add("-classpath");  // -classpath <path>      Specify where to find user class files
     options.add(sb.toString());
     options.add("-d");          // -d <directory>         Specify where to place generated class files

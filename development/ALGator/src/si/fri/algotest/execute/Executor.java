@@ -367,6 +367,12 @@ public class Executor {
 
       if (ErrorStatus.getLastErrorStatus().isOK()) {
         String resFilename = ATGlobal.getRESULTfilename(projRoot, algName, testSetName, mType);
+
+        // create result folder if it does not exist
+        File resPath = new File(ATTools.extractFilePath(new File(resFilename)));
+        if (!resPath.exists())
+          resPath.mkdirs();
+        
         PrintWriter pw = new PrintWriter(resFilename);
         for (ParameterSet parameterSet : resultParameterSets) {
           parameterSet.addParameter(EResultDescription.getAlgorithmNameParameter(algName), true);

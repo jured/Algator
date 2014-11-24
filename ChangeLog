@@ -15,3 +15,9 @@ C2 (11/21/2014)  td
 Added -sourcepath option to javac. This enables source files in src 
 folder to be in packages. Only the main class (algorithm class) must 
 be in root (i.e. ALG-<name>/src) folder.
+
+C3 (11/24/2014)  td
+Changed class si.fri.algotest.timer.Timer to enable several different 
+timers to be used. Default usage (timer.start(), timer.stop()) wasn't 
+changed. Simplest way to use several timers is by calling the method 
+timer.next(), which stops the current timer and starts the next one.

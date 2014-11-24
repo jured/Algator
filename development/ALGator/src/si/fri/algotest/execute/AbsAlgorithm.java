@@ -3,12 +3,21 @@ package si.fri.algotest.execute;
 import si.fri.algotest.entities.ParameterSet;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.global.ErrorStatus;
+import si.fri.algotest.timer.Timer;
 
 /**
  *
  * @author tomaz
  */
 public abstract class AbsAlgorithm implements Cloneable {
+  
+  public Timer timer;
+
+  public AbsAlgorithm() {
+    timer = new Timer();
+  }
+  
+  
   /**
    * Extract data from {@code test} and prepare them in the form to be simply used
    * when running execute method of [Alg][Project]AbsAlgorithm.execute().

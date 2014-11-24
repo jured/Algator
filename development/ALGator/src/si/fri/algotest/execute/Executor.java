@@ -2,7 +2,6 @@ package si.fri.algotest.execute;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Scanner;
 import org.apache.commons.io.FileUtils;
@@ -34,10 +33,7 @@ public class Executor {
           Notificator notificator, MeasurementType mType) {
 
     ArrayList<ParameterSet> parameterSets = new ArrayList();
-
-    final Timer timer = new Timer();
     
-
     AbsAlgorithm curAlg;
     TestCase testCase = null;
     ParameterSet result;
@@ -91,13 +87,13 @@ public class Executor {
             // If time is exceeded set PASS=KILLED and return form the method! 
            
             
-            timer.start();
+            curAlg.timer.start();
               curAlg.run();
-            timer.stop();                
+            curAlg.timer.stop();                
             
 
             for (int tID = 0; tID < Timer.MAX_TIMERS; tID++) {
-              times[tID][i] = timer.time(tID);
+              times[tID][i] = curAlg.timer.time(tID);
             }
           }
         }
@@ -106,8 +102,9 @@ public class Executor {
 
           result.addParameter(EResultDescription.getPassParameter(true), true);
           
-          long nanos = ManagementFactory.getThreadMXBean().getThreadCpuTime(java.lang.Thread.currentThread().getId());
-          result.addParameter(new EParameter("CPUTime", "Bla", ParameterType.INT, nanos), true);
+          // testing ThreadCpuTime
+          // long nanos = ManagementFactory.getThreadMXBean().getThreadCpuTime(java.lang.Thread.currentThread().getId());
+          // result.addParameter(new EParameter("CPUTime", "Bla", ParameterType.INT, nanos), true);
 
           switch (mType) {
             case EM:

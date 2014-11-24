@@ -5,21 +5,27 @@ package si.fri.algotest.timer;
  * @author tomaz
  */
 public class Timer {
-  // maximu number of timers that the system supports
+
+  // maximu number of timers supported by ALGator
+
   public static final int MAX_TIMERS = 5;
-  
-  
-  private long [] startTime, stopTime;
+
+  // current timer from 0, ..., MAX_TIMERS-1
+  private int curTimer;
+
+  private long[] startTime, stopTime;
 
   public Timer() {
+    curTimer = 0;
+
     startTime = new long[MAX_TIMERS];
-    stopTime  = new long[MAX_TIMERS];
+    stopTime = new long[MAX_TIMERS];
 
     for (int i = 0; i < MAX_TIMERS; i++) {
-      startTime[i] = stopTime[i] = Long.MIN_VALUE;
+      startTime[i] = stopTime[i] = 0;
     }
   }
-   
+
   /**
    * Starts the i-th timer
    */
@@ -28,10 +34,10 @@ public class Timer {
   }
 
   /**
-   * Starts the first (main) timer
+   * Starts the current timer
    */
   public void start() {
-    start(0);
+    start(curTimer);
   }
 
   /**
@@ -42,20 +48,47 @@ public class Timer {
   }
 
   /**
-   * Stops the first (main) timer
-   */  
+   * Stops the current timer
+   */
   public void stop() {
-    stop(0);
+    stop(curTimer);
+  }
+
+  /**
+   * Resumes the i-th timer
+   */
+  public void resume(int i) {
+    startTime[i] = System.nanoTime() - startTime[i];
+  }
+
+  /**
+   * Resumes the current timer
+   */
+  public void resume() {
+    resume(curTimer);
   }
   
+  /**
+   * This method performs three tasks: 1) stops the current timer, 
+   * 2) set the current timer to be current timer + 1
+   * 3) starts (new) current timer
+   */
+  public void next() {
+    stop();
+
+    curTimer++;
+    if (curTimer >= MAX_TIMERS) {
+      throw new RuntimeException("Maximum number of timers exceeded.");
+    }
+
+    start();
+  }
+
   public long time(int i) {
-    if (startTime[i] != Long.MIN_VALUE && stopTime[i] != Long.MIN_VALUE)
-      return (stopTime[i] - startTime[i]) / 1000;
-    else
-      return 0;
+    return (stopTime[i] - startTime[i]) / 1000;
   }
+
   public long time() {
-    return time(0);
+    return time(curTimer);
   }
-  
 }

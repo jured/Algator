@@ -168,11 +168,16 @@ public class Analyse {
           fileName = queryName;
         } else
           fileName = ATGlobal.getQUERYfilename(project.getProject().getProjectRootDir(), queryName);
+     
+        //File queryFN = new File(fileName);
+        //if (!queryFN.exists()) fileName += "." + ATGlobal.AT_FILEEXT_query;
+        
         query.initFromFile(new File(fileName));
         break;
     }
     
-    String result = "Invalid query.";
+    String result = ErrorStatus.getLastErrorMessage().equals(ErrorStatus.STATUS_OK) ? "Invalid query." :
+            ErrorStatus.getLastErrorMessage();
     if (query != null & !query.toJSONString().equals("{}")) {
       // run query ...
       TableData td = DataAnalyser.runQuery(project.getProject(), query);

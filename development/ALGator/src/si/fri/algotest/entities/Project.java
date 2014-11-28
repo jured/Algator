@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 import si.fri.algotest.global.ATGlobal;
+import si.fri.algotest.global.ATLog;
 import si.fri.algotest.global.ErrorStatus;
 
 /**
@@ -68,13 +69,16 @@ public class Project {
     
     // read the resultDescriptions
     for(MeasurementType mType : MeasurementType.values()) {
-    
       String rdFilename = ATGlobal.getRESULTDESCfilename(eProject.getProjectRootDir(), projectName, mType);
+      if (!mType.equals(MeasurementType.EM)) // only for EM type an error message is shown; 
+        ATLog.disableLog();
       EResultDescription eResrulDescription = new EResultDescription(new File(rdFilename));
+      ATLog.enableLog();
       if (ErrorStatus.getLastErrorStatus().isOK()) {
         resultDescriptions.put(mType, eResrulDescription);
-      } else
-	errors.add(ErrorStatus.getLastErrorStatus()); 
+      } else {
+   	  errors.add(ErrorStatus.getLastErrorStatus()); 
+      }
     }
   }
 

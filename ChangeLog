@@ -21,3 +21,17 @@ Changed class si.fri.algotest.timer.Timer to enable several different
 timers to be used. Default usage (timer.start(), timer.stop()) wasn't 
 changed. Simplest way to use several timers is by calling the method 
 timer.next(), which stops the current timer and starts the next one.
+
+C4 (11/28/2014)
+Filter fixed to accepts output parameters. If an output parameter is a
+part of a filter, filter keeps only those lines in which filter is true
+for EVERY selected algorithm.
+
+Property "subtype" added to parameter of type Double. Subtype is used to
+define number of decimal places of a double.
+
+Fix: the main form of Analyse changed from JDialog to JFrame.
+
+A COUNT option was added to a query. 
+
+A Testset column added to an output array of Analyser. 

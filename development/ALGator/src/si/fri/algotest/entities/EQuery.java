@@ -2,6 +2,7 @@ package si.fri.algotest.entities;
 
 import java.io.File;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ErrorStatus;
 
@@ -24,19 +25,17 @@ public class EQuery extends Entity {
   public static final String ID_GroupBy        = "GroupBy";          // String []
   public static final String ID_Filter         = "Filter";           // String []
   public static final String ID_SortBy         = "SortBy";           // String []
-  
-   
-  
+  public static final String ID_Count          = "Count";            // String (1-true, other-false)
   
   
   public EQuery() {
    super(ID_Query, 
 	 new String [] {ID_Description, ID_Algorithms, ID_TestSets, ID_inParameters, ID_outParameters, 
-                        ID_GroupBy, ID_Filter, ID_SortBy});
+                        ID_GroupBy, ID_Filter, ID_SortBy, ID_Count});
   }
   
   public EQuery(String [] algs, String [] tsts, String [] inParams, String [] outParams,
-                String [] groupby, String [] filter, String [] sortby) {
+                String [] groupby, String [] filter, String [] sortby, String count) {
     this();
     
     set(ID_Algorithms,    new JSONArray(algs));
@@ -46,6 +45,7 @@ public class EQuery extends Entity {
     set(ID_GroupBy,       new JSONArray(groupby));
     set(ID_Filter,        new JSONArray(filter));
     set(ID_SortBy,        new JSONArray(sortby));
+    set(ID_Count,         count);
   }
   
   
@@ -85,6 +85,11 @@ public class EQuery extends Entity {
     }
     JSONArray jTab = new JSONArray(strEntities);
     set(id, jTab);
+  }
+  
+  public boolean isCount() {
+    Object count = get(ID_Count);
+    return (count != null && count.equals("1"));
   }
   
   public static void main(String args[]) {

@@ -17,6 +17,8 @@ public class TableData {
 
   public ArrayList<String> header;
   public ArrayList<ArrayList<Object>> data;
+  
+  public int numberOfInputParameters = 0;
 
   public TableData() {
     header = new ArrayList<>();
@@ -152,11 +154,30 @@ public class TableData {
   }
   
   /**
+   * Returns positions of the fields in the header table with suffix 
+   * (last part of the name - everything that follows .) equal to fieldSuffix
+   */
+  private ArrayList<Integer> getFieldsPos(String fieldSuffix) {
+    int pos; 
+    
+    ArrayList<Integer> result = new ArrayList<>();
+    for (int i = 0; i < header.size(); i++) {
+      String headerName = header.get(i);
+      if ((pos = headerName.indexOf(".")) != -1) {
+        headerName = headerName.substring(pos + 1);
+      }
+      if (headerName.equals(fieldSuffix))
+        result.add(i);
+    }    
+    return result;
+  }
+  
+  /**
    * Filter out rows that do not satisfy the filter condition
    * @param groupby 
    */
   public void filter(String filter) {
-    if (data == null || data.size() == 0) return;
+    if (data == null || data.size() == 0 || filter.isEmpty()) return;
     
     String operators = "<=|<|>=|>|==|!=";
     String[] flt = filter.split(operators);
@@ -178,66 +199,80 @@ public class TableData {
     if (filedName.length()==0)
       return;
     
-    int fieldPos = getFieldPos(filedName);
-    if (fieldPos == -1)
-      return;
+    ArrayList<Integer> fieldPositions = getFieldsPos(filedName);
+    if (fieldPositions.isEmpty()) return;
     
-    // detect the type of data in corresponding column
-    ParameterType  type = ParameterType.UNKNOWN;
-    if (data.get(0).get(fieldPos) instanceof String)
-      type = ParameterType.STRING;
-    if (data.get(0).get(fieldPos) instanceof Integer)
-      type = ParameterType.INT;
-    if (data.get(0).get(fieldPos) instanceof Double)
-      type = ParameterType.DOUBLE;
+    ParameterType pTypes [] = new ParameterType[fieldPositions.size()];
+    for (int i = 0; i < fieldPositions.size(); i++) {
+      // detect the type of data in corresponding column
+      ParameterType  type = ParameterType.UNKNOWN;
+      if (data.get(0).get(fieldPositions.get(i)) instanceof String)
+        type = ParameterType.STRING;
+      if (data.get(0).get(fieldPositions.get(i)) instanceof Integer)
+        type = ParameterType.INT;
+      if (data.get(0).get(fieldPositions.get(i)) instanceof Double)
+        type = ParameterType.DOUBLE;
     
-    if (type.equals(ParameterType.UNKNOWN))
-      return;
+      if (type.equals(ParameterType.UNKNOWN))
+        return;
+      
+      pTypes[i] = type;
+    }
+    
     
     Iterator<ArrayList<Object>> iterator = data.iterator();
+    
+    // iterate all lines of the data
     while (iterator.hasNext()) {
       ArrayList<Object> line = iterator.next();
-      boolean remove = false;
       
-      Comparable curValue = (Comparable) line.get(fieldPos);
-      Comparable refValue = "";
-      switch (type) {
-        case STRING:
-          refValue = value;
-          break;
-        case INT: 
-          refValue = Integer.parseInt(value);
-          break;
-        case DOUBLE: 
-          refValue = Double.parseDouble(value);
-          break;
-      }
+      // check for each field to comply the condition
+      for (int i = 0; i < fieldPositions.size(); i++) {
+        
+        boolean keepLine = true;
+      
+        Comparable curValue = (Comparable) line.get(fieldPositions.get(i));
+        Comparable refValue = "";
+        switch (pTypes[i]) {
+          case STRING:
+            refValue = value;
+            break;
+          case INT: 
+            refValue = Integer.parseInt(value);
+            break;
+          case DOUBLE: 
+            refValue = Double.parseDouble(value);
+            break;
+        }
 
-      int cmp = refValue.compareTo(curValue);
+        int cmp = refValue.compareTo(curValue);
       
-      switch(operator) {
-        case "==":
-          remove = !(refValue.compareTo(curValue) == 0);
+        switch(operator) {
+          case "==":
+            keepLine &= cmp == 0;
+            break;
+          case "!=":
+            keepLine &= cmp != 0;
+            break;
+          case "<":
+            keepLine &= cmp  > 0;
+            break;
+          case "<=":
+            keepLine &= cmp  >= 0;
+            break;
+          case ">":
+            keepLine &= cmp  < 0;
+            break;
+          case ">=":
+            keepLine &= cmp  <= 0;
+            break;
+        }
+      
+        if (!keepLine) {
+          iterator.remove();
           break;
-        case "!=":
-          remove = !(refValue.compareTo(curValue) != 0);
-          break;
-        case "<":
-          remove =  (refValue.compareTo(curValue) <= 0);
-          break;
-        case "<=":
-          remove =  (refValue.compareTo(curValue) <  0);
-          break;
-        case ">":
-          remove =  (refValue.compareTo(curValue) >= 0);
-          break;
-        case ">=":
-          remove =  (refValue.compareTo(curValue) >  0);
-          break;
+        }
       }
-      
-      if (remove)
-        iterator.remove();
     }    
   }
   
@@ -323,7 +358,10 @@ public class TableData {
     for (int i = 0; i < data.size(); i++) {
       String vrstica = "";
       for (int j = 0; j < data.get(i).size(); j++) {
-        vrstica = add(vrstica, data.get(i).get(j).toString(), delim);
+        Object object = data.get(i).get(j);
+        String value  = object.toString();
+        
+        vrstica = add(vrstica, value, delim);
       }
       result = add(result, vrstica, "\n");
     }

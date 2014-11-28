@@ -130,8 +130,9 @@ public class QueryComposer extends javax.swing.JPanel {
     
     // currently only one GropuBy, one filter and one sortby is suported
     
-    return new EQuery(algs, tsts, inf, outf, groupbyTF.getText().split(" *\\| *"), 
-                  filterTF.getText().split(" *\\| *"), sortbyTF.getText().split(" *\\| *"));
+    return new EQuery(algs, tsts, inf, outf, groupbyTF.getText().split(" *\\& *"), 
+                  filterTF.getText().split(" *\\& *"), sortbyTF.getText().split(" *\\& *"), 
+                  countCB.isSelected() ? "1" : "0");
   }
   
   public void setQuery(EQuery query) {
@@ -145,23 +146,27 @@ public class QueryComposer extends javax.swing.JPanel {
       String[] gb = query.getStringArray(EQuery.ID_GroupBy);
       String qS = "";
       for (String q : gb) {
-        qS += (qS.isEmpty() ? "" : " | ") + q;
+        qS += (qS.isEmpty() ? "" : " & ") + q;
       }
       groupbyTF.setText(qS);
   
       String[] ft = query.getStringArray(EQuery.ID_Filter);
       String fS = "";
       for (String f : ft) {
-        fS += (fS.isEmpty() ? "" : " | ") + f;
+        fS += (fS.isEmpty() ? "" : " & ") + f;
       }
       filterTF.setText(fS);
       
       String[] sb = query.getStringArray(EQuery.ID_SortBy);
       String sS = "";
       for (String s : sb) {
-        sS += (sS.isEmpty() ? "" : " | ") + s;
+        sS += (sS.isEmpty() ? "" : " & ") + s;
       }
       sortbyTF.setText(sS);
+      
+      Object count = query.get(EQuery.ID_Count);
+      boolean doCount = (count != null) && (count instanceof String) && (count.equals("1"));
+      countCB.setSelected(doCount);
       
     } catch (Exception e) {}
   }
@@ -196,6 +201,7 @@ public class QueryComposer extends javax.swing.JPanel {
     tstsPanel = new javax.swing.JPanel();
     infieldPanel = new javax.swing.JPanel();
     outfieldPanel = new javax.swing.JPanel();
+    countCB = new javax.swing.JCheckBox();
 
     org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
     jPanel4.setLayout(jPanel4Layout);
@@ -222,6 +228,12 @@ public class QueryComposer extends javax.swing.JPanel {
 
     groupByPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
     groupByPanel.setLayout(new java.awt.BorderLayout());
+
+    groupbyTF.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        groupbyTFActionPerformed(evt);
+      }
+    });
     groupByPanel.add(groupbyTF, java.awt.BorderLayout.CENTER);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -242,6 +254,12 @@ public class QueryComposer extends javax.swing.JPanel {
 
     groupByPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
     groupByPanel1.setLayout(new java.awt.BorderLayout());
+
+    filterTF.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        filterTFActionPerformed(evt);
+      }
+    });
     groupByPanel1.add(filterTF, java.awt.BorderLayout.CENTER);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -262,6 +280,12 @@ public class QueryComposer extends javax.swing.JPanel {
 
     groupByPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
     groupByPanel2.setLayout(new java.awt.BorderLayout());
+
+    sortbyTF.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        sortbyTFActionPerformed(evt);
+      }
+    });
     groupByPanel2.add(sortbyTF, java.awt.BorderLayout.CENTER);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -273,7 +297,7 @@ public class QueryComposer extends javax.swing.JPanel {
     jPanel2.add(groupByPanel2, gridBagConstraints);
 
     jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/info.png"))); // NOI18N
-    jLabel5.setToolTipText("<html>\nTo enter more than one SortBy value, use the separator  |. Example: <br><br>\n\n&nbsp; &nbsp; N | QS.TMin\n</html>\n");
+    jLabel5.setToolTipText("<html>\nTo enter more than one SortBy value, use the separator  &. Example: <br><br>\n\n&nbsp; &nbsp; N & QS.TMin\n</html>\n");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 3;
@@ -281,7 +305,7 @@ public class QueryComposer extends javax.swing.JPanel {
     jPanel2.add(jLabel5, gridBagConstraints);
 
     jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/info.png"))); // NOI18N
-    jLabel9.setToolTipText("<html>\nTo enter more than one GroupBy, use the separator  |. Example: <br><br>\n\n&nbsp; &nbsp; N; Tmax:MAX; MIN | Group\n</html>\n");
+    jLabel9.setToolTipText("<html>\nTo enter more than one GroupBy, use the separator  &. Example: <br><br>\n\n&nbsp; &nbsp; N; Tmax:MAX; MIN & Group\n</html>\n");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 2;
@@ -289,7 +313,7 @@ public class QueryComposer extends javax.swing.JPanel {
     jPanel2.add(jLabel9, gridBagConstraints);
 
     jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/info.png"))); // NOI18N
-    jLabel10.setToolTipText("<html>\nTo enter more than one filter, use the separator  |. Example: <br><br>\n\n&nbsp; &nbsp; N>=100  | Group == RND\n</html>\n");
+    jLabel10.setToolTipText("<html>\nTo enter more than one filter, use the separator  &. Example: <br><br>\n\n&nbsp; &nbsp; N>=100  & Group == RND\n</html>\n");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
@@ -318,11 +342,23 @@ public class QueryComposer extends javax.swing.JPanel {
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
-    gridBagConstraints.gridwidth = 3;
+    gridBagConstraints.gridwidth = 4;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.weighty = 1.0;
     jPanel2.add(jPanel1, gridBagConstraints);
+
+    countCB.setText("COUNT");
+    countCB.addItemListener(new java.awt.event.ItemListener() {
+      public void itemStateChanged(java.awt.event.ItemEvent evt) {
+        countCBItemStateChanged(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 3;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+    jPanel2.add(countCB, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -333,8 +369,25 @@ public class QueryComposer extends javax.swing.JPanel {
     add(jPanel2, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
 
+  private void filterTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterTFActionPerformed
+    innerChangeListner.actionPerformed(evt);
+  }//GEN-LAST:event_filterTFActionPerformed
+
+  private void groupbyTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_groupbyTFActionPerformed
+    innerChangeListner.actionPerformed(evt);
+  }//GEN-LAST:event_groupbyTFActionPerformed
+
+  private void sortbyTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortbyTFActionPerformed
+    innerChangeListner.actionPerformed(evt);
+  }//GEN-LAST:event_sortbyTFActionPerformed
+
+  private void countCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_countCBItemStateChanged
+    innerChangeListner.actionPerformed(null);
+  }//GEN-LAST:event_countCBItemStateChanged
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel algPanel;
+  private javax.swing.JCheckBox countCB;
   private javax.swing.JTextField filterTF;
   private javax.swing.JPanel groupByPanel;
   private javax.swing.JPanel groupByPanel1;

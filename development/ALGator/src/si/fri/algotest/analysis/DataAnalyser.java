@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Set;
+import org.json.JSONArray;
 import si.fri.algotest.entities.EParameter;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.EQuery;
@@ -192,7 +193,6 @@ public class DataAnalyser {
     if (resFile.exists()) {
 
       // add the current resultdescription parameters to the resPack resultDescription parameterset
-
       resPack.resultDescription.getParameters().addParameters(eResultDesc.getParameters(), false);
 
       try (Scanner sc = new Scanner(resFile)) {
@@ -260,7 +260,41 @@ public class DataAnalyser {
     }
   }
 
+  /**
+   * Methos runs a given query. For NO_COUNT queries it calls  runQuery_NO_COUNT once, while for COUNT queries
+   * runQuery_NO_COUNT is called n times (n=number of algorithm selected in query) and the results 
+   * are joint into a single tableData 
+   */
   public static TableData runQuery(EProject project, EQuery query) {
+    if (!query.isCount())
+      return runQuery_NO_COUNT(project,query);
+    else {
+      TableData result = new TableData();
+      result.header.add(EResultDescription.algParName);
+      result.header.add("COUNT");
+      
+      String algorithms [] = query.getStringArray(EQuery.ID_Algorithms);
+      for (String algorithm : algorithms) {
+        String [] enAlgoritemArray = {algorithm};
+        JSONArray enALgoritemJArray = new JSONArray(enAlgoritemArray);
+        query.set(EQuery.ID_Algorithms, enALgoritemJArray);
+        
+        TableData dataForAlg = runQuery_NO_COUNT(project, query);
+        ArrayList line = new ArrayList();
+        line.add(new NameAndAbrev(algorithm).getName());
+        
+        int algCount = (dataForAlg != null && dataForAlg.data != null) ? dataForAlg.data.size() : 0;
+        line.add(algCount);
+        
+        result.data.add(line);
+      }
+      
+      return result;
+    }
+  }
+  
+  
+  public static TableData runQuery_NO_COUNT(EProject project, EQuery query) {
     TableData td = new TableData();
     
     NameAndAbrev[] algs = query.getNATabFromJSONArray(EQuery.ID_Algorithms);
@@ -282,13 +316,20 @@ public class DataAnalyser {
 
     NameAndAbrev[] inPars = query.getNATabFromJSONArray(EQuery.ID_inParameters);
     NameAndAbrev[] outPars = query.getNATabFromJSONArray(EQuery.ID_outParameters);
-
-    // the order of testset-test key is obtained trom the first algorithm (this order
+    
+    // the order of testset-test key is obtained from the first algorithm (this order
     // should be the same for all algorithms, therefore the selection of the algorithms 
     // is arbitrary). 
     ArrayList<String> keyOrder = results.get(algs[0].getName()).keyOrder;
 
+    // add headers for default test parameters
+    td.header.add(EResultDescription.tstParName);
+    td.header.add(EResultDescription.testIDParName);
 
+    // Input (test) parameters + 2 default parameters (TestSet, TestID) 
+    td.numberOfInputParameters = inPars.length + 2;
+
+    
     for (NameAndAbrev inPar : inPars) {
       td.header.add(inPar.getAbrev());
     }
@@ -302,12 +343,18 @@ public class DataAnalyser {
       ArrayList<Object> line = new ArrayList<>();
 
       String alg1Name = algs[0].getName();
+      ParameterSet ps = results.get(alg1Name).getResult(key);
+        
+      // add values for default test parameters
+      line.add(ps.getParamater(EResultDescription.tstParName).get(EParameter.ID_Value));
+      line.add(ps.getParamater(EResultDescription.testIDParName).get(EParameter.ID_Value));
+      
+      
       for (NameAndAbrev inPar : inPars) {
 	Object value;
 	try {
-	  ParameterSet ps = results.get(alg1Name).getResult(key);
 	  EParameter parameter = ps.getParamater(inPar.getName());
-	  value =  parameter.get(EParameter.ID_Value);
+	  value =  parameter.getValue();
 	} catch (Exception e) {
 	  value = "?";
 	}
@@ -319,9 +366,9 @@ public class DataAnalyser {
 	for (NameAndAbrev alg : algs) {
 	  Object value;
 	  try {
-	    ParameterSet ps = results.get(alg.getName()).getResult(key);
-	    EParameter parameter = ps.getParamater(outPar.getName());
-	    value = parameter.get(EParameter.ID_Value);
+	    ParameterSet ps2 = results.get(alg.getName()).getResult(key);
+	    EParameter parameter = ps2.getParamater(outPar.getName());
+	    value = parameter.getValue();
 	  } catch (Exception e) {
 	    value = "?";
 	  }

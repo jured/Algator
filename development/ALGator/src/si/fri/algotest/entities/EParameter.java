@@ -98,6 +98,31 @@ public class EParameter extends Entity {
     return subtype;
   }
   
+  
+  public Object getValue() {
+    Object value = get(ID_Value);
+    
+    // getValue() method for parameters of type DOUBLE returns a value with limited number of decimals (given in subtype) 
+    if (type.equals(ParameterType.DOUBLE) && subtype != null && !subtype.isEmpty()) {
+      int decimals = 2;
+      try {
+        decimals = Integer.parseInt(subtype);        
+      
+        Double d = null;
+        if (value instanceof String)
+          d = Double.parseDouble((String) value);
+        else if (value instanceof Double)
+          d = (Double) value;
+        else return value;
+        
+        double potenca = Math.pow(10, decimals);
+        value = new Double(Math.round(d * potenca)/potenca);
+      } catch (Exception e) {
+        return value; 
+      }      
+    }
+    return value;
+  }
 
   @Override
   public boolean equals(Object obj) {

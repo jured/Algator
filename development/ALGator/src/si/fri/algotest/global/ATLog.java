@@ -21,6 +21,15 @@ public class ATLog {
   private static int logLevel = LOG_LEVEL_STDOUT;
   
   private static PrintWriter pw;
+  private static int lastLogLevel = LOG_LEVEL_OFF;
+  
+  public static void disableLog() {
+    lastLogLevel = logLevel;
+    logLevel = LOG_LEVEL_OFF;
+  }
+  public static void enableLog(){
+    logLevel = lastLogLevel;
+  }
   
   public static void setLogLevel(int level) {
     logLevel = level;

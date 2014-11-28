@@ -4,6 +4,8 @@
  */
 package si.fri.algotest.analysis.view;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -23,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import org.math.plot.Plot2DPanel;
 import si.fri.algotest.analysis.DataAnalyser;
@@ -42,7 +45,7 @@ import si.fri.algotest.global.ErrorStatus;
  *
  * @author tomaz
  */
-public class Analyser extends javax.swing.JDialog {
+public class Analyser extends javax.swing.JFrame {
 
   SeriesSelect seriesSelect1;
   private Project project = null;
@@ -53,7 +56,6 @@ public class Analyser extends javax.swing.JDialog {
    * Creates new form Analyse
    */
   public Analyser(java.awt.Frame parent, boolean modal) {
-    super(parent, modal);
 
     initComponents();
     
@@ -67,6 +69,9 @@ public class Analyser extends javax.swing.JDialog {
     };
     
     seriesSelect1 = new SeriesSelect(onSeriesSelectButtonChange);
+    
+    JPanel xypanel = new JPanel(new BorderLayout());
+    graphPanel.add(xypanel, BorderLayout.PAGE_END);
     
     JScrollPane scp = new JScrollPane(seriesSelect1);
     scp.setPreferredSize(new Dimension(100,90));
@@ -218,29 +223,6 @@ public class Analyser extends javax.swing.JDialog {
     return result;
   } 
   
-  private void drawGraph(TableData td, JPanel outPanel) {
-    if (td.data.size()==0 || td.data.get(0).size()<2)
-      return;
-    
-    if (plotPanel!=null) {
-      outPanel.remove(plotPanel);
-    }
-    
-    plotPanel = new Plot2DPanel();
-    double[] x = getDoubleArray(td.data, 0);
-    
-    for (int i = 1; i < td.data.get(0).size(); i++) {
-      double[] y = getDoubleArray(td.data, i);
-
-      plotPanel.addLinePlot((String) td.header.get(i), x, y);
-    }
-    
-    plotPanel.addLegend("SOUTH");
-    
-    outPanel.add(plotPanel);
-    jSplitPane2.revalidate();
-  }
-  
   /**
    * Draw y.length graphs with X-axis be the x-th column and y-axis the y[i] column of td. 
    */
@@ -342,7 +324,7 @@ public class Analyser extends javax.swing.JDialog {
   }
   
   public void run(ActionEvent evt) {
-     EQuery query = queryComposer1.getQuery();
+    EQuery query = queryComposer1.getQuery();
     System.out.println(query.toJSONString());
 
     TableData td = DataAnalyser.runQuery(project.getProject(), query);
@@ -355,7 +337,15 @@ public class Analyser extends javax.swing.JDialog {
       seriesSelect1.addFields(td.header, 1);
     
     DefaultTableModel dtm = new DefaultTableModel(td.getDataAsArray(), td.header.toArray());
-    jTable1.setModel(dtm);
+    dataTable.setModel(dtm);
+    
+    DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
+    headerRenderer.setBackground(new Color(239, 198, 46));
+
+    for (int i = 0; i < dataTable.getModel().getColumnCount(); i++) {
+      if (i<td.numberOfInputParameters)
+        dataTable.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
+    }
 
     if (td.data != null && td.data.size() > 0 && td.data.get(0).size() >= 2)
     drawGraph(td, graphPanel, seriesSelect1.getXFieldID(), seriesSelect1.getYFieldsID());
@@ -391,10 +381,9 @@ public class Analyser extends javax.swing.JDialog {
     queryComposer1 = new si.fri.algotest.analysis.view.QueryComposer();
     jButton4 = new javax.swing.JButton();
     jScrollPane3 = new javax.swing.JScrollPane();
-    jTable1 = new javax.swing.JTable();
+    dataTable = new javax.swing.JTable();
     jPanel13 = new javax.swing.JPanel();
     graphPanel = new javax.swing.JPanel();
-    xypanel = new javax.swing.JPanel();
     jMenuBar1 = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     jMenuItem1 = new javax.swing.JMenuItem();
@@ -516,18 +505,15 @@ public class Analyser extends javax.swing.JDialog {
 
     jSplitPane1.setLeftComponent(qPanel);
 
-    jTable1.setModel(new javax.swing.table.DefaultTableModel(
+    dataTable.setModel(new javax.swing.table.DefaultTableModel(
       new Object [][] {
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null},
-        {null, null, null, null}
+
       },
       new String [] {
-        "Title 1", "Title 2", "Title 3", "Title 4"
+
       }
     ));
-    jScrollPane3.setViewportView(jTable1);
+    jScrollPane3.setViewportView(dataTable);
 
     jSplitPane1.setRightComponent(jScrollPane3);
 
@@ -536,10 +522,6 @@ public class Analyser extends javax.swing.JDialog {
     jPanel13.setLayout(new java.awt.BorderLayout());
 
     graphPanel.setLayout(new java.awt.BorderLayout());
-
-    xypanel.setLayout(new java.awt.BorderLayout());
-    graphPanel.add(xypanel, java.awt.BorderLayout.PAGE_END);
-
     jPanel13.add(graphPanel, java.awt.BorderLayout.CENTER);
 
     jSplitPane2.setRightComponent(jPanel13);
@@ -672,6 +654,7 @@ public class Analyser extends javax.swing.JDialog {
     });
   }
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JTable dataTable;
   private javax.swing.JPanel graphPanel;
   private javax.swing.JEditorPane htmlPane;
   private javax.swing.JButton jButton2;
@@ -698,10 +681,8 @@ public class Analyser extends javax.swing.JDialog {
   private javax.swing.JSplitPane jSplitPane1;
   private javax.swing.JSplitPane jSplitPane2;
   private javax.swing.JTabbedPane jTabbedPane1;
-  private javax.swing.JTable jTable1;
   private javax.swing.JPanel qPanel;
   private si.fri.algotest.analysis.view.QueryComposer queryComposer1;
   private javax.swing.JEditorPane selectPane;
-  private javax.swing.JPanel xypanel;
   // End of variables declaration//GEN-END:variables
 }

@@ -1,26 +1,11 @@
 ChangeLog for project ALGator since November 2014
 
 
-C1 (11/21/2014)  td
-Two new atributes added to the project entity:
-    ProjectJARs   ... the JAR files needed to compile the project
-    AlgorithmJARs ... the JAR files provided by project administrator
-                          that are alowed to be used in algorithms 
-		
-    Note: the filenames for these atributes are relative to the projects 
-          lib folder (<project_root>/proj/lib)
+C5 (22/20/2014)
+A TimeLimit parameter was added to atts file. If the execution of an 
+algorithm on a given testcase exceedes TimeLimit seconds, the execution
+is killed. Default value for this parameter is 10 (sec).
 
-
-C2 (11/21/2014)  td
-Added -sourcepath option to javac. This enables source files in src 
-folder to be in packages. Only the main class (algorithm class) must 
-be in root (i.e. ALG-<name>/src) folder.
-
-C3 (11/24/2014)  td
-Changed class si.fri.algotest.timer.Timer to enable several different 
-timers to be used. Default usage (timer.start(), timer.stop()) wasn't 
-changed. Simplest way to use several timers is by calling the method 
-timer.next(), which stops the current timer and starts the next one.
 
 C4 (11/28/2014)
 Filter fixed to accepts output parameters. If an output parameter is a
@@ -35,3 +20,26 @@ Fix: the main form of Analyse changed from JDialog to JFrame.
 A COUNT option was added to a query. 
 
 A Testset column added to an output array of Analyser. 
+
+C3 (11/24/2014)  td
+Changed class si.fri.algotest.timer.Timer to enable several different 
+timers to be used. Default usage (timer.start(), timer.stop()) wasn't 
+changed. Simplest way to use several timers is by calling the method 
+timer.next(), which stops the current timer and starts the next one.
+
+
+C2 (11/21/2014)  td
+Added -sourcepath option to javac. This enables source files in src 
+folder to be in packages. Only the main class (algorithm class) must 
+be in root (i.e. ALG-<name>/src) folder.
+
+C1 (11/21/2014)  td
+Two new atributes added to the project entity:
+    ProjectJARs   ... the JAR files needed to compile the project
+    AlgorithmJARs ... the JAR files provided by project administrator
+                          that are alowed to be used in algorithms 
+		
+    Note: the filenames for these atributes are relative to the projects 
+          lib folder (<project_root>/proj/lib)
+
+

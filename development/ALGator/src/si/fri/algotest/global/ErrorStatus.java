@@ -117,7 +117,38 @@ public enum ErrorStatus {
       return "Error: Invalid JSON format.";
     }
   },
- 
+
+  ERROR_CANT_WRITE_ALGORITHM_TO_FILE {
+    public String toString() {
+      return "Error: Algorithm serialization error";
+    }
+  },
+  
+  
+  ERROR_CANT_READ_ALGORITHM_FROM_FILE {
+    public String toString() {
+      return "Error: Algorithm deserialization error.";
+    }
+  },
+
+  ERROR_ALGORITHM_CANT_BE_CREATED {
+    public String toString() {
+      return "Error: Algorithm can not be created." ;
+    }
+  },  
+  
+  ERROR_PROCESS_CANT_BE_CREATED {
+    public String toString() {
+      return "Error: Process can not be created." ;
+    }
+  },
+  
+  MESSAGE_PROCESS_KILLED {
+    public String toString() {
+      return "Msg: Process was killed.";
+    }
+  },
+  
   ERROR       {
     public String toString() {
       return "Error: Undefined error";

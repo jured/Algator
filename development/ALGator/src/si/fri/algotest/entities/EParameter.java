@@ -1,12 +1,13 @@
 package si.fri.algotest.entities;
 
 import java.io.File;
+import java.io.Serializable;
 
 /**
  *
  * @author tomaz
  */
-public class EParameter extends Entity {
+public class EParameter extends Entity  implements Serializable {
   // Entity identifier
   public static final String ID_ResultParameter   = "Parameter";
   

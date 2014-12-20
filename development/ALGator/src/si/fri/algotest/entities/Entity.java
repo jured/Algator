@@ -1,6 +1,7 @@
 package si.fri.algotest.entities;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import si.fri.algotest.global.ErrorStatus;
  * methods or write his own getters and setters.
  * @author tomaz
  */
-public class Entity implements Cloneable {
+public class Entity implements Cloneable, Serializable {
 
   private final String unknown_value = "?";
   
@@ -42,6 +43,11 @@ public class Entity implements Cloneable {
    * The prefix of the name of the file from which the entity was read (if entity was read from a file), null otherwise
    */
   private String entity_name;
+  
+  /**
+   * The extension of the file where entity was written 
+   */
+  private String entity_file_ext;
 
   
   protected TreeSet<String> fieldNames;
@@ -62,6 +68,7 @@ public class Entity implements Cloneable {
     
     entity_id   = entityID;
     entity_name = "?";
+    entity_file_ext = "?";
     
     this.fieldNames.addAll(Arrays.asList(fieldNames));
     
@@ -82,6 +89,7 @@ public class Entity implements Cloneable {
   public ErrorStatus initFromFile(File entityFile) {
     entity_rootdir = ATTools.extractFilePath(entityFile);
     entity_name    = ATTools.extractFileNamePrefix(entityFile);
+    entity_file_ext= ATTools.getFilenameExtension(entityFile.getAbsolutePath());
     
     try (Scanner sc = new Scanner(entityFile, "UTF-8")) {
       String vsebina = "";
@@ -201,7 +209,8 @@ public class Entity implements Cloneable {
       }
       return result;
     } catch (Exception e) {
-      ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_NOT_A_STRING_ARRAY, fieldKey);
+      ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_NOT_A_STRING_ARRAY, 
+              String.format("[%s.%s, %s]", entity_name, entity_file_ext, fieldKey));
       
       return new String[0];
     }

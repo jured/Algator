@@ -1,5 +1,6 @@
 package si.fri.algotest.entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import si.fri.algotest.global.ATLog;
@@ -8,7 +9,7 @@ import si.fri.algotest.global.ATLog;
  * A set of parameters.
  * @author tomaz
  */
-public class ParameterSet {
+public class ParameterSet implements Serializable {
   private ArrayList<EParameter> parameters;
 
   public ParameterSet() {

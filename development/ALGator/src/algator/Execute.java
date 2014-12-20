@@ -1,5 +1,6 @@
 package algator;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 import org.apache.commons.cli.BasicParser;
@@ -28,11 +29,6 @@ public class Execute {
 
   private static String introMsg = "ALGator Executor, " + Version.getVersion();
   
-  static Notificator notificator = new Notificator() {
-    public void notify(int i) {
-      System.out.println(String.format("Notificator: test %d out of %d done.", i, this.getN()));
-    }
-  };
 
   private static Options getOptions() {
     Options options = new Options();
@@ -88,7 +84,7 @@ public class Execute {
   private static void printMsg(Options options) {
 
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp("algator.Executor [options] project_name", options);
+    formatter.printHelp("algator.Execute [options] project_name", options);
 
     System.exit(0);
   }
@@ -99,6 +95,14 @@ public class Execute {
       System.out.println(sc.nextLine());
     
     System.exit(0);
+  }
+
+  private static Notificator getNotificator(final String alg, final String testSet) {
+    return new Notificator() {
+      public void notify(int i) {
+        System.out.println(String.format("[%s, %s]: test %d out of %d done.", alg, testSet, i, this.getN()));
+      }
+    };
   }
   
   /**
@@ -143,7 +147,7 @@ public class Execute {
       if (line.hasOption("data_root")) {
 	dataRoot = line.getOptionValue("data_root");
       }
-
+      
       if (line.hasOption("algorithm")) {
 	algorithmName = line.getOptionValue("algorithm");
       }
@@ -239,11 +243,11 @@ public class Execute {
     } else {
       for (int i = 0; i < eAlgs.size(); i++) {
 	for (int j = 0; j < eTests.size(); j++) {
+          Notificator notificator = getNotificator(eAlgs.get(i).getName(), eTests.get(j).getName());
 	  ErrorStatus error = Executor.algorithmRun(projekt, eAlgs.get(i).getName(), 
 		  eTests.get(j).getName(),  mType, notificator, alwaysCompile, alwaysRun);          
 	}
       }
-      
     }
 
   }

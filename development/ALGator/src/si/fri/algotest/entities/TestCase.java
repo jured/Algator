@@ -1,5 +1,7 @@
 package si.fri.algotest.entities;
 
+import java.io.Serializable;
+
 
 /**
  * General test case with its parameters. Only basic funcionality of
@@ -7,7 +9,7 @@ package si.fri.algotest.entities;
  * is needed to cover the needs of a given problem. 
  * @author tomaz
  */
-public class TestCase {
+public class TestCase implements Serializable {
 
   protected ParameterSet parameters;
 

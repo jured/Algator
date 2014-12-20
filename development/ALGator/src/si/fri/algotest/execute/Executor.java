@@ -29,6 +29,7 @@ import si.fri.algotest.global.ErrorStatus;
  */
 public class Executor {
 
+
   public static ArrayList<ParameterSet> iterateTestSetAndRunAlgorithm(Project project, String algName, AbstractTestSetIterator it, EResultDescription resultDesc,
           Notificator notificator, MeasurementType mType) {
 
@@ -177,7 +178,7 @@ public class Executor {
     ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, "");
     return parameterSets;
   }
-
+  
   /**
    * Compares the creation date of the files at bin directory and compiles the
    * sources if required (bin files are older than src files or bin files are
@@ -259,8 +260,8 @@ public class Executor {
 
   /**
    * Create a new java class in which all //@COUNT{cnt_name, value} are replaced
-   * with Counters.addToCounter("CMP", 1) commands. The new class resides in the
-   * same folder as the oroginal class (root).
+   * with Counters.addToCounter("CMP", 1) commands. The new class is placed to the
+   * same src folder where the original class resides.
    */
   static void testAndCreateCOUNTClass(String classRoot, String className) {
     try {
@@ -359,7 +360,7 @@ public class Executor {
       String delim = eResDesc.getField(EResultDescription.ID_Delim);
 
       ArrayList<ParameterSet> resultParameterSets
-              = iterateTestSetAndRunAlgorithm(project, algName, tsInstance, eResDesc, notificator, mType);
+              = ExternalExecutor.iterateTestSetAndRunAlgorithm(project, algName, tsInstance, eResDesc, notificator, mType);
 
       if (ErrorStatus.getLastErrorStatus().isOK()) {
         String resFilename = ATGlobal.getRESULTfilename(projRoot, algName, testSetName, mType);

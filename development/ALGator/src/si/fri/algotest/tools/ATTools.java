@@ -298,6 +298,13 @@ public class ATTools {
     return (pos != -1) ? fileName.substring(0,pos) : fileName;
   } 
 
+  /**
+   * Returns the file extension
+   */
+  public static String getFilenameExtension(String fileName) {        
+    int pos = fileName.lastIndexOf(".");
+    return (pos != -1) ? fileName.substring(pos+1, fileName.length()) : fileName;
+  }
   
   /**
    * Returns true is an aray is sorted

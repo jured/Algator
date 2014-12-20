@@ -14,6 +14,13 @@ import si.fri.algotest.global.ErrorStatus;
  * @author tomaz
  */
 public class Project {
+  
+  // the data_root folder name ...
+  public String dataRoot;
+  // .. and the project name
+  public String projectName;
+  
+  
   private HashMap<String, EAlgorithm> algorithms;
   private HashMap<String, ETestSet>   testsets;
   private HashMap<MeasurementType, EResultDescription>   resultDescriptions;
@@ -28,6 +35,9 @@ public class Project {
   ArrayList<ErrorStatus> errors;
  
   public Project(String dataRoot, String projectName) {
+    this.dataRoot    = dataRoot;
+    this.projectName = projectName;
+    
     errors = new ArrayList();
     
     algorithms = new HashMap();

@@ -1,10 +1,12 @@
 package si.fri.algotest.timer;
 
+import java.io.Serializable;
+
 /**
  *
  * @author tomaz
  */
-public class Timer {
+public class Timer implements Serializable {
 
   // maximu number of timers supported by ALGator
 
@@ -58,7 +60,7 @@ public class Timer {
    * Resumes the i-th timer
    */
   public void resume(int i) {
-    startTime[i] = System.nanoTime() - startTime[i];
+    startTime[i] = System.nanoTime()- startTime[i];
   }
 
   /**

@@ -1,6 +1,7 @@
 package si.fri.algotest.global;
 
 import java.io.File;
+import java.util.Random;
 import si.fri.algotest.entities.MeasurementType;
 
 /**
@@ -31,6 +32,9 @@ public class ATGlobal {
   private static final String ATDIR_algsDir = "algs";
   private static final String ATDIR_algDir = "ALG-%s";
   private static final String ATDIR_queryDir = "queries";
+  
+  private static final String ATDIR_tmpDir = "tmp";
+  
   
   private static final String ATDIR_libDir = "lib";
   
@@ -139,4 +143,16 @@ public class ATGlobal {
     return getQUERIESroot(projectRoot) + File.separator + query + "." + AT_FILEEXT_query;
   }
     
+  public static String getTMProot(String root, String projName) {
+    return getPROJECTroot(root, projName) + File.separator + ATDIR_tmpDir;
+  }
+  
+  public static String getTMPDir(String root, String projName) {
+    String folderName = getTMProot(root, projName) + File.separator + "alg" + (new Random()).nextLong();
+    File tmpFolder = new File(folderName);
+    if (!tmpFolder.exists())
+      tmpFolder.mkdirs();
+    
+    return folderName;
+  }
 }

@@ -33,6 +33,7 @@ public class ATLog {
   
   public static void setLogLevel(int level) {
     logLevel = level;
+    lastLogLevel = logLevel;
     
     if (logLevel == LOG_LEVEL_FILE) {
       try {

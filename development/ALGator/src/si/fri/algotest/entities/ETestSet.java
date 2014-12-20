@@ -18,6 +18,7 @@ public class ETestSet extends Entity {
   public static final String ID_HTMLDescFile  ="HTMLDescFile";    // Filename  
   public static final String ID_N             ="N";		  // Integer
   public static final String ID_TestRepeat    ="TestRepeat";	  // Integer
+  public static final String ID_TimeLimit     ="TimeLimit";	  // Integer  
   public static final String ID_QuickTest     ="QuickTest";	  // Boolean
   public static final String ID_TestSetFiles  ="TestSetFiles";	  // String []
   public static final String ID_DescFile      ="DescriptionFile"; // Filename  
@@ -26,7 +27,7 @@ public class ETestSet extends Entity {
   public ETestSet() {
    super(ID_TestSet, 
 	 new String [] {ID_ShortName, ID_Desc, ID_HTMLDescFile, ID_N,  
-                        ID_TestRepeat, ID_QuickTest, ID_TestSetFiles, ID_DescFile}
+                        ID_TestRepeat, ID_TimeLimit, ID_QuickTest, ID_TestSetFiles, ID_DescFile}
 	);
   }
   

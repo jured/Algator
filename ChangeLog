@@ -1,7 +1,16 @@
 ChangeLog for project ALGator since November 2014
 
+C6 (1/12/2015, td)
 
-C5 (22/20/2014)
+A Pass column added to an output array of Analyser.
+
+A "Query" wrapper added to a query printed to stdout by Analyser.
+
+A parameter with range @(from,to,step) added to the filter of a query.
+
+ 
+
+C5 (12/20/2014)
 A TimeLimit parameter was added to atts file. If the execution of an 
 algorithm on a given testcase exceedes TimeLimit seconds, the execution
 is killed. Default value for this parameter is 10 (sec).

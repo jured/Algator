@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.EQuery;
 import si.fri.algotest.entities.NameAndAbrev;
@@ -41,6 +43,17 @@ public class QueryComposer extends javax.swing.JPanel {
 	outerChangeListener.actionPerformed(e);
       }
     };    
+    
+    filterTF.getDocument().addDocumentListener(new DocumentListener() {
+      public void insertUpdate(DocumentEvent e) {checkFilter();}
+      public void removeUpdate(DocumentEvent e) {checkFilter();}
+      public void changedUpdate(DocumentEvent e) {checkFilter();}
+    });
+  }
+  
+  private void checkFilter() {
+    if (filterTF.getText().contains("@"))
+      countCB.setSelected(true);
   }
 
   public void setProject(Project project) {

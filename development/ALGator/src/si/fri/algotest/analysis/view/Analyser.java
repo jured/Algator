@@ -27,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import org.json.JSONObject;
 import org.math.plot.Plot2DPanel;
 import si.fri.algotest.analysis.DataAnalyser;
 import si.fri.algotest.analysis.TableData;
@@ -323,9 +324,10 @@ public class Analyser extends javax.swing.JFrame {
     }
   }
   
-  public void run(ActionEvent evt) {
+  public void run(ActionEvent evt) {    
     EQuery query = queryComposer1.getQuery();
-    System.out.println(query.toJSONString());
+    
+    System.out.println(query.toJSONString(true));
 
     TableData td = DataAnalyser.runQuery(project.getProject(), query);
     if (td==null) return;
@@ -348,7 +350,9 @@ public class Analyser extends javax.swing.JFrame {
     }
 
     if (td.data != null && td.data.size() > 0 && td.data.get(0).size() >= 2)
-    drawGraph(td, graphPanel, seriesSelect1.getXFieldID(), seriesSelect1.getYFieldsID());
+      try {
+       drawGraph(td, graphPanel, seriesSelect1.getXFieldID(), seriesSelect1.getYFieldsID());
+      } catch (Exception e) {}
   }
   /**
    * This method is called from within the constructor to initialize the form.

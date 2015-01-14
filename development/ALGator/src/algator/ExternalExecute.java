@@ -124,7 +124,13 @@ public class ExternalExecute {
 //    String classPath = Version.getClassesLocation();
 //    String[] cmd = {"java", "-cp",  classPath, "algator.ExternalExecute", folderName/*, verbose?"-v":""*/};
     
-    String classPath = Version.getClassesLocation();//"/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar";
+    //*
+    String classPath = Version.getClassesLocation();
+    //*/
+    /*
+    String classPath = "/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar";
+    //*/
+    
     String[] command = {"java", "-cp", classPath, "algator.ExternalExecute", folderName};
     ProcessBuilder probuilder = new ProcessBuilder( command );
     try {

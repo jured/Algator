@@ -230,22 +230,29 @@ public class TableData {
       for (int i = 0; i < fieldPositions.size(); i++) {
         
         boolean keepLine = true;
-      
-        Comparable curValue = (Comparable) line.get(fieldPositions.get(i));
-        Comparable refValue = "";
-        switch (pTypes[i]) {
-          case STRING:
-            refValue = value;
-            break;
-          case INT: 
-            refValue = Integer.parseInt(value);
-            break;
-          case DOUBLE: 
-            refValue = Double.parseDouble(value);
-            break;
-        }
+        int cmp;
+        try {
+          Comparable curValue = (Comparable) line.get(fieldPositions.get(i));
+          Comparable refValue = "";
+          switch (pTypes[i]) {
+            case STRING:
+              refValue = value;
+              break;
+            case INT: 
+              refValue = Integer.parseInt(value);
+              break;
+            case DOUBLE: 
+              refValue = Double.parseDouble(value);
+              break;
+          }
 
-        int cmp = refValue.compareTo(curValue);
+          cmp = refValue.compareTo(curValue);
+        } catch (Exception e) {
+          // if comparison can not be done, item is removed
+          // this happens, for example, if one of the values is undefined or if the comparison condition is incorrectly formed
+          iterator.remove();
+          break;
+        }
       
         switch(operator) {
           case "==":
@@ -273,7 +280,7 @@ public class TableData {
           break;
         }
       }
-    }    
+    }  
   }
   
   /**

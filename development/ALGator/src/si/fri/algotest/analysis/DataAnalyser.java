@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.json.JSONArray;
+import si.fri.algotest.entities.DeparamFilter;
 import si.fri.algotest.entities.EParameter;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.EQuery;
@@ -205,6 +208,7 @@ public class DataAnalyser {
 	  String[] lineFields = line.split(delim);
 
 	  String testName = lineFields[2];
+          String pass     = lineFields[3];
 
 	  // initializes algorithms parameterset with "empty" parameters
 	  ParameterSet algPS = new ParameterSet(resultPS);
@@ -213,6 +217,7 @@ public class DataAnalyser {
 	  algPS.getParamater(EResultDescription.algParName).set(EParameter.ID_Value, algorithm);
 	  algPS.getParamater(EResultDescription.tstParName).set(EParameter.ID_Value, testset);
 	  algPS.getParamater(EResultDescription.testIDParName).set(EParameter.ID_Value, testName);
+          algPS.getParamater(EResultDescription.passParName).set(EParameter.ID_Value, pass);
 
 	  int lineFiledsPos = EResultDescription.FIXNUM;
 
@@ -260,32 +265,120 @@ public class DataAnalyser {
     }
   }
 
+  public static DeparamFilter [] getDeparamFilters(String [] filter) {
+    if (filter == null) return new DeparamFilter[0];
+    
+    // filters without @()
+    String [] clearFilter = new String[filter.length];
+    
+   
+    Pattern pattern = Pattern.compile("(.*)@\\((.*)\\)");
+    String range="";
+    
+    for(int i=0; i<filter.length;i++) {
+      String curFilter = filter[i];
+      if (filter[i].contains("@(")) {
+        Matcher matcher = pattern.matcher(filter[i]);
+        if (matcher.find()) {
+          curFilter = matcher.group(1);
+          range     = matcher.group(2);
+        }
+      }
+      clearFilter[i] = curFilter;  
+    }
+    
+    
+    ArrayList<DeparamFilter> deFilterList = new ArrayList<DeparamFilter>();
+    if (range.isEmpty()) {
+      DeparamFilter deFilter = new DeparamFilter(1, clearFilter);
+      deFilterList.add(deFilter);
+    } else {
+      int iFrom, iTo, iStep;
+      String rangeParts [] = range.split(",");
+      try {
+        iFrom = Integer.valueOf(rangeParts[0]);
+        iTo   = Integer.valueOf(rangeParts[1]);
+        iStep = Integer.valueOf(rangeParts[2]);
+      } catch (Exception e) {
+        iFrom = iTo = iStep = 1;
+      }
+      for(int i=iFrom; i<=iTo; i=i+iStep) {
+        String [] thisFilter  = clearFilter.clone();
+        for (int iTab = 0; iTab < thisFilter.length; iTab++) {
+          thisFilter[iTab] = thisFilter[iTab].replaceAll("\\$1", Integer.toString(i));
+        }
+        deFilterList.add(new DeparamFilter(i, thisFilter));
+      }
+    }
+    return (DeparamFilter []) deFilterList.toArray(new DeparamFilter[1]);
+  }
+  
+  public static String getFilterHeaderName(String [] filter) {
+    return "#";
+  }
+   
   /**
    * Methos runs a given query. For NO_COUNT queries it calls  runQuery_NO_COUNT once, while for COUNT queries
    * runQuery_NO_COUNT is called n times (n=number of algorithm selected in query) and the results 
    * are joint into a single tableData 
    */
   public static TableData runQuery(EProject project, EQuery query) {
-    if (!query.isCount())
+    if (!query.isCount()) {
+      
       return runQuery_NO_COUNT(project,query);
+    }
+//    else {
+//      TableData result = new TableData();
+//      result.header.add(EResultDescription.algParName);
+//      result.header.add("COUNT");
+//      
+//      String algorithms [] = query.getStringArray(EQuery.ID_Algorithms);
+//      for (String algorithm : algorithms) {
+//        String [] enAlgoritemArray = {algorithm};
+//        JSONArray enALgoritemJArray = new JSONArray(enAlgoritemArray);
+//        query.set(EQuery.ID_Algorithms, enALgoritemJArray);
+//        
+//        TableData dataForAlg = runQuery_NO_COUNT(project, query);
+//        ArrayList line = new ArrayList();
+//        line.add(new NameAndAbrev(algorithm).getName());
+//        
+//        int algCount = (dataForAlg != null && dataForAlg.data != null) ? dataForAlg.data.size() : 0;
+//        line.add(algCount);
+//        
+//        result.data.add(line);
+//      }
     else {
       TableData result = new TableData();
-      result.header.add(EResultDescription.algParName);
-      result.header.add("COUNT");
-      
       String algorithms [] = query.getStringArray(EQuery.ID_Algorithms);
-      for (String algorithm : algorithms) {
-        String [] enAlgoritemArray = {algorithm};
-        JSONArray enALgoritemJArray = new JSONArray(enAlgoritemArray);
-        query.set(EQuery.ID_Algorithms, enALgoritemJArray);
-        
-        TableData dataForAlg = runQuery_NO_COUNT(project, query);
+      
+      String [] origQueryFilter = query.getStringArray(EQuery.ID_Filter);
+      
+      // header
+      result.header.add(getFilterHeaderName(origQueryFilter));
+      for (String algorithm : algorithms) {         
+         result.header.add(new NameAndAbrev(algorithm).getAbrev()+".COUNT");
+      }
+            
+      //data
+
+      DeparamFilter [] filters = getDeparamFilters(origQueryFilter);
+      for(DeparamFilter curFilter : filters) {
         ArrayList line = new ArrayList();
-        line.add(new NameAndAbrev(algorithm).getName());
+
+        // first column of result = the value of the parameter
+        line.add(curFilter.getParamValue());
         
-        int algCount = (dataForAlg != null && dataForAlg.data != null) ? dataForAlg.data.size() : 0;
-        line.add(algCount);
-        
+     
+        for (String algorithm : algorithms) {
+          String [] enAlgoritemArray = {algorithm};
+          JSONArray enALgoritemJArray = new JSONArray(enAlgoritemArray);
+          query.set(EQuery.ID_Algorithms, enALgoritemJArray);
+          query.set(EQuery.ID_Filter, new JSONArray(curFilter.getFilter()));
+                
+          TableData dataForAlg = runQuery_NO_COUNT(project, query);      
+          int algCount = (dataForAlg != null && dataForAlg.data != null) ? dataForAlg.data.size() : 0;
+          line.add(algCount);
+        }
         result.data.add(line);
       }
       
@@ -293,6 +386,8 @@ public class DataAnalyser {
     }
   }
   
+    
+    
   
   public static TableData runQuery_NO_COUNT(EProject project, EQuery query) {
     TableData td = new TableData();
@@ -325,9 +420,10 @@ public class DataAnalyser {
     // add headers for default test parameters
     td.header.add(EResultDescription.tstParName);
     td.header.add(EResultDescription.testIDParName);
+    td.header.add(EResultDescription.passParName);
 
-    // Input (test) parameters + 2 default parameters (TestSet, TestID) 
-    td.numberOfInputParameters = inPars.length + 2;
+    // Input (test) parameters + 3 default parameters (TestSet, TestID, pass) 
+    td.numberOfInputParameters = inPars.length + 3;
 
     
     for (NameAndAbrev inPar : inPars) {
@@ -345,9 +441,10 @@ public class DataAnalyser {
       String alg1Name = algs[0].getName();
       ParameterSet ps = results.get(alg1Name).getResult(key);
         
-      // add values for default test parameters
+      // add values for 3 default test parameters
       line.add(ps.getParamater(EResultDescription.tstParName).get(EParameter.ID_Value));
       line.add(ps.getParamater(EResultDescription.testIDParName).get(EParameter.ID_Value));
+      line.add(ps.getParamater(EResultDescription.passParName).get(EParameter.ID_Value));
       
       
       for (NameAndAbrev inPar : inPars) {
@@ -381,7 +478,11 @@ public class DataAnalyser {
     
     String [] filter = query.getStringArray(EQuery.ID_Filter);
     for (int i = 0; i < filter.length; i++) {
-      td.filter(filter[i]); 
+      try {
+        td.filter(filter[i]); 
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
     
     

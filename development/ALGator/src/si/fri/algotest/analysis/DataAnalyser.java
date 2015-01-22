@@ -403,8 +403,10 @@ public class DataAnalyser {
     for (NameAndAbrev alg : algs) {
       ResultPack rPack = new ResultPack();
       for (NameAndAbrev ts : testsets) {
-	readResults(rPack, project, alg.getName(), ts.getName(), MeasurementType.EM);
-        readResults(rPack, project, alg.getName(), ts.getName(), MeasurementType.CNT);
+        ATLog.disableLog(); // to prevent error messages on missing description files
+	  readResults(rPack, project, alg.getName(), ts.getName(), MeasurementType.EM);
+          readResults(rPack, project, alg.getName(), ts.getName(), MeasurementType.CNT);
+        ATLog.enableLog();
       }
       results.put(alg.getName(), rPack);
     }

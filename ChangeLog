@@ -1,5 +1,11 @@
 ChangeLog for project ALGator since November 2014
 
+C7 (1/22/2015, td)
+
+Analyser: added option to view query&graph in more than one tab
+Analyser: new graph types were added (line, stair, bar, box)
+Analyser: changes if the interface for defining X and y axis 
+
 C6 (1/12/2015, td)
 
 A Pass column added to an output array of Analyser.

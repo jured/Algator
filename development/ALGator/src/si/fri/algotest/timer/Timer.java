@@ -3,7 +3,7 @@ package si.fri.algotest.timer;
 import java.io.Serializable;
 
 /**
- *
+ * Time of execution in micro (10^(-6)) seconds
  * @author tomaz
  */
 public class Timer implements Serializable {

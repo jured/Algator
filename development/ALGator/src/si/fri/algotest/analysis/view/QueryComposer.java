@@ -88,6 +88,8 @@ public class QueryComposer extends javax.swing.JPanel {
   }
 
   private String [] getNAAsAsStringArray(NAAPanel [] naaPanel) {
+    if (naaPanel == null) return new String[0];
+    
     int count = 0;
     for (int i = 0; i < naaPanel.length; i++) {
       if (naaPanel[i].isSelected()) count++;
@@ -367,6 +369,11 @@ public class QueryComposer extends javax.swing.JPanel {
         countCBItemStateChanged(evt);
       }
     });
+    countCB.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        countCBActionPerformed(evt);
+      }
+    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 3;
     gridBagConstraints.gridy = 1;
@@ -395,8 +402,12 @@ public class QueryComposer extends javax.swing.JPanel {
   }//GEN-LAST:event_sortbyTFActionPerformed
 
   private void countCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_countCBItemStateChanged
-    innerChangeListner.actionPerformed(null);
+    innerChangeListner.actionPerformed(new ActionEvent(countCB, 0, "Re-run"));
   }//GEN-LAST:event_countCBItemStateChanged
+
+  private void countCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_countCBActionPerformed
+    // innerChangeListner.actionPerformed(new ActionEvent(countCB, 0, "Re-run"));    
+  }//GEN-LAST:event_countCBActionPerformed
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel algPanel;

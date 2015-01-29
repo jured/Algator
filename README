@@ -1,5 +1,5 @@
 *****************************************************************************
-ALGator - izvajanje in analiza algoritmov
+1) ALGator - izvajanje in analiza algoritmov
 *****************************************************************************
 ALGator je sistem za izvajanje algoritmov na podanih testnih podatkih ter 
 analizo rezultatov izvajanja.  
@@ -12,7 +12,14 @@ analizo izvajanja posameznega algoritma ter primerjavo med algoritmi istega
 projekta. 
 
 *****************************************************************************
-Navodila za uporabo programa ALGator.jar
+2) Podroben opis delovanja sistema ALGator.jar
+*****************************************************************************
+https://github.com/ALGatorDevel/Algator/blob/master/doc/ALGator.docx?raw=true
+
+
+
+*****************************************************************************
+3) Kratka navodila za uporabo programa ALGator.jar
 *****************************************************************************
 1. Preveden program ALGator z vsemi potrebnimi dodatki se nahaja v datoteki
 ALGator.zip. Za uporabo programa prenesite datoteko 
@@ -41,7 +48,7 @@ in jo odpakirajte v poljuben direktorij (<algator_root>).
 
 
 *****************************************************************************
-Navodila za avtorje projektov
+4) Navodila za avtorje projektov
 *****************************************************************************
 Navodila za avtorje projektov so v datoteki doc/NovProjekt.txt. Pred 
 implementacijo novega projekta je priporočljivo, da avtor prebere tudi opis 
@@ -49,7 +56,7 @@ delovanja celotnega sistema, ki se nahaja v doc/ALGator.docx
 
 
 *****************************************************************************
-Navodila za razvijalce ALGatorja
+5) Navodila za razvijalce ALGatorja
 *****************************************************************************
 Vsa izvorna koda programa ALGator se nahaja v mapi development/ALGator/src.
 
@@ -57,6 +64,6 @@ Vsa izvorna koda programa ALGator se nahaja v mapi development/ALGator/src.
 
 
 *****************************************************************************
-Pot do ALGator githuba:
+6) Pot do ALGator githuba:
   https://github.com/ALGatorDevel/Algator
 *****************************************************************************

@@ -25,13 +25,14 @@ public class EParameter extends Entity  implements Serializable {
   public EParameter() {
    super(ID_ResultParameter, 
 	 new String [] {ID_Name, ID_Desc, ID_Type, ID_Subtype, ID_Value});
+  
+   setRepresentatives(ID_Name, ID_Value);
   }
   
   public EParameter(File fileName) {
     this();
     initFromFile(fileName);
     
-    setRepresentatives(ID_Name, ID_Value);
     setTypeAndSubtype();
   }
   
@@ -39,7 +40,6 @@ public class EParameter extends Entity  implements Serializable {
     this();
     initFromJSON(json);
 
-    setRepresentatives(ID_Name, ID_Value);
     setTypeAndSubtype();
   }
 

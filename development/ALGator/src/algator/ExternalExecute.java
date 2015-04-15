@@ -1,19 +1,13 @@
 package algator;
 
-import java.io.File;
 import java.io.IOException;
 import si.fri.algotest.execute.*;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import si.fri.algotest.timer.Timer;
 
 /**
@@ -53,7 +47,7 @@ public class ExternalExecute {
   
   /**
    * Method executes the algorithm timesToExecute times. For each execution
-   * the clean copy of algorithm instance (which include the testcase instance)
+   * the clean copy of algorithm instance (which includes the testcase instance)
    * is loaded from file. The execution times are stored in local array and are
    * written to the final algorithm's array at the end of all executions. 
    * The final version of algorithm instance (which include the result parameters
@@ -101,13 +95,19 @@ public class ExternalExecute {
       System.out.println("");
     
     if (curAlg != null) {
-      for (int i = 0; i < timesToExecute; i++) 
+      // save execution times ...
+      for (int i = 0; i < timesToExecute; i++) {
         for (int tID = 0; tID < Timer.MAX_TIMERS; tID++)  {
           curAlg.setExectuionTime(tID, i, times[tID][i]);
           
           if (verbose && tID==0)
             System.out.printf("%5d", times[tID][i]);
         }
+      }
+      
+      // ... and counters
+      curAlg.setCounters(Counters.getCounters());
+      
       System.out.println("");
       ExternalExecutor.saveAlgToFile(urls, curAlg, tmpFolderName, ExternalExecutor.SER_ALG_TYPE.RESULT);
     }
@@ -124,10 +124,11 @@ public class ExternalExecute {
 //    String classPath = Version.getClassesLocation();
 //    String[] cmd = {"java", "-cp",  classPath, "algator.ExternalExecute", folderName/*, verbose?"-v":""*/};
     
-    //*
+    /* For real-time execution (classPath=..../ALGator.jar)
     String classPath = Version.getClassesLocation();
     //*/
-    /*
+    
+    ///* For execution in debug mode (Netbeans)
     String classPath = "/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar";
     //*/
     

@@ -15,11 +15,14 @@ public class EResultDescription extends Entity {
    * Currently: 4 (the name of the algorithm, the testset, the test and pass (DONE/KILLED))
    */
   public static final int FIXNUM = 4;
-  public static final String algParName    = "Algorithm"; 
-  public static final String tstParName    = "Testset"; 
-  public static final String testIDParName = "TestID";   // Unique identificator of a test within a testset  
-  public static final String passParName   = "Pass";     // DONE if algorithem finished within the given time limit, KILLLED otherwise
+  public static final String algParName      = "Algorithm"; 
+  public static final String tstParName      = "Testset"; 
+  public static final String testIDParName   = "TestID";   // Unique identificator of a test within a testset  
+  public static final String passParName     = "Pass";     // DONE if algorithem finished within the given time limit, KILLLED otherwise
   
+  // unique sequence number of a test in a tabel (id of table row)
+  public static final String testNoParName   = "ID";     
+
   // Entity identifier
   public static final String ID_ResultDescription   = "ResultDescription";
   

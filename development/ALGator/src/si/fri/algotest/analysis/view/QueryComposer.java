@@ -132,7 +132,9 @@ public class QueryComposer extends javax.swing.JPanel {
     algNAAs = createNAAPanels(algs, algPanel);
     tstsNAAs = createNAAPanels(tsts, tstsPanel);
 
-    infieldNAAs  = createNAAPanels(project.getTestParameters(),   infieldPanel); 
+    String [] inPars = project.getTestParameters();
+    infieldNAAs  = createNAAPanels(inPars, infieldPanel); 
+  
     outfieldNAAs = createNAAPanels(project.getResultParameters(), outfieldPanel);
 
   }

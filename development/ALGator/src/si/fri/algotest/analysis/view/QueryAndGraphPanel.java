@@ -110,7 +110,7 @@ public class QueryAndGraphPanel extends javax.swing.JPanel {
         outParams.add(new NameAndAbrev(op).getAbrev());
       outParams.add("COUNT");
       
-      // two possibilities: inthe table are fields or in tha table are COUNTs
+      // two possibilities: in the table are fields or in tha table are COUNTs
       int start = td.header.size() > 0 && td.header.get(0).equals("#") ? 0 : 3;
       
       for (int i = start; i < td.header.size(); i++) {

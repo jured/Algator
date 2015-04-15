@@ -1,6 +1,7 @@
 package si.fri.algotest.execute;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import si.fri.algotest.entities.ParameterSet;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.global.ErrorStatus;
@@ -13,19 +14,18 @@ import si.fri.algotest.timer.Timer;
 public abstract class AbsAlgorithm implements Cloneable, Serializable {
   
   public Timer timer;                 // timer to measure the execution time of the current test
-  private long[][] executoinTimes;  // the times of execution for all executions of the current test
+  private long[][] executoinTimes;    // the times of execution for all executions of the current test
+  
+  // values of counters after the execution of algorithm<
+  private HashMap<String, Integer> counters = new HashMap();
   
   
   public AbsAlgorithm() {
     timer = new Timer();
     executoinTimes = new long[0][0];
+    counters = new HashMap<>();
   }
   
-  
-  
-  public void setTimesToExecute(int timesToExecute) {
-    executoinTimes = new long[Timer.MAX_TIMERS][timesToExecute];
-  }
   
   public int getTimesToExecute() {
     if (executoinTimes != null && executoinTimes.length > 0)
@@ -33,6 +33,10 @@ public abstract class AbsAlgorithm implements Cloneable, Serializable {
     else return 0;
   }
   
+  public void setTimesToExecute(int timesToExecute) {
+    executoinTimes = new long[Timer.MAX_TIMERS][timesToExecute];
+  }
+    
   public long [][] getExecutionTimes() {
     return executoinTimes;
   }
@@ -40,6 +44,14 @@ public abstract class AbsAlgorithm implements Cloneable, Serializable {
   public void setExectuionTime(int timer, int executionID, long time) {
     if (timer < executoinTimes.length && executionID < executoinTimes[timer].length)
       executoinTimes[timer][executionID] = time;
+  }
+ 
+  public HashMap<String, Integer> getCounters() {
+    return counters;
+  }
+  
+  public void setCounters(HashMap<String, Integer> counters) {
+    this.counters = (HashMap<String, Integer>) counters.clone();
   }
   
   /**

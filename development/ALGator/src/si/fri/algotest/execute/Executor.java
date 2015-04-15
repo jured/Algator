@@ -30,6 +30,9 @@ import si.fri.algotest.global.ErrorStatus;
 public class Executor {
 
 
+  /**
+   * This method is not used any more. It has been replaced by ExternalExecutor.iterateTestSetAndRunAlgorithm 
+   */
   public static ArrayList<ParameterSet> iterateTestSetAndRunAlgorithm(Project project, String algName, AbstractTestSetIterator it, EResultDescription resultDesc,
           Notificator notificator, MeasurementType mType) {
 
@@ -276,7 +279,13 @@ public class Executor {
       String classContent = "";
       Scanner sc = new Scanner(classFile);
       while (sc.hasNextLine()) {
-        classContent += sc.nextLine() + "\n";
+        // skip all the lines that contain @REMOVE_LINE tag
+        String line = sc.nextLine();
+        
+        if (line.contains("//@REMOVE_LINE")) 
+          continue;
+        
+        classContent += line + "\n";
       }
       sc.close();
 

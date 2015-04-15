@@ -9,6 +9,10 @@ import java.util.HashMap;
 public class Counters {
 
   private static HashMap<String, Integer> counters = new HashMap();
+
+  public static HashMap<String, Integer> getCounters() {
+    return counters;
+  }
   
   public static void resetCounters() {
     counters = new HashMap();

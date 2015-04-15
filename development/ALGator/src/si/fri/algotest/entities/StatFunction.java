@@ -34,14 +34,13 @@ public enum StatFunction {
             }
 
           },
-  
-    FIRST {
+  FIRST {
             public String toString() {
               return "FIRST";
             }
 
           },
-    LAST {
+  LAST {
             public String toString() {
               return "LAST";
             }
@@ -89,22 +88,23 @@ public enum StatFunction {
 //        return -1;
 //    }
 //  }
-
   public static Object getFunctionValue(StatFunction function, ArrayList<? extends Comparable> values) {
     if (values == null || values.size() == 0) {
       return -1;
     }
 
     // For non-numbers only FIRST and LAST are exceptable; FIRST is default.
-    if (!(values.get(0) instanceof Number)) 
-      if (!function.equals(StatFunction.LAST))          
+    if (!(values.get(0) instanceof Number)) {
+      if (!function.equals(StatFunction.LAST)) {
         function = StatFunction.FIRST;
-    
+      }
+    }
+
     switch (function) {
       case FIRST:
-        return  values.get(0);
+        return values.get(0);
       case LAST:
-        return  values.get(values.size()-1);
+        return values.get(values.size() - 1);
       case MIN:
       case MAX:
         Comparable val = values.get(0);

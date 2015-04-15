@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import si.fri.algotest.entities.EParameter;
@@ -289,12 +290,15 @@ public class ExternalExecutor {
 
   static ParameterSet getCounterParameters(EResultDescription resultDesc, AbsAlgorithm algorithm) {
     ParameterSet counterParameters = new ParameterSet();
-    if (resultDesc != null) {
+    HashMap<String, Integer> counters = algorithm.getCounters();
+    if (resultDesc != null && counters != null) {
       ParameterSet pSet = resultDesc.getParameters();
       for (int i = 0; i < pSet.size(); i++) {
         if (ParameterType.COUNTER.equals(pSet.getParameter(i).getType())) {
           String counterName = (String) pSet.getParameter(i).getField(EParameter.ID_Name);
-          int value = Counters.getCounterValue(counterName);
+          int value = 0;
+          if (counters.containsKey(counterName))
+            value = counters.get(counterName);
           counterParameters.addParameter(new EParameter(counterName, null, null, value), true);
         }
       }

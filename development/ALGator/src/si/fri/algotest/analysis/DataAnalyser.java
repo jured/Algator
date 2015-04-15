@@ -420,12 +420,13 @@ public class DataAnalyser {
     ArrayList<String> keyOrder = results.get(algs[0].getName()).keyOrder;
 
     // add headers for default test parameters
+    td.header.add(EResultDescription.testNoParName);  // ID of a table row
     td.header.add(EResultDescription.tstParName);
     td.header.add(EResultDescription.testIDParName);
     td.header.add(EResultDescription.passParName);
 
-    // Input (test) parameters + 3 default parameters (TestSet, TestID, pass) 
-    td.numberOfInputParameters = inPars.length + 3;
+    // Input (test) parameters + 4 default parameters (TestNo, TestSet, TestID, pass) 
+    td.numberOfInputParameters = inPars.length + 4; 
 
     
     for (NameAndAbrev inPar : inPars) {
@@ -437,17 +438,22 @@ public class DataAnalyser {
       }
     }
 
+    int testNUM = 0;
     for (String key : keyOrder) {
+      testNUM++;
       ArrayList<Object> line = new ArrayList<>();
 
       String alg1Name = algs[0].getName();
       ParameterSet ps = results.get(alg1Name).getResult(key);
         
       // add values for 3 default test parameters
+      line.add(testNUM);
       line.add(ps.getParamater(EResultDescription.tstParName).get(EParameter.ID_Value));
       line.add(ps.getParamater(EResultDescription.testIDParName).get(EParameter.ID_Value));
       line.add(ps.getParamater(EResultDescription.passParName).get(EParameter.ID_Value));
       
+      
+      //line.add(testNUM);
       
       for (NameAndAbrev inPar : inPars) {
 	Object value;

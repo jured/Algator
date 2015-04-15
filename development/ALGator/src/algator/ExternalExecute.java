@@ -124,11 +124,11 @@ public class ExternalExecute {
 //    String classPath = Version.getClassesLocation();
 //    String[] cmd = {"java", "-cp",  classPath, "algator.ExternalExecute", folderName/*, verbose?"-v":""*/};
     
-    /* For real-time execution (classPath=..../ALGator.jar)
+    ///* For real-time execution (classPath=..../ALGator.jar)
     String classPath = Version.getClassesLocation();
     //*/
     
-    ///* For execution in debug mode (Netbeans)
+    /* For execution in debug mode (Netbeans)
     String classPath = "/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar";
     //*/
     

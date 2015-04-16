@@ -23,6 +23,10 @@ public class ATLog {
   private static PrintWriter pw;
   private static int lastLogLevel = LOG_LEVEL_OFF;
   
+  // maximal error size in bytes (to truncate very long error messages)
+  private static int MAX_ERROR_SIZE = 512;
+
+  
   public static void disableLog() {
     lastLogLevel = logLevel;
     logLevel = LOG_LEVEL_OFF;
@@ -48,6 +52,8 @@ public class ATLog {
   
   public static void log(String msg) {
     if (logLevel == LOG_LEVEL_OFF) return;
+    
+    msg = msg.substring(0, Math.min(msg.length(), MAX_ERROR_SIZE));
 
     DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     Date date = new Date();

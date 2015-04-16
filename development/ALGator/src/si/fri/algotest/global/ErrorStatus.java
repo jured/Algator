@@ -154,8 +154,6 @@ public enum ErrorStatus {
       return "Error: Undefined error";
     }
   };
-
-
   
   private static String      lastErrorMerrage = "";
   private static ErrorStatus lastErrorStatus  = ErrorStatus.STATUS_OK;

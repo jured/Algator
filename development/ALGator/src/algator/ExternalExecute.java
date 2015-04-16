@@ -132,7 +132,7 @@ public class ExternalExecute {
     String classPath = "/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar";
     //*/
     
-    String[] command = {"java", "-cp", classPath, "-Xss:1024k", "algator.ExternalExecute", folderName};
+    String[] command = {"java", "-cp", classPath, "-Xss1024k", "algator.ExternalExecute", folderName};
     ProcessBuilder probuilder = new ProcessBuilder( command );
     try {
       return probuilder.start();      

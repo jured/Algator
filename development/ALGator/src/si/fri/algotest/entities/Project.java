@@ -3,6 +3,7 @@ package si.fri.algotest.entities;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ATLog;
@@ -21,8 +22,8 @@ public class Project {
   public String projectName;
   
   
-  private HashMap<String, EAlgorithm> algorithms;
-  private HashMap<String, ETestSet>   testsets;
+  private TreeMap<String, EAlgorithm> algorithms;
+  private TreeMap<String, ETestSet>   testsets;
   private HashMap<MeasurementType, EResultDescription>   resultDescriptions;
 	  
   private EProject eProject;
@@ -40,8 +41,8 @@ public class Project {
     
     errors = new ArrayList();
     
-    algorithms = new HashMap();
-    testsets   = new HashMap();
+    algorithms = new TreeMap();
+    testsets   = new TreeMap();
     resultDescriptions = new HashMap();
     
     // read the eProject
@@ -104,10 +105,10 @@ public class Project {
     return (eProject==null) ? "?" : eProject.getName();
   }
   
-  public HashMap<String, EAlgorithm> getAlgorithms() {
+  public TreeMap<String, EAlgorithm> getAlgorithms() {
     return algorithms;
   }
-  public HashMap<String, ETestSet> getTestSets() {
+  public TreeMap<String, ETestSet> getTestSets() {
     return testsets;
   }
 

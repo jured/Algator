@@ -6,54 +6,32 @@ package si.fri.algotest.entities;
  */
 public enum GraphType {
 
-  UNKNOWN {
-    public String toString() {
-      return "unknown";
-    }    
-  }, 
-  
-  LINE{
-    public String toString() {
-      return "line";
-    }    
-  }, 
+  LINE, STAIR, BAR, BOX, PIE, AREA, DONUT, UNKNOWN; 
 
-  STAIR{
-    public String toString() {
-      return "stair";
-    }    
-  }, 
+  @Override
+  public String toString() {
+    switch(this) {
+      case LINE:
+        return "line";
+      case STAIR:
+        return "stair";
+      case BAR:
+        return "bar";
+      case BOX:
+        return "box";
+      case PIE:
+        return "pie";
+      case AREA: 
+        return "area";
+      case DONUT:
+        return "donut";
+      default:
+        return "/unknown/";
+    }
+  }
   
-  BAR{
-    public String toString() {
-      return "bar";
-    }    
-  }, 
   
-  BOX{
-    public String toString() {
-      return "box";
-    }    
-  },
-  
-  PIE{
-    public String toString() {
-      return "pie";
-    }    
-  },
-  
-  AREA{
-    public String toString() {
-      return "area";
-    }    
-  },  
-  
-  DONUT{
-    public String toString() {
-      return "donut";
-    }    
-  };
-  
+    
   static GraphType getType(String typeDesc) {
     for (GraphType type : GraphType.values())
       if (typeDesc.equalsIgnoreCase(type.toString())) 

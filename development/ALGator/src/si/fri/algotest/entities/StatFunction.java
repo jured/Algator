@@ -8,44 +8,29 @@ import java.util.ArrayList;
  */
 public enum StatFunction {
 
-  UNKNOWN {
-            public String toString() {
-              return "unknown";
-            }
-          },
-  MIN {
-            public String toString() {
-              return "MIN";
-            }
-          },
-  MAX {
-            public String toString() {
-              return "MAX";
-            }
-          },
-  AVG {
-            public String toString() {
-              return "AVG";
-            }
-          },
-  SUM {
-            public String toString() {
-              return "SUM";
-            }
+  UNKNOWN, MIN, MAX, AVG, SUM, FIRST, LAST;
 
-          },
-  FIRST {
-            public String toString() {
-              return "FIRST";
-            }
-
-          },
-  LAST {
-            public String toString() {
-              return "LAST";
-            }
-
-          };
+  @Override
+  public String toString() {
+    switch (this) {
+      case UNKNOWN:
+        return "unknown";
+      case MIN:
+        return "MIN";
+      case MAX:
+        return "MAX";
+      case AVG:
+        return "AVG";
+      case SUM:
+        return "SUM";
+      case FIRST:
+        return "FIRST";
+      case LAST:
+        return "LAST";
+      default:
+        return "/unknown/";
+    }
+  }
 
   public static StatFunction getStatFunction(String desc) {
     for (StatFunction sfnc : StatFunction.values()) {

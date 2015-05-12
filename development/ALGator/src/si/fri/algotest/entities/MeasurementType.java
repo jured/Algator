@@ -1,10 +1,12 @@
 package si.fri.algotest.entities;
 
+import java.io.Serializable;
+
 /**
  *
  * @author tomaz
  */
-public enum MeasurementType {
+public enum MeasurementType implements Serializable {
   EM {
     @Override
     public String toString() {

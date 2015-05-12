@@ -11,6 +11,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.json.JSONObject;
 import si.fri.algotest.analysis.DataAnalyser;
 import si.fri.algotest.analysis.view.Analyser;
 import si.fri.algotest.analysis.TableData;
@@ -89,8 +90,6 @@ public class Analyse {
    * @param args
    */
   public static void main(String args[]) {
-    System.out.println(introMsg + "\n");
-
     Options options = getOptions();
 
     CommandLineParser parser = new BasicParser();
@@ -117,7 +116,6 @@ public class Analyse {
       if (line.hasOption("data_root")) {
         dataRoot = line.getOptionValue("data_root");        
       }
-      System.out.println("Data root = " + dataRoot);
       
       ATLog.setLogLevel(ATLog.LOG_LEVEL_OFF);
       if (line.hasOption("verbose")) {
@@ -136,6 +134,12 @@ public class Analyse {
       
       String origin = line.getOptionValue("query_origin");
       if (origin == null) origin = "R";
+   
+      if (!line.hasOption("query")) {
+        System.out.println(introMsg + "\n");
+        System.out.println("Data root = " + dataRoot);
+      }
+
       
       if (line.hasOption("query") || "S".equals(origin)) {  
         // if a query is given, run a query and print result ...
@@ -158,8 +162,10 @@ public class Analyse {
         Scanner sc = new Scanner(System.in);
         String vsebina = "";
         while (sc.hasNextLine()) 
-          vsebina += sc.nextLine();
-        query.initFromJSON(vsebina);
+          vsebina += sc.nextLine() + "\n";
+        
+        JSONObject queryObject = new JSONObject(vsebina);        
+        query.initFromJSON(queryObject.get("Query").toString());
         break;
       case "F":
       case "R":
@@ -175,6 +181,8 @@ public class Analyse {
         query.initFromFile(new File(fileName));
         break;
     }
+    
+    // debug: System.out.println("---> " + query.toJSONString());
     
     String result = ErrorStatus.getLastErrorMessage().equals(ErrorStatus.STATUS_OK) ? "Invalid query." :
             ErrorStatus.getLastErrorMessage();

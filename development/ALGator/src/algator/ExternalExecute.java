@@ -10,6 +10,12 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import si.fri.algotest.timer.Timer;
 
+import jamvm.vmep.InstructionMonitor;
+import jamvm.vmep.Opcode;
+import java.io.File;
+import si.fri.algotest.entities.EConfig;
+import si.fri.algotest.entities.MeasurementType;
+
 /**
  * This class is used to execute a given algorithm. The main method in this class is the run() method, which
  * reads the algorithm (and input parameters that are included in the algortihm's testcase) and runs this 
@@ -70,7 +76,7 @@ public class ExternalExecute {
     for (int i = 0; curAlg!=null && i < timesToExecute; i++) {
 
       if (verbose) 
-        System.out.printf("%5d", i);
+        System.out.printf("%5d ", i);
       
       Counters.resetCounters();
       curAlg.timer = new Timer();
@@ -120,24 +126,32 @@ public class ExternalExecute {
    * @param verbose
    * @return 
    */
-  public static Object runWithExternalJVM(String folderName, boolean verbose) {
-//    String classPath = Version.getClassesLocation();
-//    String[] cmd = {"java", "-cp",  classPath, "algator.ExternalExecute", folderName/*, verbose?"-v":""*/};
-    
-    ///* For real-time execution (classPath=..../ALGator.jar)
-    String classPath = Version.getClassesLocation();
-    //*/
-    
-    /* For execution in debug mode (Netbeans)
-    String classPath = "/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar";
-    //*/
-    
-    String[] command = {"java", "-cp", classPath, "-Xss1024k", "algator.ExternalExecute", folderName};
-    ProcessBuilder probuilder = new ProcessBuilder( command );
+  public static Object runWithExternalJVM(String folderName, MeasurementType mType, boolean verbose) {    
     try {
+      ///* For real-time execution (classPath=..../ALGator.jar)
+      String classPath = Version.getClassesLocation();
+      //*/
+    
+      //* For execution in debug mode (Netbeans)
+      classPath =  "/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar";
+      //*/
+    
+      String jvmCommand = "java";
+      if (mType.equals(MeasurementType.JVM)) {
+        String vmepCmd = EConfig.getConfig().getField(EConfig.ID_VMEP);
+        String vmepCP  = EConfig.getConfig().getField(EConfig.ID_VMEPClasspath);
+        if (!vmepCmd.isEmpty()) 
+          jvmCommand = vmepCmd;
+        if (!vmepCP.isEmpty())
+          classPath += File.pathSeparator + vmepCP;
+      }
+    
+      String[] command = {jvmCommand, "-cp", classPath, "-Xss1024k", "algator.ExternalExecute", folderName};
+      ProcessBuilder probuilder = new ProcessBuilder( command );
+    
       return probuilder.start();      
-    } catch (IOException ex) {
-      return ex.toString();
+    } catch (Exception e) {
+      return e.toString();
     }
   }
   

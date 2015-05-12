@@ -263,7 +263,7 @@ public class Executor {
 
   /**
    * Create a new java class in which all //@COUNT{cnt_name, value} are replaced
-   * with Counters.addToCounter("CMP", 1) commands. The new class is placed to the
+   * with Counters.addToCounter(cnt_name, value) commands. The new class is placed to the
    * same src folder where the original class resides.
    */
   static void testAndCreateCOUNTClass(String classRoot, String className) {
@@ -394,9 +394,5 @@ public class Executor {
     } catch (Exception e) {
       return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
     }
-  }
-
-  public static void main(String[] args) {
-    testAndCreateCOUNTClass("/Users/Tomaz/Dropbox/FRI/ALGator/test_data_root/projects/PROJ-Sorting/algs/ALG-BubbleSort/src", "BubblesortSortAlgorithm");
   }
 }

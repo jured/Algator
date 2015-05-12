@@ -12,11 +12,14 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import si.fri.algotest.entities.EAlgorithm;
+import si.fri.algotest.entities.EConfig;
+import si.fri.algotest.entities.EResultDescription;
 import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.execute.Executor;
 import si.fri.algotest.execute.Notificator;
+import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ATLog;
 import si.fri.algotest.tools.ATTools;
 import si.fri.algotest.global.ErrorStatus;
@@ -147,6 +150,7 @@ public class Execute {
       if (line.hasOption("data_root")) {
 	dataRoot = line.getOptionValue("data_root");
       }
+      ATGlobal.ALGatorDataRoot = dataRoot;
       
       if (line.hasOption("algorithm")) {
 	algorithmName = line.getOptionValue("algorithm");
@@ -185,20 +189,19 @@ public class Execute {
     } catch (ParseException ex) {
       printMsg(options);
     }
-
-
-
   }
 
   private static void runAlgorithms(String dataRoot, String projName, String algName,
 	  String testsetName, MeasurementType mType, boolean alwaysCompile, boolean alwaysRun, boolean printOnly) {
     
+    // Test the project
     Project projekt = new Project(dataRoot, projName);
     if (!projekt.getErrors().get(0).equals(ErrorStatus.STATUS_OK)) {
       System.out.println(projekt.getErrors().get(0));
       System.exit(0);
     }
      
+    // Test algorithms
     ArrayList<EAlgorithm> eAlgs;
     if (!algName.isEmpty()) {
       EAlgorithm alg = projekt.getAlgorithms().get(algName);
@@ -212,6 +215,7 @@ public class Execute {
        eAlgs = new ArrayList(projekt.getAlgorithms().values());
     }
     
+    // Test testsets
     ArrayList<ETestSet> eTests;
     if (!testsetName.isEmpty()) {
       ETestSet test = projekt.getTestSets().get(testsetName);
@@ -223,6 +227,23 @@ public class Execute {
       eTests.add(test);
     } else {
        eTests = new ArrayList(projekt.getTestSets().values());
+    }
+    
+    
+    // Test mesurement type
+    EResultDescription rDesc = projekt.getResultDescriptions().get(mType);  
+    if (rDesc == null) {
+      System.out.printf("Result description file for '%s' does not exist.\n", mType.getExtension());
+      System.exit(0);
+    }
+    if (mType.equals(MeasurementType.JVM)) {
+      String vmep = EConfig.getConfig().getField(EConfig.ID_VMEP);
+      File vmepFile = new File(vmep == null ? "":vmep);
+
+      if (vmep == null || vmep.isEmpty() /*|| !vmepFile.exists()  || !vmepFile.canExecute()*/) {
+        System.out.printf("Invelid vmep executable: '%s'.\n", vmep);
+        System.exit(0);    
+      }
     }
     
     

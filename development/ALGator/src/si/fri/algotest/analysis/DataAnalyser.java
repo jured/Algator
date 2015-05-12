@@ -185,9 +185,9 @@ public class DataAnalyser {
 
     ParameterSet resultPS = eResultDesc.getParameters();
     // test parameters are only defined in EM file
-    String[] testOrder = (measurement.equals(MeasurementType.EM)) ?
-            eResultDesc.getStringArray(EResultDescription.ID_TestParOrder) :
-            new String[0];
+    String[] testOrder = eResultDesc.getStringArray(EResultDescription.ID_TestParOrder);
+    if (testOrder == null) testOrder = new String[0];
+    
     String[] resultOrder = eResultDesc.getStringArray(EResultDescription.ID_ResultParOrder);
 
     String resFileName = ATGlobal.getRESULTfilename(project.getProjectRootDir(), algorithm, testset, measurement);

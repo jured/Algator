@@ -80,6 +80,8 @@ public class New {
 
       Class algClass = Class.forName(algClassName, true, classLoader);
       result = (AbsAlgorithm) algClass.newInstance();
+      
+      result.setmType(mType);
     } catch (Exception e) {
       ATLog.log("Can't make an instance of algorithm " + algName + ": " + e);
     }

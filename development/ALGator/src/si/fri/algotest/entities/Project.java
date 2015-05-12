@@ -133,12 +133,13 @@ public class Project {
    * @return 
    */
   public String[] getResultParameters() {
-    TreeSet<String> params = new TreeSet();
+    ArrayList<String> params = new ArrayList();
     
     for (EResultDescription eRedDesc : resultDescriptions.values()) {
       String [] tParams = eRedDesc.getStringArray(EResultDescription.ID_ResultParOrder);
       for (String param : tParams) 
-        params.add(param);
+        if (!params.contains(param))
+          params.add(param);
     }
     
     return (String []) params.toArray(new String[0]);

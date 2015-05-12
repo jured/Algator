@@ -60,7 +60,7 @@ public class ExternalExecutor {
   /**
    * This file is used as a communication chanell between main ALGator executor and ExternalJVMExecutor.
    * When an algorithm test is started, this file is initialized with empty contents. For each execution
-   * of the algorithm, ExternalJVMExecutor writes one byte to this. ALGator's executor regulary checks  
+   * of the algorithm, ExternalJVMExecutor writes one byte to this file. ALGator's executor regulary checks  
    * the content of this file and stops the execution is there is no progress.
    */
   private final static String COMMUNICATION_FILENAME = "alg.com";
@@ -124,7 +124,7 @@ public class ExternalExecutor {
         if (executionOK) {
           saveAlgToFile(New.getClassPathsForAlgorithm(project, algName), curAlg, tmpFolderName, SER_ALG_TYPE.TEST);
           
-          executionStatus = runWithLimitedTime(tmpFolderName, timesToExecute, timeLimit, false);
+          executionStatus = runWithLimitedTime(tmpFolderName, timesToExecute, timeLimit, mType, false);
         }
         
         if (executionStatus == ErrorStatus.STATUS_OK) { // the execution passed normaly (not killed)
@@ -152,10 +152,13 @@ public class ExternalExecutor {
             EParameter p1 = new EParameter("[Error]: invalid test", "Dataset can not be executed.", ParameterType.STRING, testCase.toString());
             oneAlgResults.addParameter(p1, true);
           }
-        } else { // the execution was killed
-          oneAlgResults = curAlg.done();
-          oneAlgResults.addParameter(EResultDescription.getPassParameter(false), true);
-
+        } else { // the execution did not perform succesfully
+          if (executionStatus == ErrorStatus.ERROR_PROCESS_CANT_BE_CREATED) {
+            return null;
+          } else {
+            oneAlgResults = curAlg.done();
+            oneAlgResults.addParameter(EResultDescription.getPassParameter(false), true);
+          }
         }
         allAlgsRestuls.add(oneAlgResults);
       
@@ -189,9 +192,10 @@ public class ExternalExecutor {
    * for n times (where n is one of the paramters in the algorithm's testcase) and returns
    * null if each execution finished in timeForOneExecutionTime and errorMessage otherwise
    */
-  static ErrorStatus runWithLimitedTime(String folderName, int timesToExecute, long timeForOneExecution, boolean verbose) {
+  static ErrorStatus runWithLimitedTime(String folderName, int timesToExecute, 
+            long timeForOneExecution, MeasurementType mType, boolean verbose) {
     
-    Object result =  ExternalExecute.runWithExternalJVM(folderName, verbose);
+    Object result =  ExternalExecute.runWithExternalJVM(folderName, mType, verbose);
       
     // during the process creation, an error occured
     if (result instanceof String)
@@ -309,15 +313,16 @@ public class ExternalExecutor {
   static ParameterSet getJVMParameters(EResultDescription resultDesc, AbsAlgorithm algorithm) {
     ParameterSet counterParameters = new ParameterSet();
     if (resultDesc != null) {
-      // not implemented!
+      return getTimeParameters(resultDesc, algorithm);
     }
     return counterParameters;
   }
 
  /**
-  * Saves the algotihm instance and the classpaths that were used to load this algorithm
+  * Saves the measurement type, classpath and algotihm instance to a file. 
   */
-  public static boolean saveAlgToFile(URL[] urls, AbsAlgorithm curAlg, String folderName, SER_ALG_TYPE algType) {
+  public static boolean saveAlgToFile(URL[] urls, AbsAlgorithm curAlg, 
+          String folderName, SER_ALG_TYPE algType) {
     try (FileOutputStream fis = new FileOutputStream(new File(folderName + File.separator + SERIALIZED_ALG_FILENAME + algType));
             ObjectOutputStream dos = new ObjectOutputStream(fis);        
         ) {

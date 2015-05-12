@@ -2,6 +2,7 @@ package si.fri.algotest.execute;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.ParameterSet;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.global.ErrorStatus;
@@ -12,6 +13,9 @@ import si.fri.algotest.timer.Timer;
  * @author tomaz
  */
 public abstract class AbsAlgorithm implements Cloneable, Serializable {
+  
+  // This data is needed by ExternalExecutor to determine the type of execution.
+  private MeasurementType mType;
   
   public Timer timer;                 // timer to measure the execution time of the current test
   private long[][] executoinTimes;    // the times of execution for all executions of the current test
@@ -53,6 +57,16 @@ public abstract class AbsAlgorithm implements Cloneable, Serializable {
   public void setCounters(HashMap<String, Integer> counters) {
     this.counters = (HashMap<String, Integer>) counters.clone();
   }
+
+  public MeasurementType getmType() {
+    return mType;
+  }
+
+  public void setmType(MeasurementType mType) {
+    this.mType = mType;
+  }
+  
+  
   
   /**
    * Extract data from {@code test} and prepare them in the form to be simply used

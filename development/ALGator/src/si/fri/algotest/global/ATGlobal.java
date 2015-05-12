@@ -34,13 +34,17 @@ public class ATGlobal {
   private static final String ATDIR_queryDir = "queries";
   
   private static final String ATDIR_tmpDir = "tmp";
+
+  private static final String ATDIR_configDir = "config";
+  private static final String CONFIG_FILENAME = "algator.conf";  // The name of the configuration file
   
   
   private static final String ATDIR_libDir = "lib";
   
-  
   public static final String COUNTER_CLASS_EXTENSION = "_COUNT"; 
 
+
+  
   /**
    * Returns the root of the project
    *
@@ -154,5 +158,9 @@ public class ATGlobal {
       tmpFolder.mkdirs();
     
     return folderName;
+  }
+  
+  public static String getCONFIGfilemane() {
+    return ALGatorDataRoot + File.separator + ATDIR_configDir + File.separator + CONFIG_FILENAME;
   }
 }

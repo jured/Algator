@@ -60,9 +60,6 @@ public class New {
     if (result == null) {
       try {
         URL[] urls = getClassPathsForAlgorithm(project, algName);
-        for (int i = 0; i < urls.length; i++) {
-          System.out.println(urls[i]);
-        }
         classloaders.put(key, (result = URLClassLoader.newInstance(urls)));
       } catch (Exception e) {
         ATLog.log("Error creating class loader: " + e.toString());
@@ -99,8 +96,10 @@ public class New {
               = ATTools.stripFilenameExtension((String) project.getProject().getField(EProject.ID_TestSetIteratorClass));
       Class tsClass = Class.forName(testSetIteratorClassName, true, classLoader);
 
-      System.out.printf("tsiClassName: %s\n", testSetIteratorClassName);
-      result = (AbstractTestSetIterator) tsClass.newInstance();
+      Object atsiNewInstance = tsClass.newInstance();
+      System.out.println("o:" + atsiNewInstance);
+      
+      result = (AbstractTestSetIterator) atsiNewInstance;
     } catch (Exception e) {
       ATLog.log("Can't make an instance of testset iterator for project " + project.getName() + ": " + e);
     }

@@ -1,9 +1,11 @@
 package si.fri.algotest.execute;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
+import java.util.HashSet;
 import si.fri.algotest.entities.EAlgorithm;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.MeasurementType;
@@ -53,6 +55,24 @@ public class New {
   }
   
   
+  /*
+  Opomba: Prvotna verzija programa je uporabljala metodo getCLassLoader(projekt, algoritm),
+    ki je za vsak par projekt-algoritm ustvarila NOV classloader. To se ni 
+  */
+  
+  private static HashSet<String> pathsAdded = new HashSet<String>();
+  private static ClassLoader getClassloader(URL [] urls) throws Exception {    
+    Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
+    method.setAccessible(true);
+    for (int i = 0; i < urls.length; i++) {
+      if (!pathsAdded.contains(urls[i].toString())) {
+        method.invoke(ClassLoader.getSystemClassLoader(), new Object[]{urls[i]});
+        pathsAdded.add(urls[i].toString());
+      }
+    }
+    return ClassLoader.getSystemClassLoader();
+  }
+  
   private static URLClassLoader getClassloader(Project project, String algName) {
     String key = project.getName() + "+" + algName;
     URLClassLoader result = classloaders.get(key);
@@ -71,7 +91,10 @@ public class New {
   public static AbsAlgorithm algorithmInstance(Project project, String algName, MeasurementType mType) {
     AbsAlgorithm result = null;
     try {
-      URLClassLoader classLoader = getClassloader(project, algName);
+      // ... glej opombo zgoraj pri getClassLoader
+      // ClassLoader classLoader = getClassloader(project, algName);
+      ClassLoader classLoader = getClassloader(getClassPathsForAlgorithm(project, algName));
+      
       String algClassName = project.getAlgorithms().get(algName).getField(EAlgorithm.ID_MainClassName);
 
       if (mType.equals(MeasurementType.CNT)) {
@@ -91,15 +114,15 @@ public class New {
   public static AbstractTestSetIterator testsetIteratorInstance(Project project, String algName) {
     AbstractTestSetIterator result = null;
     try {
-      URLClassLoader classLoader = getClassloader(project, algName);
+      // ... glej opombo zgoraj pri getClassLoader
+      //URLClassLoader classLoader = getClassloader(project, algName);
+      ClassLoader classLoader = getClassloader(getClassPathsForAlgorithm(project, algName));
+      
       String testSetIteratorClassName
               = ATTools.stripFilenameExtension((String) project.getProject().getField(EProject.ID_TestSetIteratorClass));
       Class tsClass = Class.forName(testSetIteratorClassName, true, classLoader);
-
-      Object atsiNewInstance = tsClass.newInstance();
-      System.out.println("o:" + atsiNewInstance);
       
-      result = (AbstractTestSetIterator) atsiNewInstance;
+      result = (AbstractTestSetIterator) tsClass.newInstance();
     } catch (Exception e) {
       ATLog.log("Can't make an instance of testset iterator for project " + project.getName() + ": " + e);
     }

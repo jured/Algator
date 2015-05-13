@@ -1,7 +1,5 @@
 package algator;
 
-import java.io.File;
-
 /**
  *
  * @author tomaz

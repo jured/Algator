@@ -68,7 +68,7 @@ public class New {
     return result;
   }
 
-  static AbsAlgorithm algorithmInstance(Project project, String algName, MeasurementType mType) {
+  public static AbsAlgorithm algorithmInstance(Project project, String algName, MeasurementType mType) {
     AbsAlgorithm result = null;
     try {
       URLClassLoader classLoader = getClassloader(project, algName);
@@ -88,7 +88,7 @@ public class New {
     return result;
   }
 
-  static AbstractTestSetIterator testsetIteratorInstance(Project project, String algName) {
+  public static AbstractTestSetIterator testsetIteratorInstance(Project project, String algName) {
     AbstractTestSetIterator result = null;
     try {
       URLClassLoader classLoader = getClassloader(project, algName);
@@ -98,7 +98,7 @@ public class New {
       Class tsClass = Class.forName(testSetIteratorClassName, true, classLoader);
       result = (AbstractTestSetIterator) tsClass.newInstance();
     } catch (Exception e) {
-      ATLog.log("Can't make an instance of testset iterator for project" + project.getName() + ": " + e);
+      ATLog.log("Can't make an instance of testset iterator for project " + project.getName() + ": " + e);
     }
     return result;
   }

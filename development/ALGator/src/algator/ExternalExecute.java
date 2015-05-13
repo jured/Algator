@@ -1,6 +1,5 @@
 package algator;
 
-import java.io.IOException;
 import si.fri.algotest.execute.*;
 import java.net.URL;
 import org.apache.commons.cli.BasicParser;
@@ -10,8 +9,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import si.fri.algotest.timer.Timer;
 
-import jamvm.vmep.InstructionMonitor;
-import jamvm.vmep.Opcode;
 import java.io.File;
 import si.fri.algotest.entities.EConfig;
 import si.fri.algotest.entities.MeasurementType;
@@ -52,11 +49,11 @@ public class ExternalExecute {
   
   
   /**
-   * Method executes the algorithm timesToExecute times. For each execution
+   * Executes a given algorithmm on a given testcase several times. For each execution
    * the clean copy of algorithm instance (which includes the testcase instance)
    * is loaded from file. The execution times are stored in local array and are
    * written to the final algorithm's array at the end of all executions. 
-   * The final version of algorithm instance (which include the result parameters
+   * The final version of algorithm instance (which includes the result parameters
    * in the testCase and timer parameters in the timer array) is written to file.
    */
   public static void run(String tmpFolderName, boolean verbose) {

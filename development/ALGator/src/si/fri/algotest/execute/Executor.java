@@ -5,20 +5,14 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import si.fri.algotest.entities.EAlgorithm;
-import si.fri.algotest.entities.EParameter;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.EResultDescription;
 import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.ParameterSet;
-import si.fri.algotest.entities.ParameterType;
 import si.fri.algotest.entities.Project;
-import si.fri.algotest.entities.StatFunction;
-import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.global.ATGlobal;
-import si.fri.algotest.timer.Timer;
 import si.fri.algotest.tools.ATTools;
 import static si.fri.algotest.tools.ATTools.compile;
 import si.fri.algotest.global.ErrorStatus;
@@ -28,159 +22,6 @@ import si.fri.algotest.global.ErrorStatus;
  * @author tomaz
  */
 public class Executor {
-
-
-  /**
-   * This method is not used any more. It has been replaced by ExternalExecutor.iterateTestSetAndRunAlgorithm 
-   */
-  public static ArrayList<ParameterSet> iterateTestSetAndRunAlgorithm(Project project, String algName, AbstractTestSetIterator it, EResultDescription resultDesc,
-          Notificator notificator, MeasurementType mType) {
-
-    ArrayList<ParameterSet> parameterSets = new ArrayList();
-    
-    AbsAlgorithm curAlg;
-    TestCase testCase = null;
-    ParameterSet result;
-
-    int timesToExecute = 1;
-    // for EM type of execution timesToExecute may be more than 1
-    if (mType.equals(MeasurementType.EM)) {
-      try {
-        ETestSet testSet = it.testSet;
-        timesToExecute = Integer.parseInt((String) testSet.getField(ETestSet.ID_TestRepeat));
-      } catch (Exception e) {
-        System.out.println(e);
-      }
-    }
-    if (timesToExecute <= 0) {
-      timesToExecute = 1;
-    }
-
-    int tsID = 0;
-    try {
-      while (it.hasNext()) {
-        it.readNext();
-
-        tsID++;
-        notificator.notify(tsID);
-
-        long[][] times = new long[Timer.MAX_TIMERS][timesToExecute];
-
-        // true if algorithm passes the execution, false otherwise
-        boolean executionOK = true;
-        curAlg = null;
-
-        // run the test timesToExecute-times and save time to the times[] array
-        for (int i = 0; i < timesToExecute; i++) {
-
-          testCase = it.getCurrent();
-
-          curAlg = New.algorithmInstance(project, algName, mType);
-
-          ErrorStatus err = curAlg.init(testCase);
-
-          if (err != ErrorStatus.STATUS_OK) {
-            executionOK = false;
-            break;
-          } else {
-
-            Counters.resetCounters();
-            
-            //!!! TODO
-            // Test should be run in a separate thread with limited time available. 
-            // If time is exceeded set PASS=KILLED and return form the method! 
-           
-            
-            curAlg.timer.start();
-              curAlg.run();
-            curAlg.timer.stop();                
-            
-
-            for (int tID = 0; tID < Timer.MAX_TIMERS; tID++) {
-              times[tID][i] = curAlg.timer.time(tID);
-            }
-          }
-        }
-        if (executionOK && curAlg != null) {
-          result = curAlg.done();
-
-          result.addParameter(EResultDescription.getPassParameter(true), true);
-          
-          // testing ThreadCpuTime
-          // long nanos = ManagementFactory.getThreadMXBean().getThreadCpuTime(java.lang.Thread.currentThread().getId());
-          // result.addParameter(new EParameter("CPUTime", "Bla", ParameterType.INT, nanos), true);
-
-          switch (mType) {
-            case EM:
-              // pregledam resultDesc parametre in za vsak parameter tipa "timer" ustvarim
-              // parameter v results s pravo vrednostj
-              if (resultDesc != null) {
-                ParameterSet pSet = resultDesc.getParameters();
-                for (int i = 0; i < resultDesc.getParameters().size(); i++) {
-                  EParameter rdP = pSet.getParameter(i);
-                  if (ParameterType.TIMER.equals(rdP.getType())) {
-                    String[] subtypeFields;
-                    try {
-                      String subtype = rdP.getSubtype();
-                      subtypeFields = subtype.split(" ");
-                      if (subtypeFields.length != 2) {
-                        throw new Exception("subtype: " + subtype);
-                      }
-
-                      int tID = Integer.parseInt(subtypeFields[0]);
-                      if (tID < 0 || tID > Timer.MAX_TIMERS - 1) {
-                        throw new Exception("Timer ID not in [0...MAX_TIMERS] " + subtype);
-                      }
-
-                      StatFunction fs = StatFunction.getStatFunction(subtypeFields[1]);
-                      if (fs.equals(StatFunction.UNKNOWN)) {
-                        throw new Exception("Invalid function: " + subtype);
-                      }
-
-                      // times[tID] -> ArrayList<Long> (list)
-                      Long[] longObjects = ArrayUtils.toObject(times[tID]);
-                      ArrayList<Long> list = new ArrayList<>(java.util.Arrays.asList(longObjects));
-
-                      Long time = (Long) StatFunction.getFunctionValue(fs, list);
-                      EParameter timeP = new EParameter(
-                              (String) rdP.getField(EParameter.ID_Name), null, null, time);
-                      result.addParameter(timeP, true);
-                    } catch (Exception e) {
-                      ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR, "Subtype parameter invalid (" + e.toString() + ")");
-                    }
-                  }
-                }
-              }
-              break;
-            case CNT:
-              if (resultDesc != null) {
-                ParameterSet pSet = resultDesc.getParameters();
-                for (int i = 0; i < pSet.size(); i++) {                  
-                  if (ParameterType.COUNTER.equals(pSet.getParameter(i).getType())) {
-                    String counterName = (String) pSet.getParameter(i).getField(EParameter.ID_Name);
-                    int value = Counters.getCounterValue(counterName);
-                    result.addParameter(new EParameter(counterName , null, null, value), true);
-                  }
-                   
-                }
-              }
-              break;
-          }
-        } else {
-          result = new ParameterSet();
-          EParameter p1 = new EParameter("[Error]: invalid test", "Dataset can not be executed.", ParameterType.STRING, testCase.toString());
-          result.addParameter(p1, true);
-        }
-        parameterSets.add(result);
-      }
-      it.close();
-    } catch (Exception e) {
-      ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
-    }
-
-    ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, "");
-    return parameterSets;
-  }
   
   /**
    * Compares the creation date of the files at bin directory and compiles the

@@ -1,6 +1,7 @@
 package algator;
 
 import jamvm.vmep.InstructionMonitor;
+import jamvm.vmep.Opcode;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -221,6 +222,13 @@ public class VMEPExecute {
           instrMonitor.start();
           result = curAlg.done();
           instrMonitor.stop();
+          
+          int[] instFreq=instrMonitor.getCounts();
+          for(int i=0;i<instFreq.length;i++){
+            if(instFreq[i]>0) {
+              System.out.println(Opcode.getNameFor(i) + " : "+instFreq[i]);
+            }
+          }
           
           result.addParameter(new EParameter("Tmin", "", ParameterType.INT, time), true);
 

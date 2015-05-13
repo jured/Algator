@@ -211,16 +211,16 @@ public class VMEPExecute {
           AbsAlgorithm curAlg = New.algorithmInstance(project, algName, MeasurementType.JVM);
           curAlg.init(testCase); 
         
-          InstructionMonitor instrMonitor = new InstructionMonitor();
+          //InstructionMonitor instrMonitor = new InstructionMonitor();
           
           long time = System.currentTimeMillis();
           
           curAlg.run();
           time = System.currentTimeMillis() - time;
           
-          instrMonitor.start();
+          //instrMonitor.start();
           result = curAlg.done();
-          instrMonitor.stop();
+          //instrMonitor.stop();
           
           result.addParameter(new EParameter("Tmin", "", ParameterType.INT, time), true);
 

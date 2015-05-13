@@ -155,10 +155,7 @@ public class VMEPExecute {
 
       System.exit(4); // invalid testset
     }
-    
-    AbsAlgorithm curAlg = New.algorithmInstance(projekt, algName, MeasurementType.JVM);
-
-    
+        
     AbstractTestSetIterator testsetIterator = New.testsetIteratorInstance(projekt, algName);
     if (testsetIterator == null) {
       if (verbose)

@@ -91,12 +91,16 @@ public class New {
   public static AbstractTestSetIterator testsetIteratorInstance(Project project, String algName) {
     AbstractTestSetIterator result = null;
     try {
+      System.out.println("1!");
       URLClassLoader classLoader = getClassloader(project, algName);
+      System.out.println("2!");
       String testSetIteratorClassName
               = ATTools.stripFilenameExtension((String) project.getProject().getField(EProject.ID_TestSetIteratorClass));
-
+      System.out.println("3!");
       Class tsClass = Class.forName(testSetIteratorClassName, true, classLoader);
+      System.out.println("4!");
       result = (AbstractTestSetIterator) tsClass.newInstance();
+      System.out.println("5!");
     } catch (Exception e) {
       ATLog.log("Can't make an instance of testset iterator for project " + project.getName() + ": " + e);
     }

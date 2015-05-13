@@ -172,7 +172,7 @@ public class VMEPExecute {
     }
 
     String resFilename = ATGlobal.getRESULTfilename(".", algName, testsetName, MeasurementType.JVM);
-    resFilename = Paths.get(resFilename).getFileName().toString(); // cut off the path ...
+    resFilename = ATTools.extractFileNamePrefix(new File(resFilename)) + ".jvm";
     resFilename = commFolder + File.separator + resFilename;       // ... and add commFolder as a path
     
     Notificator notificator = getNotificator(algName, testsetName, commFolder, verbose);

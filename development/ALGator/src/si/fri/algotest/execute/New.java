@@ -60,6 +60,9 @@ public class New {
     if (result == null) {
       try {
         URL[] urls = getClassPathsForAlgorithm(project, algName);
+        for (int i = 0; i < urls.length; i++) {
+          System.out.println(urls[i]);
+        }
         classloaders.put(key, (result = URLClassLoader.newInstance(urls)));
       } catch (Exception e) {
         ATLog.log("Error creating class loader: " + e.toString());

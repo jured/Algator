@@ -200,7 +200,6 @@ public class VMEPExecute {
       new FileWriter(resFilename).close();
       
       InstructionMonitor instrMonitor = new InstructionMonitor();
-      
       while (testsetIterator.hasNext()) {
         testsetIterator.readNext();
 
@@ -215,20 +214,16 @@ public class VMEPExecute {
           System.out.println("Test " + tsID);
           System.out.println("Pred urejanjem");
           System.out.println(testCase);
-          
-          long time = System.currentTimeMillis();
-          
-          curAlg.run();
-          time = System.currentTimeMillis() - time;
-          
-          instrMonitor.start();
-          result = curAlg.done();
+                    
+          instrMonitor.start();                    
+          curAlg.run();          
           instrMonitor.stop();
 
+          result = curAlg.done();
+          
           System.out.println("Po urejanju");
           System.out.println(testCase);
                     
-
           // write results to result set.
           ParameterSet pSet = resultDesc.getParameters();
           int[] instFreq=instrMonitor.getCounts();

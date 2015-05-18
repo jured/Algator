@@ -5,8 +5,6 @@ import jamvm.vmep.Opcode;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Scanner;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -223,16 +221,16 @@ public class VMEPExecute {
           result = curAlg.done();
           instrMonitor.stop();
           
+
+          // write results to result set.
+          ParameterSet pSet = resultDesc.getParameters();
           int[] instFreq=instrMonitor.getCounts();
           for(int i=0;i<instFreq.length;i++){
-            if(instFreq[i]>0) {
-              System.out.println(Opcode.getNameFor(i) + " : "+instFreq[i]);
+            String pName = Opcode.getNameFor(i);
+            if (pSet.getParamater(pName) != null) {
+              result.addParameter(new EParameter(pName, "", ParameterType.INT, instFreq[i]), true);
             }
           }
-          
-          result.addParameter(new EParameter("Tmin", "", ParameterType.INT, time), true);
-
-          // TODO: dodaj JVM PARAMETRE v result
           
           result.addParameter(EResultDescription.getPassParameter(true), true);
           

@@ -69,6 +69,14 @@ public class EResultDescription extends Entity {
 	JSONObject jo = ja.getJSONObject(i);
 	result.addParameter(new EParameter(jo.toString()), true);
       }
+      
+      // Add all undefined parameters - default type for undefined parameter is INT
+      String [] resultParameters = getField(ID_ResultParOrder);
+      for (String parameterName : resultParameters) {
+        if (result.getParamater(parameterName) == null)
+          result.addParameter(new EParameter(parameterName, parameterName, ParameterType.INT, 0), true);
+      }
+      
       return result;
     } catch (Exception e) {
       ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_NOT_A_RESULTPARAMETER_ARRAY, ID_params);

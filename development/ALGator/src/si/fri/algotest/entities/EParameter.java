@@ -117,8 +117,8 @@ public class EParameter extends Entity  implements Serializable {
         else return value;
         
         double potenca = Math.pow(10, decimals);
-        value = new Double(Math.round(d * potenca)/potenca);
-      } catch (Exception e) {
+        value = Math.round(d * potenca)/potenca;
+      } catch (NumberFormatException e) {
         return value; 
       }      
     }

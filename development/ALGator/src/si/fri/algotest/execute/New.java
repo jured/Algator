@@ -57,7 +57,13 @@ public class New {
   
   /*
   Opomba: Prvotna verzija programa je uporabljala metodo getCLassLoader(projekt, algoritm),
-    ki je za vsak par projekt-algoritm ustvarila NOV classloader. To se ni 
+    ki je za vsak par projekt-algoritm ustvarila NOV classloader. To se ni obneslo, saj je 
+    vmep pri tem javljal napako: ClassCastException (kot da bi bila AbstractTestsetIterator
+    in npr. SortTestsetIterator naložena z drugim nalagalnikom). Javanska verzija programa 
+    (če se algator požene z običajno javo) je delala brez problemov. 
+    Da sem odpravil to težavo, ves čas uporabljam ISTI nalagalnik, le classpath mu po potrebi
+    dopolnjujem. V množici pathsAdded si zapomnim, katere poti sem že dodal in jih ob nadaljnjih 
+    izvajanjih ne dodajam ponovno (brez tega je program delal bistveno bolj počasi).
   */
   
   private static HashSet<String> pathsAdded = new HashSet<String>();
@@ -73,6 +79,9 @@ public class New {
     return ClassLoader.getSystemClassLoader();
   }
   
+  /**
+   * Metoda se trenutno ne uporablja - glej komentar pri metodi getClassLoader(URL [] url)
+   */
   private static URLClassLoader getClassloader(Project project, String algName) {
     String key = project.getName() + "+" + algName;
     URLClassLoader result = classloaders.get(key);

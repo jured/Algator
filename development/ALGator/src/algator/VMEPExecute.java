@@ -237,7 +237,11 @@ public class VMEPExecute {
             if (pSet.getParamater(pName) != null) {
               result.addParameter(new EParameter(pName, "", ParameterType.INT, instFreq[i]), true);
             }
+            if (instFreq[i]!=0)
+              System.out.println(pName + " ");
+
           }
+          System.out.println("");
           
           result.addParameter(EResultDescription.getPassParameter(true), true);
           

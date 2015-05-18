@@ -199,6 +199,8 @@ public class VMEPExecute {
       // delete the content of an output file
       new FileWriter(resFilename).close();
       
+      InstructionMonitor instrMonitor = new InstructionMonitor();
+      
       while (testsetIterator.hasNext()) {
         testsetIterator.readNext();
 
@@ -213,8 +215,6 @@ public class VMEPExecute {
           System.out.println("Test " + tsID);
           System.out.println("Pred urejanjem");
           System.out.println(testCase);
-        
-          InstructionMonitor instrMonitor = new InstructionMonitor();
           
           long time = System.currentTimeMillis();
           

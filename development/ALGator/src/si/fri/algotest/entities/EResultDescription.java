@@ -33,7 +33,11 @@ public class EResultDescription extends Entity {
   public static final String ID_ResultParOrder  = "ResultParameters"; // String []
   public static final String ID_params          = "Parameters";       // EParameter []
   
+  // parameters of this testset
+  private ParameterSet parameters;
+  
    public EResultDescription() {
+     
      super(ID_ResultDescription, 
 	 new String [] {ID_Format, ID_Delim, ID_TestParOrder, ID_ResultParOrder, ID_params});
      set(ID_params, new JSONArray());
@@ -54,6 +58,9 @@ public class EResultDescription extends Entity {
    * Method return an String array obtained from corresponding field. 
    */
   public ParameterSet getParameters() {
+    if (parameters != null)
+      return parameters;
+    
     try {
       JSONArray ja = getField(ID_params);
       ParameterSet result = new ParameterSet();
@@ -71,11 +78,12 @@ public class EResultDescription extends Entity {
       }
       
       // Add all undefined parameters - default type for undefined parameter is INT
-      String [] resultParameters = getField(ID_ResultParOrder);
+      String [] resultParameters = getStringArray(ID_ResultParOrder);
       for (String parameterName : resultParameters) {
         if (result.getParamater(parameterName) == null)
           result.addParameter(new EParameter(parameterName, parameterName, ParameterType.INT, 0), true);
       }
+      parameters = result;
       
       return result;
     } catch (Exception e) {

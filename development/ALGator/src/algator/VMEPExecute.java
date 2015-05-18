@@ -209,6 +209,10 @@ public class VMEPExecute {
         try {
           AbsAlgorithm curAlg = New.algorithmInstance(project, algName, MeasurementType.JVM);
           curAlg.init(testCase); 
+          
+          System.out.println("Test " + tsID);
+          System.out.println("Pred urejanjem");
+          System.out.println(testCase);
         
           InstructionMonitor instrMonitor = new InstructionMonitor();
           
@@ -220,7 +224,10 @@ public class VMEPExecute {
           instrMonitor.start();
           result = curAlg.done();
           instrMonitor.stop();
-          
+
+          System.out.println("Po urejanju");
+          System.out.println(testCase);
+                    
 
           // write results to result set.
           ParameterSet pSet = resultDesc.getParameters();

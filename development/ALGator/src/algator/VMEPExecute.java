@@ -186,12 +186,19 @@ public class VMEPExecute {
 
     ParameterSet result = new ParameterSet();
     
+    if (verboseLevel == 2)
+      System.out.println("Running test...");
+    
     try {
       // delete the content of the output file
       new FileWriter(resFilename).close();
 
       if (testsetIterator.readTest(testNumber)) {
 
+       if (verboseLevel == 2)
+        System.out.println("Getting current...");
+        
+        
         TestCase testCase = testsetIterator.getCurrent();    
         AbsAlgorithm curAlg = New.algorithmInstance(project, algName, MeasurementType.JVM);
         curAlg.init(testCase); 
@@ -242,6 +249,8 @@ public class VMEPExecute {
       result.addParameter(EResultDescription.getPassParameter(false), true);
 
       ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
+      if (verboseLevel == 2)
+        System.out.println(e);
     }
   }
   

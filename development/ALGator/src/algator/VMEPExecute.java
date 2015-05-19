@@ -4,6 +4,7 @@ import jamvm.vmep.InstructionMonitor;
 import jamvm.vmep.Opcode;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 import org.apache.commons.cli.BasicParser;
@@ -185,7 +186,14 @@ public class VMEPExecute {
     String delim   = resultDesc.getField(EResultDescription.ID_Delim);
 
     ParameterSet result = new ParameterSet();
+    result.addParameter(EResultDescription.getAlgorithmNameParameter(algName), true);
+    result.addParameter(EResultDescription.getTestsetNameParameter(testsetName), true);
+    result.addParameter(EResultDescription.getTestIDParameter("Test"+testNumber), true); // if testCase won't initialize, a testcase ID is giver here 
+    result.addParameter(EResultDescription.getPassParameter(false), true);
     
+    // An error that appears as a result of JVM error is not caught by the following catch; however, the finally block
+    // is always executed. If in finally block success is false, then an JVM error has occured and must be reported
+    boolean success = false;
     try {
       // delete the content of the output file
       new FileWriter(resFilename).close();
@@ -196,9 +204,13 @@ public class VMEPExecute {
         AbsAlgorithm curAlg = New.algorithmInstance(project, algName, MeasurementType.JVM);
         curAlg.init(testCase); 
         
+        // add test ID (if execution fails, result should contain correct testID parameter)
+        result.addParameter(testCase.getParameters().getParamater(EResultDescription.testIDParName), true);
+        
+        
         if (verboseLevel == 2) {
           System.out.printf("Project: %s, Algorithm: %s, TestSet: %s, Test: %d\n", project.projectName, algName, testsetName, testNumber);
-          System.out.println("********* Before execution       ***********************************************");
+          System.out.println("********* Before execution       *********************************************");
           System.out.println(testCase);
         }
         
@@ -210,16 +222,14 @@ public class VMEPExecute {
         result = curAlg.done();
         
         if (verboseLevel == 2) {
-          System.out.println("********* After execution        ***********************************************");
+          System.out.println("********* After execution        *********************************************");
           System.out.println(testCase);
         }
 
         
-        if (verboseLevel == 2) {
-          System.out.println("********* Bytecode commands used  ***********************************************");
-        }
-
-        
+        if (verboseLevel == 2) 
+          System.out.println("********* Bytecode commands used *********************************************");
+                
         // write results to the result set.
         ParameterSet pSet = resultDesc.getParameters();
         int[] instFreq=instrMonitor.getCounts();
@@ -236,22 +246,28 @@ public class VMEPExecute {
         
         
         result.addParameter(EResultDescription.getPassParameter(true), true);
-        result.addParameter(EResultDescription.getTestIDParameter("test"+testNumber), true);
         result.addParameter(EResultDescription.getAlgorithmNameParameter(algName), true);
         result.addParameter(EResultDescription.getTestsetNameParameter(testsetName), true);
-
-        PrintWriter pw = new PrintWriter(new FileWriter(resFilename, true));                  
-          pw.println(result.toString(order, false, delim));
-        pw.close();          
       }
+      success = true;
       
-    } catch (Exception e) {
-      result.addParameter(EResultDescription.getPassParameter(false), true);
+    } catch (IOException e) {
+      result.addParameter(EResultDescription.getErrorParameter(e.toString()), true);
 
       ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
 
-      if (verboseLevel == 2)
+      if (verboseLevel == 1)
         System.out.println(e);
+    } finally {
+      if (!success) {
+         result.addParameter(EResultDescription.getErrorParameter("Unknown JVM error"), true);
+      }
+      try (PrintWriter pw = new PrintWriter(new FileWriter(resFilename, true))) {                  
+          pw.println(result.toString(order, false, delim));
+      } catch (IOException e) {
+        if (verboseLevel == 1)
+          System.out.println(e);
+      }
     }
   }
   

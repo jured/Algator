@@ -84,7 +84,13 @@ public class ParameterSet implements Serializable {
   public String toString(String [] order, boolean includeFieldNames, String delim) {
     String result = "";
       
-    for (int i = 0; i < order.length; i++) {
+    int numPar = order.length;
+    if (numPar > EResultDescription.FIXNUM && parameters.contains(EResultDescription.getErrorParameter(""))) {
+        numPar = EResultDescription.FIXNUM;
+        order[numPar++] = EResultDescription.errorParName;
+    }
+    
+    for (int i = 0; i < numPar; i++) {
       EParameter p = null;
     
       // find a parameter with name==order[i]
@@ -103,8 +109,8 @@ public class ParameterSet implements Serializable {
         result += delim;
     }
      
-    // strip ; at the end of line
-    return result.substring(0,result.length()-1);
+    // strip <code>delim</code> at the end of line
+    return result.substring(0,result.length()-delim.length());
   }
   
 }

@@ -19,6 +19,7 @@ public class EResultDescription extends Entity {
   public static final String tstParName      = "Testset"; 
   public static final String testIDParName   = "TestID";   // Unique identificator of a test within a testset  
   public static final String passParName     = "Pass";     // DONE if algorithem finished within the given time limit, KILLLED otherwise
+  public static final String errorParName    = "Error";    // if an error occures, this parameter contains error message
   
   // unique sequence number of a test in a tabel (id of table row)
   public static final String testNoParName   = "ID";     
@@ -148,11 +149,18 @@ public class EResultDescription extends Entity {
     String passStr = pass ? "DONE" : "KILLED";
     return new EParameter(passParName, "Algorithm passed", ParameterType.STRING, passStr);
   }
-
   /**
    * Returns a testID paremeter
    */
   public static EParameter getTestIDParameter(String testID) {
     return new EParameter(testIDParName, "Test identificator", ParameterType.STRING, testID);
   }
+
+  /**
+   * Returns an error paremeter
+   */
+  public static EParameter getErrorParameter(String errorMsg) {
+    return new EParameter(errorParName, "Error message", ParameterType.STRING, errorMsg.replaceAll("\n", " "));
+  }
+
 }

@@ -19,7 +19,9 @@ public abstract class AbstractTestSetIterator  {
   }
   
   public AbstractTestSetIterator(ETestSet testSet) {
-    this.testSet = testSet;    
+    this.testSet = testSet;   
+    
+    initIterator();
   }
   
   public void setTestSet(ETestSet testSet) {

@@ -249,6 +249,7 @@ public class VMEPExecute {
       result.addParameter(EResultDescription.getPassParameter(false), true);
 
       ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
+
       if (verboseLevel == 2)
         System.out.println(e);
     }

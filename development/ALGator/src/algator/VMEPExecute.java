@@ -186,7 +186,6 @@ public class VMEPExecute {
 
     ParameterSet result = new ParameterSet();
     
-    
     try {
       // delete the content of the output file
       new FileWriter(resFilename).close();
@@ -198,8 +197,8 @@ public class VMEPExecute {
         curAlg.init(testCase); 
         
         if (verboseLevel == 2) {
-          System.out.println("Test " + testNumber); 
-          System.out.println("Before execution: ");
+          System.out.printf("Project: %s, Algorithm: %s, TestSet: %s, Test: %d\n", project.projectName, algName, testsetName, testNumber);
+          System.out.println("********* Before execution       ***********************************************");
           System.out.println(testCase);
         }
         
@@ -211,10 +210,16 @@ public class VMEPExecute {
         result = curAlg.done();
         
         if (verboseLevel == 2) {
-          System.out.println("After execution: ");
+          System.out.println("********* After execution        ***********************************************");
           System.out.println(testCase);
         }
-                    
+
+        
+        if (verboseLevel == 2) {
+          System.out.println("********* Bytecode commands used  ***********************************************");
+        }
+
+        
         // write results to the result set.
         ParameterSet pSet = resultDesc.getParameters();
         int[] instFreq=instrMonitor.getCounts();
@@ -224,11 +229,12 @@ public class VMEPExecute {
             result.addParameter(new EParameter(pName, "", ParameterType.INT, instFreq[i]), true);
           }
           if (verboseLevel == 2 && instFreq[i]!=0)
-            System.out.println(pName + " ");
-          
-          if (verboseLevel == 2)
-            System.out.println("");
+            System.out.print(pName + " ");
         }  
+        if (verboseLevel == 2)
+            System.out.println("");
+        
+        
         result.addParameter(EResultDescription.getPassParameter(true), true);
         result.addParameter(EResultDescription.getTestIDParameter("test"+testNumber), true);
         result.addParameter(EResultDescription.getAlgorithmNameParameter(algName), true);

@@ -137,23 +137,24 @@ public class VMEPExecute {
 
       System.exit(4); // invalid testset
     }    
-    
-    // Test testNumber
-    int allTests = testSet.getField(ETestSet.ID_N);
-    if (testNumber > allTests) {
-      if (verboseLevel > 0)
-        System.out.println("Invalid test number.");
-
-      System.exit(5); // invalid testset      
-    }
-        
+            
     AbstractTestSetIterator testsetIterator = New.testsetIteratorInstance(projekt, algName);
     if (testsetIterator == null) {
       if (verboseLevel > 0)
         System.out.println("Can not create testset iterator.");
-      System.exit(6); // testset iterator can not be created
+      System.exit(5); // testset iterator can not be created
     }
     testsetIterator.setTestSet(testSet);
+    
+    // Test testNumber
+    int allTests = testsetIterator.getNumberOfTestInstances();
+    if (testNumber > allTests) {
+      if (verboseLevel > 0)
+        System.out.println("Invalid test number.");
+
+      System.exit(6); // invalid testset      
+    }
+
 
     EResultDescription resultDescription = projekt.getResultDescriptions().get(MeasurementType.JVM);
     if (resultDescription == null) {

@@ -48,8 +48,8 @@ import si.fri.algotest.tools.ATTools;
  *   2 ... invalid project
  *   3 ... invalid algorithm
  *   4 ... invalid testset
- *   5 ... invalid test number
- *   6 ... problems with testset iterator
+ *   5 ... problems with testset iterator
+ *   6 ... invalid test number
  *   7 ... result description file does not exist
  * 
  * @author tomaz
@@ -140,12 +140,14 @@ public class VMEPExecute {
     }    
             
     AbstractTestSetIterator testsetIterator = New.testsetIteratorInstance(projekt, algName);
-    if (testsetIterator == null) {
+    if (testsetIterator != null) 
+      testsetIterator.setTestSet(testSet);    
+    if (testsetIterator == null || !ErrorStatus.getLastErrorStatus().equals(ErrorStatus.STATUS_OK)) {
       if (verboseLevel > 0)
         System.out.println("Can not create testset iterator.");
       System.exit(5); // testset iterator can not be created
     }
-    testsetIterator.setTestSet(testSet);
+    
     
     // Test testNumber
     int allTests = testsetIterator.getNumberOfTestInstances();
@@ -155,7 +157,6 @@ public class VMEPExecute {
 
       System.exit(6); // invalid testset      
     }
-
 
     EResultDescription resultDescription = projekt.getResultDescriptions().get(MeasurementType.JVM);
     if (resultDescription == null) {
@@ -206,8 +207,7 @@ public class VMEPExecute {
         
         // add test ID (if execution fails, result should contain correct testID parameter)
         result.addParameter(testCase.getParameters().getParamater(EResultDescription.testIDParName), true);
-        
-        
+           
         if (verboseLevel == 2) {
           System.out.printf("Project: %s, Algorithm: %s, TestSet: %s, Test: %d\n", project.projectName, algName, testsetName, testNumber);
           System.out.println("********* Before execution       *********************************************");
@@ -226,7 +226,6 @@ public class VMEPExecute {
           System.out.println(testCase);
         }
 
-        
         if (verboseLevel == 2) 
           System.out.println("********* Bytecode commands used *********************************************");
                 
@@ -248,6 +247,8 @@ public class VMEPExecute {
         result.addParameter(EResultDescription.getPassParameter(true), true);
         result.addParameter(EResultDescription.getAlgorithmNameParameter(algName), true);
         result.addParameter(EResultDescription.getTestsetNameParameter(testsetName), true);
+      } else {
+        result.addParameter(EResultDescription.getErrorParameter("Invaldi testset or test."), true);
       }
       success = true;
       

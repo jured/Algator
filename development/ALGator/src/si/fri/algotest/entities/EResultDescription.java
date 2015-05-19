@@ -12,13 +12,13 @@ import si.fri.algotest.global.ErrorStatus;
 public class EResultDescription extends Entity {
   /**
    * The numnber of fileds added to every result file.
-   * Currently: 4 (the name of the algorithm, the testset, the test and pass (DONE/KILLED))
+   * Currently: 4 (the name of the algorithm, the testset, the test and pass (DONE/FAILED))
    */
   public static final int FIXNUM = 4;
   public static final String algParName      = "Algorithm"; 
   public static final String tstParName      = "Testset"; 
   public static final String testIDParName   = "TestID";   // Unique identificator of a test within a testset  
-  public static final String passParName     = "Pass";     // DONE if algorithem finished within the given time limit, KILLLED otherwise
+  public static final String passParName     = "Pass";     // DONE if algorithem finished within the given time limit, FAILED otherwise
   public static final String errorParName    = "Error";    // if an error occures, this parameter contains error message
   
   // unique sequence number of a test in a tabel (id of table row)
@@ -146,7 +146,7 @@ public class EResultDescription extends Entity {
    * Returns a parameter that represents the success of the algorithm (DONE or KILLED)
    */
   public static EParameter getPassParameter(boolean pass) {
-    String passStr = pass ? "DONE" : "KILLED";
+    String passStr = pass ? "DONE" : "FAILED";
     return new EParameter(passParName, "Algorithm passed", ParameterType.STRING, passStr);
   }
   /**

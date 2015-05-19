@@ -46,8 +46,7 @@ public abstract class DefaultTestSetIterator  extends AbstractTestSetIterator {
 	lineNumber=0;
       } catch (Exception e) {
 	input = null;
-	
-	ATLog.log(e.toString());
+        ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_INVALID_TESTSET, e.toString());
       } 
     }
   }

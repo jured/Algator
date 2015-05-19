@@ -11,18 +11,6 @@ import si.fri.algotest.entities.TestCase;
 public abstract class AbstractTestSetIterator  {
 
   protected ETestSet  testSet;
-
-  /** 
-   * If the default constructor is used, a setTestSet method has to be called after the instantination.
-   */
-  public AbstractTestSetIterator() {
-  }
-  
-  public AbstractTestSetIterator(ETestSet testSet) {
-    this.testSet = testSet;   
-    
-    initIterator();
-  }
   
   public void setTestSet(ETestSet testSet) {
     this.testSet = testSet;

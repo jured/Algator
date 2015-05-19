@@ -23,21 +23,8 @@ public abstract class DefaultTestSetIterator  extends AbstractTestSetIterator {
   protected int     lineNumber;        // the number of the current line
   protected String  currentInputLine;  // the current input line 
 
-  /** 
-   * If the default constructor is used, a setTestSet method has to be called after the instantination.
-   */
-  public DefaultTestSetIterator() {
-  }
   
-  public DefaultTestSetIterator(ETestSet testSet) {
-    this.testSet = testSet;    
-  }
   
-  public void setTestSet(ETestSet testSet) {
-    this.testSet = testSet;
-    
-    initIterator();
-  }
   
   @Override
   /**
@@ -93,7 +80,7 @@ public abstract class DefaultTestSetIterator  extends AbstractTestSetIterator {
       } 
     }
     
-    while (testNumber < lineNumber && hasNext())
+    while (testNumber > lineNumber && hasNext())
       readNext();
     
     return testNumber == lineNumber;

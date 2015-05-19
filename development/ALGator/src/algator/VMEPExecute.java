@@ -47,8 +47,9 @@ import si.fri.algotest.tools.ATTools;
  *   2 ... invalid project
  *   3 ... invalid algorithm
  *   4 ... invalid testset
- *   5 ... problems with testset iterator
- *   6 ... result description file does not exist
+ *   5 ... invalid test number
+ *   6 ... problems with testset iterator
+ *   7 ... result description file does not exist
  * 
  * @author tomaz
  */
@@ -56,27 +57,6 @@ public class VMEPExecute {
 
   private static String introMsg = "ALGator VMEP Executor, " + Version.getVersion();
   
-
-  /**
-   * This notificator notifies to stdout and to communication file
-   */
-  private static Notificator getNotificator(final String alg, final String testSet, 
-          final String comFolder, final boolean verbose) {
-    return new Notificator() {
-      
-      { // anonimous constructor
-        ExternalExecutor.initCommunicationFile(comFolder);
-      }
-      
-      public void notify(int i) {
-        if (verbose)
-          System.out.println(String.format("[%s, %s]: test %d out of %d done.", alg, testSet, i, this.getN()));
-        
-        ExternalExecutor.addToCommunicationFile(comFolder);
-      }
-    };
-  }
-
 
   private static Options getOptions() {
     Options options = new Options();
@@ -91,8 +71,10 @@ public class VMEPExecute {
     
     options.addOption("h", "help", false,
 	    "print this message");    
-    options.addOption("v", "verbose", false, "print additional information on error");
-    options.addOption("u", "usage", false, "print usage guide");
+        
+    options.addOption("v1", "print",   false, "print   information on error");
+    options.addOption("v2", "verbose", false, "verbose information on error");
+    options.addOption("u", "usage",    false, "print usage guide");
     
     return options;
   }
@@ -101,7 +83,7 @@ public class VMEPExecute {
     System.out.println(introMsg + "\n");
     
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp("algator.VMEPExecute [options] project_name algorithm_name testset_name comm_folder", options);
+    formatter.printHelp("algator.VMEPExecute [options] project_name algorithm_name testset_name test_number comm_folder", options);
 
     System.exit(0);
   }
@@ -116,26 +98,26 @@ public class VMEPExecute {
     System.exit(0);
   }
     
-  public static void runTestset(String dataRoot, String projName, String algName, 
-          String testsetName, String commFolder, boolean verbose) {
+  public static void runTest(String dataRoot, String projName, String algName, 
+          String testsetName, int testNumber, String commFolder, int verboseLevel) {
 
     // Test the project
     Project projekt = new Project(dataRoot, projName);
     if (!projekt.getErrors().get(0).equals(ErrorStatus.STATUS_OK)) {
-      if (verbose)
+      if (verboseLevel > 0)
         System.out.println("Invalid project name.");
       System.exit(2); // invalid project
     }
 
     // Test algorithms
     if (algName == null || algName.isEmpty()) {
-      if (verbose)
+      if (verboseLevel > 0)
         System.out.println("Invalid algorithm name.");
       System.exit(3);
     }
     EAlgorithm alg = projekt.getAlgorithms().get(algName);
     if (alg == null) {
-      if (verbose)
+      if (verboseLevel > 0)
         System.out.println("Invalid algorithm name.");
 
       System.exit(3); // invalid algorithm
@@ -143,41 +125,48 @@ public class VMEPExecute {
 
     // Test testsets
     if (testsetName == null || testsetName.isEmpty()) {
-      if (verbose)
+      if (verboseLevel > 0)
         System.out.println("Invalid testset name.");
       System.exit(4);
     }
+    
     ETestSet testSet = projekt.getTestSets().get(testsetName);
     if (testSet == null) {
-      if (verbose)
+      if (verboseLevel > 0)
         System.out.println("Invalid testset name.");
 
       System.exit(4); // invalid testset
+    }    
+    
+    // Test testNumber
+    int allTests = testSet.getField(ETestSet.ID_N);
+    if (testNumber > allTests) {
+      if (verboseLevel > 0)
+        System.out.println("Invalid test number.");
+
+      System.exit(5); // invalid testset      
     }
         
     AbstractTestSetIterator testsetIterator = New.testsetIteratorInstance(projekt, algName);
     if (testsetIterator == null) {
-      if (verbose)
+      if (verboseLevel > 0)
         System.out.println("Can not create testset iterator.");
-      System.exit(5); // testset iterator can not be created
+      System.exit(6); // testset iterator can not be created
     }
     testsetIterator.setTestSet(testSet);
 
     EResultDescription resultDescription = projekt.getResultDescriptions().get(MeasurementType.JVM);
     if (resultDescription == null) {
-      if (verbose)
+      if (verboseLevel > 0)
         System.out.println("JVM result description file does not exist.");
-      System.exit(6); // JVM result descritpion does not exist
+      System.exit(7); // JVM result descritpion does not exist
     }
 
     String resFilename = ATGlobal.getRESULTfilename(".", algName, testsetName, MeasurementType.JVM);
-    resFilename = ATTools.extractFileNamePrefix(new File(resFilename)) + ".jvm";
+    resFilename = ATTools.extractFileNamePrefix(new File(resFilename)) + "-" + testNumber + ".jvm";
     resFilename = commFolder + File.separator + resFilename;       // ... and add commFolder as a path
     
-    Notificator notificator = getNotificator(algName, testsetName, commFolder, verbose);
-    notificator.setNumberOfInstances(testsetIterator.getNumberOfTestInstances());
-    
-    iterateTestSetAndRunAlgorithm(projekt, algName, testsetName, resultDescription, testsetIterator, notificator, resFilename);
+    runAlgorithmOnTest(projekt, algName, testsetName, testNumber, resultDescription, testsetIterator, verboseLevel, resFilename);
   }
 
   
@@ -185,65 +174,61 @@ public class VMEPExecute {
   /**
    * 
    */
-  public static void iterateTestSetAndRunAlgorithm(
-    Project project, String algName, String testsetName, EResultDescription resultDesc,
-          AbstractTestSetIterator testsetIterator, Notificator notificator, String resFilename) {
-    
+  public static void runAlgorithmOnTest(
+    Project project, String algName, String testsetName, int testNumber, EResultDescription resultDesc,
+          AbstractTestSetIterator testsetIterator, int verboseLevel, String resFilename) {
+        
     
     // the order of parameters to be printed
     String[] order = resultDesc.getParamsOrder();
     String delim   = resultDesc.getField(EResultDescription.ID_Delim);
+
+    ParameterSet result = new ParameterSet();
     
-    int tsID = 0;
     try {
-      // delete the content of an output file
+      // delete the content of the output file
       new FileWriter(resFilename).close();
-      
-      while (testsetIterator.hasNext()) {
-        testsetIterator.readNext();
 
-        notificator.notify(++tsID);
+      if (testsetIterator.readTest(testNumber)) {
 
-        TestCase testCase = testsetIterator.getCurrent();
-        ParameterSet result;
-        try {
-          AbsAlgorithm curAlg = New.algorithmInstance(project, algName, MeasurementType.JVM);
-          curAlg.init(testCase); 
-          
-          System.out.println("Test " + tsID);
-          System.out.println("Pred urejanjem");
+        TestCase testCase = testsetIterator.getCurrent();    
+        AbsAlgorithm curAlg = New.algorithmInstance(project, algName, MeasurementType.JVM);
+        curAlg.init(testCase); 
+        
+        if (verboseLevel == 2) {
+          System.out.println("Test " + testNumber);
+          System.out.println("Before execution: ");
           System.out.println(testCase);
-
-          InstructionMonitor instrMonitor = new InstructionMonitor();
-          instrMonitor.start();                    
-          curAlg.run();          
-          instrMonitor.stop();
-
-          result = curAlg.done();
-          
-          System.out.println("Po urejanju");
-          System.out.println(testCase);
-                    
-          // write results to result set.
-          ParameterSet pSet = resultDesc.getParameters();
-          int[] instFreq=instrMonitor.getCounts();
-          for(int i=0;i<instFreq.length;i++){
-            String pName = Opcode.getNameFor(i);
-            if (pSet.getParamater(pName) != null) {
-              result.addParameter(new EParameter(pName, "", ParameterType.INT, instFreq[i]), true);
-            }
-            if (instFreq[i]!=0)
-              System.out.println(pName + " ");
-
-          }
-          System.out.println("");
-          
-          result.addParameter(EResultDescription.getPassParameter(true), true);
-          
-        } catch (Exception e) {
-          result = new ParameterSet();
-          result.addParameter(EResultDescription.getPassParameter(false), true);
         }
+        
+        InstructionMonitor instrMonitor = new InstructionMonitor();
+        instrMonitor.start();                    
+        curAlg.run();          
+        instrMonitor.stop();
+
+        result = curAlg.done();
+        
+        if (verboseLevel == 2) {
+          System.out.println("After execution: ");
+          System.out.println(testCase);
+        }
+                    
+        // write results to the result set.
+        ParameterSet pSet = resultDesc.getParameters();
+        int[] instFreq=instrMonitor.getCounts();
+        for(int i=0;i<instFreq.length;i++){
+          String pName = Opcode.getNameFor(i);
+          if (pSet.getParamater(pName) != null) {
+            result.addParameter(new EParameter(pName, "", ParameterType.INT, instFreq[i]), true);
+          }
+          if (verboseLevel == 2 && instFreq[i]!=0)
+            System.out.println(pName + " ");
+          
+          if (verboseLevel == 2)
+            System.out.println("");
+        }  
+        result.addParameter(EResultDescription.getPassParameter(true), true);
+        result.addParameter(EResultDescription.getTestIDParameter("test"+testNumber), true);
         result.addParameter(EResultDescription.getAlgorithmNameParameter(algName), true);
         result.addParameter(EResultDescription.getTestsetNameParameter(testsetName), true);
 
@@ -251,9 +236,10 @@ public class VMEPExecute {
           pw.println(result.toString(order, false, delim));
         pw.close();          
       }
-      testsetIterator.close();
       
     } catch (Exception e) {
+      result.addParameter(EResultDescription.getPassParameter(false), true);
+
       ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
     }
   }
@@ -281,14 +267,15 @@ public class VMEPExecute {
       }
 
       String[] curArgs = line.getArgs();
-      if (curArgs.length != 4) {
+      if (curArgs.length != 5) {
 	printMsg(options);
       }
 
       String projectName   = curArgs[0];
       String algorithmName = curArgs[1];
       String testsetName   = curArgs[2];
-      String commFolder    = curArgs[3];
+      String testNumberS   = curArgs[3];
+      String commFolder    = curArgs[4];
 
       String dataRoot = System.getenv("ALGATOR_DATA_ROOT");
       if (line.hasOption("data_root")) {
@@ -296,16 +283,30 @@ public class VMEPExecute {
       }
       ATGlobal.ALGatorDataRoot = dataRoot;
       
-      boolean verbose = line.hasOption("verbose");
+      
+      int testNumber = 1; // the first test in testset is the default test to run
+      try {
+        testNumber = Integer.parseInt(testNumberS);
+      } catch (Exception e) {}
+      
+      int verboseLevel = 0;
+      if (line.hasOption("print")) verboseLevel = 1;
+      if (line.hasOption("verbose")) verboseLevel = 2;
+
       ATLog.setLogLevel(ATLog.LOG_LEVEL_OFF);
-      if (verbose) {
+      if (verboseLevel > 0) {
         ATLog.setLogLevel(ATLog.LOG_LEVEL_STDOUT);
       }
 
-      if (verbose)
+      if (verboseLevel > 0)
         System.out.println(introMsg + "\n");
       
-      runTestset(dataRoot, projectName, algorithmName, testsetName, commFolder, verbose);
+      // Notify to the caller (message: JVM has started) 
+      ExternalExecutor.initCommunicationFile(commFolder);
+      ExternalExecutor.addToCommunicationFile(commFolder);
+      
+      
+      runTest(dataRoot, projectName, algorithmName, testsetName, testNumber, commFolder, verboseLevel);
 
     } catch (ParseException ex) {
       printMsg(options);

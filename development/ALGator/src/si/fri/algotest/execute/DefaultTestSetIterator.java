@@ -17,8 +17,9 @@ import si.fri.algotest.global.ErrorStatus;
  */
 public abstract class DefaultTestSetIterator  extends AbstractTestSetIterator {
 
-  
   private   Scanner input;             // scanner used to iterate throught the Description file
+  private   String  testFileName;      // the name of the file this iterator reads from
+  
   protected int     lineNumber;        // the number of the current line
   protected String  currentInputLine;  // the current input line 
 
@@ -29,9 +30,7 @@ public abstract class DefaultTestSetIterator  extends AbstractTestSetIterator {
   }
   
   public DefaultTestSetIterator(ETestSet testSet) {
-    this.testSet = testSet;
-    
-    initIterator();
+    this.testSet = testSet;    
   }
   
   public void setTestSet(ETestSet testSet) {
@@ -40,6 +39,10 @@ public abstract class DefaultTestSetIterator  extends AbstractTestSetIterator {
     initIterator();
   }
   
+  @Override
+  /**
+   * The constructor of this class was changed and initIterator() has to be called manually!
+   */
   public void initIterator() {
     if (testSet != null) {
       String fileName = testSet.getTestSetDescriptionFile();
@@ -75,6 +78,28 @@ public abstract class DefaultTestSetIterator  extends AbstractTestSetIterator {
     
     currentInputLine = input.nextLine(); lineNumber++;
   }
+
+  @Override
+  public boolean readTest(int testNumber) {
+    if (lineNumber > testNumber) {
+      try {
+        input.close();
+        input = new Scanner(new File(testFileName));
+	lineNumber=0;
+      } catch (Exception e) {
+	input = null;	
+	ATLog.log(e.toString());
+        return false;
+      } 
+    }
+    
+    while (testNumber < lineNumber && hasNext())
+      readNext();
+    
+    return testNumber == lineNumber;
+  }
+  
+  
     
  @Override
   public void close() throws IOException {

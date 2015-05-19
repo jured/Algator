@@ -19,9 +19,7 @@ public abstract class AbstractTestSetIterator  {
   }
   
   public AbstractTestSetIterator(ETestSet testSet) {
-    this.testSet = testSet;
-    
-    initIterator();
+    this.testSet = testSet;    
   }
   
   public void setTestSet(ETestSet testSet) {
@@ -43,6 +41,14 @@ public abstract class AbstractTestSetIterator  {
    * Reads the next test case (as a raw data)
    */
   public abstract void readNext();
+  
+  
+  /**
+   * Reads the i-th test case (as a raw data) and returns true if no error occures
+   * or false otherwise (i.e. if i > number_of_all_tests).
+   */
+  public abstract boolean readTest(int testNumber);
+  
   
   /**
    * Creates a new TestCase object fro a raw data read by readNext() mathod. 

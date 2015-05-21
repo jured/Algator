@@ -54,7 +54,8 @@ public class VMEPExecutor {
     String tsP   = EResultDescription.getTestsetNameParameter(testSetName).getField(EParameter.ID_Value);
       
     /* The name of the output file */
-    String resFilename = ATGlobal.getRESULTfilename(project.dataRoot, algName, testSetName, MeasurementType.JVM);
+    String projectRoot = ATGlobal.getPROJECTroot(project.dataRoot, project.getName());
+    String resFilename = ATGlobal.getRESULTfilename(projectRoot, algName, testSetName, MeasurementType.JVM);
     
     // Maximum time allowed (in seconds) for one execution of one test; if the algorithm 
     // does not  finish in this time, the execution is killed

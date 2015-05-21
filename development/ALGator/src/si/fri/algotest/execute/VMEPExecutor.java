@@ -1,37 +1,22 @@
 package si.fri.algotest.execute;
 
-import algator.ExternalExecute;
 import algator.VMEPExecute;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Scanner;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import si.fri.algotest.entities.EParameter;
 import si.fri.algotest.entities.EResultDescription;
 import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.ParameterSet;
-import si.fri.algotest.entities.ParameterType;
 import si.fri.algotest.entities.Project;
-import si.fri.algotest.entities.StatFunction;
-import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ErrorStatus;
 import si.fri.algotest.global.VMEPErrorStatus;
-import si.fri.algotest.timer.Timer;
 
 /**
  *

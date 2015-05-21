@@ -168,7 +168,8 @@ public class Executor {
     String runningMsg = String.format("Running [%s, %s, %s]", mType.getExtension(), testSetName, algName);
     ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK,runningMsg);
      
-    String projRoot = project.getProject().getProjectRootDir();
+    String projRoot  = project.getProject().getProjectRootDir();
+    String proj_name = project.getProject().getName();
 
     EResultDescription eResDesc = project.getResultDescriptions().get(mType);
     if (eResDesc == null) {
@@ -202,6 +203,7 @@ public class Executor {
     AbstractTestSetIterator tsInstance = New.testsetIteratorInstance(project, algName);
     tsInstance.setTestSet(eTestSet);
 
+    if (mType.equals(MeasurementType.EM) || mType.equals(MeasurementType.EM)) {
     try {
       notificator.setNumberOfInstances(numberOfInstances);
 
@@ -235,5 +237,9 @@ public class Executor {
     } catch (Exception e) {
       return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
     }
+    } else {
+        VMEPExecutor.iterateTestSetAndRunAlgorithm(project, algName, testSetName, tsInstance, eResDesc, notificator, true);
+        return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg + " - done.");
+    } 
   }
 }

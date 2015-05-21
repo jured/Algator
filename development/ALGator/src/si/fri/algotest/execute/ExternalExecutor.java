@@ -65,6 +65,16 @@ public class ExternalExecutor {
    */
   private final static String COMMUNICATION_FILENAME = "alg.com";
   
+  /**
+   * Iterates through testset and for each test runs an algorithm. 
+   * @param project
+   * @param algName
+   * @param it
+   * @param resultDesc
+   * @param notificator
+   * @param mType
+   * @return 
+   */
   public static ArrayList<ParameterSet> iterateTestSetAndRunAlgorithm(Project project, String algName,
           AbstractTestSetIterator it, EResultDescription resultDesc,
           Notificator notificator, MeasurementType mType) {
@@ -142,9 +152,6 @@ public class ExternalExecutor {
                 break;
               case CNT:
                 oneAlgResults.addParameters(getCounterParameters(resultDesc, resultAlg), true);
-                break;
-              case JVM:
-                oneAlgResults.addParameters(getJVMParameters(resultDesc, resultAlg), true);
                 break;
             }
           } else {
@@ -310,14 +317,6 @@ public class ExternalExecutor {
     return counterParameters;
   }
   
-  static ParameterSet getJVMParameters(EResultDescription resultDesc, AbsAlgorithm algorithm) {
-    ParameterSet counterParameters = new ParameterSet();
-    if (resultDesc != null) {
-      return getTimeParameters(resultDesc, algorithm);
-    }
-    return counterParameters;
-  }
-
  /**
   * Saves the measurement type, classpath and algotihm instance to a file. 
   */

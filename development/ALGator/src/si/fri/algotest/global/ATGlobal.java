@@ -139,6 +139,15 @@ public class ATGlobal {
     return getRESULTSroot(projectRoot) + File.separator + algName + "-" + testSetName + "." + measurementType.getExtension();
   }
 
+  /**
+   * The name of a file on tmpFolder to hold info of one test
+   * @return 
+   */
+  public static String getJVMRESULTfilename(String tmpDir, String algName, String testSetName, int testNumber) {
+    return tmpDir + File.separator + algName + "-" + testSetName + "-"+testNumber + "." + MeasurementType.JVM.getExtension();
+  }
+
+
   public static String getQUERIESroot(String projectRoot) {
     return projectRoot + File.separator + ATDIR_queryDir;
   }

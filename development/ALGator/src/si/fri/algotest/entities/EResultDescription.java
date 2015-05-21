@@ -34,6 +34,11 @@ public class EResultDescription extends Entity {
   public static final String ID_ResultParOrder  = "ResultParameters"; // String []
   public static final String ID_params          = "Parameters";       // EParameter []
   
+  
+  public static final String Status_DONE        = "DONE";
+  public static final String Status_FAILED      = "FAILED";
+  public static final String Status_KILLED      = "KILLED";
+  
   // parameters of this testset
   private ParameterSet parameters;
   
@@ -146,7 +151,7 @@ public class EResultDescription extends Entity {
    * Returns a parameter that represents the success of the algorithm (DONE or KILLED)
    */
   public static EParameter getPassParameter(boolean pass) {
-    String passStr = pass ? "DONE" : "FAILED";
+    String passStr = pass ? Status_DONE : Status_FAILED;
     return new EParameter(passParName, "Algorithm passed", ParameterType.STRING, passStr);
   }
   /**

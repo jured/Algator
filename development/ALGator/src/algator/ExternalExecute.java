@@ -129,7 +129,7 @@ public class ExternalExecute {
       String classPath = Version.getClassesLocation();
       //*/
     
-      //*   In debug mode (running ALGator from NetBeans) getClassLocation() returns
+      //*   In debug mode (when running ALGator with NetBeans) getClassLocation() returns
          // a path to "classes" folder which is not enough to execute ALGator.
          // To run ALGator in debug mode, we add local ALGator distribution
       if (!classPath.contains("ALGator.jar"))

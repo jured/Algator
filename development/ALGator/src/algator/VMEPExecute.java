@@ -16,6 +16,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import si.fri.algotest.entities.EAlgorithm;
+import si.fri.algotest.entities.EConfig;
 import si.fri.algotest.entities.EParameter;
 import si.fri.algotest.entities.EResultDescription;
 import si.fri.algotest.entities.ETestSet;
@@ -32,6 +33,7 @@ import si.fri.algotest.execute.Notificator;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ATLog;
 import si.fri.algotest.global.ErrorStatus;
+import si.fri.algotest.global.VMEPErrorStatus;
 import si.fri.algotest.tools.ATTools;
 
 /**
@@ -42,16 +44,8 @@ import si.fri.algotest.tools.ATTools;
  * file (on byte for each test). This file can be used by invoker of VMEPExecute
  * to prevent halting.
  * 
- * Method main() executes algorithm and exites with exit code
- *   0 ... if execution was successful
- *   1 ... problems with jamvm (java.lang.UnsatisfiedLinkError, ...)
- *   2 ... invalid project
- *   3 ... invalid algorithm
- *   4 ... invalid testset
- *   5 ... problems with testset iterator
- *   6 ... invalid test number
- *   7 ... result description file does not exist
- * 
+ * Method main() executes algorithm and exites with exit code VMEPErrorStatus
+
  * @author tomaz
  */
 public class VMEPExecute {
@@ -96,7 +90,7 @@ public class VMEPExecute {
     while (sc.hasNextLine())
       System.out.println(sc.nextLine());
     
-    System.exit(0);
+    System.exit(VMEPErrorStatus.OK.getValue());
   }
     
   public static void runTest(String dataRoot, String projName, String algName, 
@@ -107,28 +101,28 @@ public class VMEPExecute {
     if (!projekt.getErrors().get(0).equals(ErrorStatus.STATUS_OK)) {
       if (verboseLevel > 0)
         System.out.println("Invalid project name.");
-      System.exit(2); // invalid project
+      System.exit(VMEPErrorStatus.INVALID_PROJECT.getValue()); // invalid project
     }
 
     // Test algorithms
     if (algName == null || algName.isEmpty()) {
       if (verboseLevel > 0)
         System.out.println("Invalid algorithm name.");
-      System.exit(3);
+      System.exit(VMEPErrorStatus.INVALID_ALGORITHM.getValue());
     }
     EAlgorithm alg = projekt.getAlgorithms().get(algName);
     if (alg == null) {
       if (verboseLevel > 0)
         System.out.println("Invalid algorithm name.");
 
-      System.exit(3); // invalid algorithm
+      System.exit(VMEPErrorStatus.INVALID_ALGORITHM.getValue()); // invalid algorithm
     }
 
     // Test testsets
     if (testsetName == null || testsetName.isEmpty()) {
       if (verboseLevel > 0)
         System.out.println("Invalid testset name.");
-      System.exit(4);
+      System.exit(VMEPErrorStatus.INVALID_TESTSET.getValue());
     }
     
     ETestSet testSet = projekt.getTestSets().get(testsetName);
@@ -136,7 +130,7 @@ public class VMEPExecute {
       if (verboseLevel > 0)
         System.out.println("Invalid testset name.");
 
-      System.exit(4); // invalid testset
+      System.exit(VMEPErrorStatus.INVALID_TESTSET.getValue()); // invalid testset
     }    
             
     AbstractTestSetIterator testsetIterator = New.testsetIteratorInstance(projekt, algName);
@@ -145,8 +139,16 @@ public class VMEPExecute {
     if (testsetIterator == null || !ErrorStatus.getLastErrorStatus().equals(ErrorStatus.STATUS_OK)) {
       if (verboseLevel > 0)
         System.out.println("Can not create testset iterator.");
-      System.exit(5); // testset iterator can not be created
+      System.exit(VMEPErrorStatus.INVALID_ITERATOR.getValue()); // testset iterator can not be created
     }
+    
+    EResultDescription resultDescription = projekt.getResultDescriptions().get(MeasurementType.JVM);
+    if (resultDescription == null) {
+      if (verboseLevel > 0)
+        System.out.println("JVM result description file does not exist.");
+      System.exit(VMEPErrorStatus.INVALID_RESULTDESCRIPTION.getValue()); // JVM result descritpion does not exist
+    }
+
     
     
     // Test testNumber
@@ -155,21 +157,12 @@ public class VMEPExecute {
       if (verboseLevel > 0)
         System.out.println("Invalid test number.");
 
-      System.exit(6); // invalid testset      
+      System.exit(VMEPErrorStatus.INVALID_TEST.getValue()); // invalid testset   
     }
-
-    EResultDescription resultDescription = projekt.getResultDescriptions().get(MeasurementType.JVM);
-    if (resultDescription == null) {
-      if (verboseLevel > 0)
-        System.out.println("JVM result description file does not exist.");
-      System.exit(7); // JVM result descritpion does not exist
-    }
-
-    String resFilename = ATGlobal.getRESULTfilename(".", algName, testsetName, MeasurementType.JVM);
-    resFilename = ATTools.extractFileNamePrefix(new File(resFilename)) + "-" + testNumber + ".jvm";
-    resFilename = commFolder + File.separator + resFilename;       // ... and add commFolder as a path
     
-    runAlgorithmOnTest(projekt, algName, testsetName, testNumber, resultDescription, testsetIterator, verboseLevel, resFilename);
+    String resFilename = ATGlobal.getJVMRESULTfilename(commFolder, algName, testsetName, testNumber);
+    
+    runAlgorithmOnATest(projekt, algName, testsetName, testNumber, resultDescription, testsetIterator, verboseLevel, resFilename);
   }
 
   
@@ -177,7 +170,7 @@ public class VMEPExecute {
   /**
    * 
    */
-  public static void runAlgorithmOnTest(
+  public static void runAlgorithmOnATest(
     Project project, String algName, String testsetName, int testNumber, EResultDescription resultDesc,
           AbstractTestSetIterator testsetIterator, int verboseLevel, String resFilename) {
         
@@ -272,7 +265,44 @@ public class VMEPExecute {
     }
   }
   
-  
+  /**
+   * Runs the algorithm using jamvm virtual machine. If execution is succesfull, the 
+   * created process is returned else the error message is returned as a String
+   */
+  public static Object runWithJamVM(String project_name, String alg_name, String testset_name,
+          int testID, String commFolder, String data_root) {    
+    try {
+      ///* For real-time execution (classPath=..../ALGator.jar)
+      String classPath = Version.getClassesLocation();
+      //*/
+    
+      //*   In debug mode (when running ALGator with NetBeans) getClassLocation() returns
+         // a path to "classes" folder which is not enough to execute ALGator.
+         // To run ALGator in debug mode, we add local ALGator distribution
+      if (!classPath.contains("ALGator.jar"))
+        classPath += File.pathSeparator +  "dist/ALGator.jar";
+      //*/
+      
+      String jvmCommand = "java";
+      String vmepCmd = EConfig.getConfig().getField(EConfig.ID_VMEP);
+      String vmepCP  = EConfig.getConfig().getField(EConfig.ID_VMEPClasspath);
+      if (!vmepCmd.isEmpty()) 
+        jvmCommand = vmepCmd;
+      if (!vmepCP.isEmpty())
+          classPath += File.pathSeparator + vmepCP;
+      
+    
+      String[] command = {jvmCommand, "-cp", classPath, "-Xss1024k", "algator.VMEPExecute", 
+        project_name, alg_name, testset_name, Integer.toString(testID), commFolder, "-d", data_root, "-v1"};
+      
+      
+      ProcessBuilder probuilder = new ProcessBuilder( command );
+    
+      return probuilder.start();      
+    } catch (Exception e) {
+      return e.toString();
+    }
+  }
   
   /**
    * Used to run the system. Parameters are given trought the arguments

@@ -41,14 +41,14 @@ public abstract class AbstractTestSetIterator  {
   
   
   /**
-   * Creates a new TestCase object fro a raw data read by readNext() mathod. 
+   * Creates a new TestCase object for a raw data read by readNext() mathod. 
    * Consecutive calls to getCurrent method must return different objects constructed
    * from the same input data.
    */
   public abstract TestCase getCurrent();
   
   /**
-   * Closes the iterator sopurce.
+   * Closes the iterator source.
    */
   public abstract void close() throws IOException;
   

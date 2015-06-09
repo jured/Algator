@@ -24,7 +24,7 @@ public class ATLog {
   private static int lastLogLevel = LOG_LEVEL_OFF;
   
   // maximal error size in bytes (to truncate very long error messages)
-  private static int MAX_ERROR_SIZE = 512;
+  private static int MAX_ERROR_SIZE = 2048;
 
   
   public static void disableLog() {

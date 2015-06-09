@@ -2,7 +2,7 @@ package si.fri.algotest.global;
 
 public enum VMEPErrorStatus {
     OK(0),                          // if execution was successful
-    JAMVM_ERROR(1),                 // problems with jamvm (java.lang.UnsatisfiedLinkError, ...)
+    VMEPVM_ERROR(1),                 // problems with vmep vm (java.lang.UnsatisfiedLinkError, ...)
     INVALID_PROJECT(2),             // invalid project
     INVALID_ALGORITHM(3),           // invalid algorithm
     INVALID_TESTSET(4),             // invalid testset
@@ -22,14 +22,14 @@ public enum VMEPErrorStatus {
     public String toString() {
       switch (this) {
         case OK:                          return "OK";
-        case JAMVM_ERROR:                 return "Problems with jamvm (java.lang.UnsatisfiedLinkError, ...)";
+        case VMEPVM_ERROR:                return "Problems with vmep vm(java.lang.UnsatisfiedLinkError, ...)";
         case INVALID_PROJECT:             return "Invalid project";
         case INVALID_ALGORITHM:           return "Invalid algorithm";
         case INVALID_TESTSET:             return "Invalid testset";
         case INVALID_ITERATOR:            return "Problems with testset iterator";
         case INVALID_RESULTDESCRIPTION:   return "Result description file does not exist";
          
-        case INVALID_TEST:                return "Invalid test number";
+        case INVALID_TEST:                return "Test case was not created due to unknown error (invalid test number?).";
         case KILLED:                      return "Test was killed"; 
         case INVALID_RESULT:              return "Invalid result in output file";
         

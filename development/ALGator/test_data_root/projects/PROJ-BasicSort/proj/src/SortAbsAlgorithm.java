@@ -38,7 +38,7 @@ public abstract class SortAbsAlgorithm extends AbsAlgorithm {
     EParameter passPar = new EParameter("Check", "", ParameterType.STRING, 
 	 ATTools.isArraySorted(sortTestCase.arrayToSort, 1) ? "OK" : "NOK");
     result.addParameter(passPar, true);
-          
+        
     return result;
   }   
 

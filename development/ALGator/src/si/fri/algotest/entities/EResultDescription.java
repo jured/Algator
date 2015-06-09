@@ -4,6 +4,7 @@ import java.io.File;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import si.fri.algotest.global.ErrorStatus;
+import si.fri.algotest.global.ExecutionStatus;
 
 /**
  * 
@@ -34,10 +35,6 @@ public class EResultDescription extends Entity {
   public static final String ID_ResultParOrder  = "ResultParameters"; // String []
   public static final String ID_params          = "Parameters";       // EParameter []
   
-  
-  public static final String Status_DONE        = "DONE";
-  public static final String Status_FAILED      = "FAILED";
-  public static final String Status_KILLED      = "KILLED";
   
   // parameters of this testset
   private ParameterSet parameters;
@@ -75,7 +72,7 @@ public class EResultDescription extends Entity {
       result.addParameter(getAlgorithmNameParameter("/"), true);
       result.addParameter(getTestsetNameParameter("/"), true);
       result.addParameter(getTestIDParameter("/"), true);
-      result.addParameter(getPassParameter(true), false);
+      result.addParameter(getExecutionStatusParameter(ExecutionStatus.UNKNOWN), false);
       
       
       for (int i = 0; i < ja.length(); i++) {
@@ -150,9 +147,8 @@ public class EResultDescription extends Entity {
   /**
    * Returns a parameter that represents the success of the algorithm (DONE or KILLED)
    */
-  public static EParameter getPassParameter(boolean pass) {
-    String passStr = pass ? Status_DONE : Status_FAILED;
-    return new EParameter(passParName, "Algorithm passed", ParameterType.STRING, passStr);
+  public static EParameter getExecutionStatusParameter(ExecutionStatus status) {
+    return new EParameter(passParName, "Algorithm execution status", ParameterType.STRING, status.toString());
   }
   /**
    * Returns a testID paremeter

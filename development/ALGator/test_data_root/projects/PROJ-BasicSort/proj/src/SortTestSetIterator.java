@@ -132,7 +132,8 @@ public class SortTestSetIterator extends DefaultTestSetIterator {
 	  reportInvalidDataFormat(e.toString());
 	}
     }
-    tCase.arrayToSort = array;
+    tCase.arrayToSort = array;    
+
     return tCase;
   }
 

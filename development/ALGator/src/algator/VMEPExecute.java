@@ -29,15 +29,14 @@ import si.fri.algotest.execute.AbsAlgorithm;
 import si.fri.algotest.execute.AbstractTestSetIterator;
 import si.fri.algotest.execute.ExternalExecutor;
 import si.fri.algotest.execute.New;
-import si.fri.algotest.execute.Notificator;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ATLog;
 import si.fri.algotest.global.ErrorStatus;
+import si.fri.algotest.global.ExecutionStatus;
 import si.fri.algotest.global.VMEPErrorStatus;
-import si.fri.algotest.tools.ATTools;
 
 /**
- * VMEPExecute class is used to execute algorithm with jamvm virtual machine. It 
+ * VMEPExecute class is used to execute algorithm with vmep virtual machine. It 
  * executes <code>algorithm</code> on a <code>testset</code> and writes results
  * into <code>Algorithm-Testset.jvm</code> file in <code>commPath</code>. 
  * During the execution of tests, notificator writes bytes to communicaiton 
@@ -67,6 +66,7 @@ public class VMEPExecute {
     options.addOption("h", "help", false,
 	    "print this message");    
         
+    options.addOption("v0", "silent",  false, "no information on error");
     options.addOption("v1", "print",   false, "print   information on error");
     options.addOption("v2", "verbose", false, "verbose information on error");
     options.addOption("u", "usage",    false, "print usage guide");
@@ -183,7 +183,7 @@ public class VMEPExecute {
     result.addParameter(EResultDescription.getAlgorithmNameParameter(algName), true);
     result.addParameter(EResultDescription.getTestsetNameParameter(testsetName), true);
     result.addParameter(EResultDescription.getTestIDParameter("Test"+testNumber), true); // if testCase won't initialize, a testcase ID is giver here 
-    result.addParameter(EResultDescription.getPassParameter(false), true);
+    result.addParameter(EResultDescription.getExecutionStatusParameter(ExecutionStatus.UNKNOWN), true);
     
     // An error that appears as a result of JVM error is not caught by the following catch; however, the finally block
     // is always executed. If in finally block success is false, then an JVM error has occured and must be reported
@@ -237,21 +237,24 @@ public class VMEPExecute {
             System.out.println("");
         
         
-        result.addParameter(EResultDescription.getPassParameter(true), true);
+        result.addParameter(EResultDescription.getExecutionStatusParameter(ExecutionStatus.DONE), true);
         result.addParameter(EResultDescription.getAlgorithmNameParameter(algName), true);
         result.addParameter(EResultDescription.getTestsetNameParameter(testsetName), true);
       } else {
+        result.addParameter(EResultDescription.getExecutionStatusParameter(ExecutionStatus.FAILED), true);
         result.addParameter(EResultDescription.getErrorParameter("Invaldi testset or test."), true);
       }
       success = true;
       
     } catch (IOException e) {
+      result.addParameter(EResultDescription.getExecutionStatusParameter(ExecutionStatus.FAILED), true);
       result.addParameter(EResultDescription.getErrorParameter(e.toString()), true);
 
       ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
 
       if (verboseLevel == 1)
         System.out.println(e);
+      
     } finally {
       if (!success) {
          result.addParameter(EResultDescription.getErrorParameter("Unknown JVM error"), true);
@@ -266,11 +269,11 @@ public class VMEPExecute {
   }
   
   /**
-   * Runs the algorithm using jamvm virtual machine. If execution is succesfull, the 
+   * Runs the algorithm using vmep virtual machine. If execution is succesfull, the 
    * created process is returned else the error message is returned as a String
    */
-  public static Object runWithJamVM(String project_name, String alg_name, String testset_name,
-          int testID, String commFolder, String data_root) {    
+  public static Object runWithVMEP(String project_name, String alg_name, String testset_name,
+          int testID, String commFolder, String data_root, boolean verbose) {    
     try {
       ///* For real-time execution (classPath=..../ALGator.jar)
       String classPath = Version.getClassesLocation();
@@ -290,10 +293,9 @@ public class VMEPExecute {
         jvmCommand = vmepCmd;
       if (!vmepCP.isEmpty())
           classPath += File.pathSeparator + vmepCP;
-      
-    
+            
       String[] command = {jvmCommand, "-cp", classPath, "-Xss1024k", "algator.VMEPExecute", 
-        project_name, alg_name, testset_name, Integer.toString(testID), commFolder, "-d", data_root, "-v1"};
+        project_name, alg_name, testset_name, Integer.toString(testID), commFolder, "-d", data_root, verbose ? "-v2" : "-v0"};
       
       
       ProcessBuilder probuilder = new ProcessBuilder( command );

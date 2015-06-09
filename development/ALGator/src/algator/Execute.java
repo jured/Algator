@@ -23,6 +23,7 @@ import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ATLog;
 import si.fri.algotest.tools.ATTools;
 import si.fri.algotest.global.ErrorStatus;
+import si.fri.algotest.global.ExecutionStatus;
 
 /**
  *
@@ -30,7 +31,7 @@ import si.fri.algotest.global.ErrorStatus;
  */
 public class Execute {
 
-  private static String introMsg = "ALGator Executor, " + Version.getVersion();
+  private static String introMsg = "ALGator Execute, " + Version.getVersion();
   
 
   private static Options getOptions() {
@@ -85,7 +86,8 @@ public class Execute {
   }
 
   private static void printMsg(Options options) {
-
+    System.out.println(introMsg + "\n");
+    
     HelpFormatter formatter = new HelpFormatter();
     formatter.printHelp("algator.Execute [options] project_name", options);
 
@@ -93,6 +95,8 @@ public class Execute {
   }
 
   private static void printUsage() {
+    System.out.println(introMsg + "\n");
+
     Scanner sc = new Scanner((new Analyse()).getClass().getResourceAsStream("/data/ExecutorUsage.txt")); 
     while (sc.hasNextLine())
       System.out.println(sc.nextLine());
@@ -100,10 +104,11 @@ public class Execute {
     System.exit(0);
   }
 
-  private static Notificator getNotificator(final String alg, final String testSet) {
+  private static Notificator getNotificator(final String alg, final String testSet, final MeasurementType mt) {
     return new Notificator() {
-      public void notify(int i) {
-        System.out.println(String.format("[%s, %s]: test %d out of %d done.", alg, testSet, i, this.getN()));
+      public void notify(int i, ExecutionStatus status) {
+        System.out.println(String.format("[%s, %s, %s]: test %3d / %-3d - %s", 
+          alg, testSet, mt.getExtension(), i, this.getN(),status.toString()));
       }
     };
   }
@@ -114,8 +119,6 @@ public class Execute {
    * @param args
    */
   public static void main(String args[]) {
-    System.out.println(introMsg + "\n");
-
     Options options = getOptions();
 
     CommandLineParser parser = new BasicParser();
@@ -178,12 +181,14 @@ public class Execute {
         } catch (Exception e) {}  
       }
 
+      boolean verbose = line.hasOption("verbose");
+      
       ATLog.setLogLevel(ATLog.LOG_LEVEL_OFF);
-      if (line.hasOption("verbose")) {
+      if (verbose) {
         ATLog.setLogLevel(ATLog.LOG_LEVEL_STDOUT);
       }
 
-      runAlgorithms(dataRoot, projectName, algorithmName, testsetName, mType, alwaysCompile, alwaysRunTests, listOnly);
+      runAlgorithms(dataRoot, projectName, algorithmName, testsetName, mType, alwaysCompile, alwaysRunTests, listOnly, verbose);
 
 
     } catch (ParseException ex) {
@@ -192,7 +197,8 @@ public class Execute {
   }
 
   private static void runAlgorithms(String dataRoot, String projName, String algName,
-	  String testsetName, MeasurementType mType, boolean alwaysCompile, boolean alwaysRun, boolean printOnly) {
+	  String testsetName, MeasurementType mType, boolean alwaysCompile, 
+          boolean alwaysRun, boolean printOnly, boolean verbose) {
     
     // Test the project
     Project projekt = new Project(dataRoot, projName);
@@ -264,9 +270,9 @@ public class Execute {
     } else {
       for (int i = 0; i < eAlgs.size(); i++) {
 	for (int j = 0; j < eTests.size(); j++) {
-          Notificator notificator = getNotificator(eAlgs.get(i).getName(), eTests.get(j).getName());
+          Notificator notificator = getNotificator(eAlgs.get(i).getName(), eTests.get(j).getName(), mType);
 	  ErrorStatus error = Executor.algorithmRun(projekt, eAlgs.get(i).getName(), 
-		  eTests.get(j).getName(),  mType, notificator, alwaysCompile, alwaysRun);          
+		  eTests.get(j).getName(),  mType, notificator, alwaysCompile, alwaysRun, verbose);          
 	}
       }
     }

@@ -3,8 +3,10 @@ package si.fri.algotest.execute;
 import algator.VMEPExecute;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Scanner;
 import org.apache.commons.io.FileUtils;
@@ -14,8 +16,10 @@ import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.ParameterSet;
 import si.fri.algotest.entities.Project;
+import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ErrorStatus;
+import si.fri.algotest.global.ExecutionStatus;
 import si.fri.algotest.global.VMEPErrorStatus;
 
 /**
@@ -24,13 +28,14 @@ import si.fri.algotest.global.VMEPErrorStatus;
  */
 public class VMEPExecutor {
   
-  /** How many times the process executed by jamvm is expected to be slower than process executed by normal vm */
+  /** How many times the process executed by vmep virtual machine is expected to be slower than process executed by normal vm */
   private static final int SLOW_FACTOR = 2;
-  /** Maximum number of seconds for jamvm startup */ 
-  private static final int JAMVM_DELAY = 5;
-
+  /** Maximum number of seconds for vmep startup */ 
+  private static final int VMEPVM_DELAY = 5;
+  
+  
   /**
-   * Iterates trought testset and executes each testcase. To execute a testcase, a JAMVM virtual machine 
+   * Iterates trought testset and executes each testcase. To execute a testcase, a VMEP virtual machine 
    * is used (method runWithLimitedTime). If execution is successful, a result  (one line) is copied from 
    * getJVMRESULTfilename to regular result file for this algorithm-testset. If execution failes, a line with 
    * error message is appended to result file.
@@ -42,16 +47,21 @@ public class VMEPExecutor {
    * @param notificator
    * @param verbose 
    */
-  public static void iterateTestSetAndRunAlgorithm(Project project, String algName, String testSetName,
-          AbstractTestSetIterator it, EResultDescription resultDesc, Notificator notificator, boolean verbose) {
+  public static void iterateTestSetAndRunAlgorithm(Project project, String algName, 
+          String testSetName, EResultDescription resultDesc, AbstractTestSetIterator it, 
+          Notificator notificator, boolean verbose, File resultFile) {
 
     ArrayList<ParameterSet> allAlgsRestuls = new ArrayList();
-    ParameterSet oneAlgResults;
     VMEPErrorStatus executionStatus;
     
-    String delim = resultDesc.getField(EResultDescription.ID_Delim);
-    String algP  = EResultDescription.getAlgorithmNameParameter(algName)  .getField(EParameter.ID_Value);
-    String tsP   = EResultDescription.getTestsetNameParameter(testSetName).getField(EParameter.ID_Value);
+    String delim      = resultDesc.getField(EResultDescription.ID_Delim);
+    EParameter algPar = EResultDescription.getAlgorithmNameParameter(algName);
+    String algP       = algPar.getField(EParameter.ID_Value);
+    EParameter tsPar  = EResultDescription.getTestsetNameParameter(testSetName);
+    String tsP        = tsPar.getField(EParameter.ID_Value);
+    
+    EParameter killedEx = EResultDescription.getExecutionStatusParameter(ExecutionStatus.KILLED);
+    EParameter failedEx = EResultDescription.getExecutionStatusParameter(ExecutionStatus.FAILED);
       
     /* The name of the output file */
     String projectRoot = ATGlobal.getPROJECTroot(project.dataRoot, project.getName());
@@ -65,40 +75,70 @@ public class VMEPExecutor {
     } catch (NumberFormatException e) {
         // if ETestSet.ID_TimeLimit parameter is missing, timelimit is set to 30 (sec) and exception is ignored
     }
-    timeLimit += JAMVM_DELAY;
+    timeLimit += VMEPVM_DELAY;
     
     int testID = 0; // 
-    try (PrintWriter pw = new PrintWriter(resFilename)) {
+    try {
       while (it.hasNext()) {
-        it.readNext();
-        
-        String tP = it.getCurrent().getParameters().getParamater(EResultDescription.testIDParName).getField(EParameter.ID_Value);
-        String resultLine = algP + delim + tsP + delim + tP + delim;
-        
-        notificator.notify(++testID);
+        it.readNext();++testID;
+
+        ParameterSet result = new ParameterSet();
+        result.addParameter(algPar, true);
+        result.addParameter(tsPar,  true);
 
         String tmpFolderName = ATGlobal.getTMPDir(project.dataRoot, project.projectName);          
-        executionStatus = runWithLimitedTime(project.getName(), algName, testSetName, testID, tmpFolderName, project.dataRoot, timeLimit);
         
+        TestCase testCase = it.getCurrent();
+        if (testCase != null) {
+          EParameter testP = testCase.getParameters().getParamater(EResultDescription.testIDParName);
+          result.addParameter(testP,  true);
+          
+          executionStatus = runWithLimitedTime(project.getName(), algName, testSetName, testID, tmpFolderName, project.dataRoot, timeLimit, verbose);
+        } else {
+          executionStatus = VMEPErrorStatus.INVALID_TEST;
+          ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_INVALID_TEST, " ");
+        }
+
+        
+        String testResultLine;
         if (!executionStatus.equals(VMEPErrorStatus.OK)) {
           if (executionStatus.equals(VMEPErrorStatus.KILLED)) {
-            pw.printf("%s%s", resultLine, EResultDescription.Status_KILLED);            
+            notificator.notify(testID,ExecutionStatus.KILLED);
+            result.addParameter(killedEx, true);
+            result.addParameter(EResultDescription.getErrorParameter(
+              String.format("Killed after %d second(s)", timeLimit)), true);
           } else {
-            String errorMsg = ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_PERFORM_TEST, executionStatus.toString()).toString();
-            pw.printf("%s%s%s%s", resultLine, EResultDescription.Status_FAILED, delim, errorMsg);            
+            notificator.notify(testID,ExecutionStatus.FAILED);
+            result.addParameter(failedEx, true);
+            result.addParameter(EResultDescription.getErrorParameter(
+              ErrorStatus.getLastErrorMessage() + executionStatus.toString()), true);
           }
+          testResultLine=result.toString(resultDesc.getParamsOrder(), false, delim);
         } else {
           String oneResultFilename = ATGlobal.getJVMRESULTfilename(tmpFolderName, algName, testSetName, testID);
           try (Scanner sc = new Scanner(new File(oneResultFilename))) {
-            String oneResult = sc.nextLine();
-            if (oneResult.startsWith(algP + delim + tsP))
-              pw.println(oneResult);
-            else
-              pw.printf("%s%s%s%s", resultLine, EResultDescription.Status_FAILED, delim, VMEPErrorStatus.UNKNOWN);            
+            testResultLine = sc.nextLine();
+            if (testResultLine.startsWith(algP + delim + tsP)) {
+              notificator.notify(testID,ExecutionStatus.DONE);
+            } else {
+              notificator.notify(testID,ExecutionStatus.FAILED);
+              result.addParameter(failedEx, true);
+              result.addParameter(EResultDescription.getErrorParameter(
+                VMEPErrorStatus.UNKNOWN.toString()), true);
+              testResultLine=result.toString(resultDesc.getParamsOrder(), false, delim);
+            }
           } catch (Exception e) {
-            pw.printf("%s%s%s%s: %s", resultLine, EResultDescription.Status_FAILED, delim, VMEPErrorStatus.UNKNOWN, e.toString().replaceAll("\n", ""));            
+            notificator.notify(testID,ExecutionStatus.FAILED);
+            result.addParameter(failedEx, true);
+            result.addParameter(EResultDescription.getErrorParameter(e.toString()), true);
+            testResultLine=result.toString(resultDesc.getParamsOrder(), false, delim);
           }
-        }      
+        }  
+        // append a line representing test results to the corresponding result file        
+        PrintWriter pw = new PrintWriter(new FileWriter(resultFile, true));
+          pw.println(testResultLine);
+        pw.close();
+        
         try {
           FileUtils.deleteDirectory(new File(tmpFolderName));
         } catch (Exception e) {
@@ -130,27 +170,27 @@ public class VMEPExecutor {
    * v VMEPErrorStatus, further information about execution status are stored in ErrorStatus.lastErrorMessage.
    * @return 
    *   <code>VMEPErrorStatus.KILLED</code> if algorithm runs out of time                            <br>
-   *   <code>VMEPErrorStatus.JAMVM_ERROR</code> if problems occure during the initialization or execution phase<br>
+   *   <code>VMEPErrorStatus.VMEPVM_ERROR</code> if problems occure during the initialization or execution phase<br>
    *   <code>VMEPErrorStatus.*</code> if algorithm exited with exit code different than 0 <br>
    *   <code>VMEPErrorStatus.OK</code> if algorithm exited normally <br>  
 
    * If algorithm finishes in time, </code>runWithLimitedTime</code> returns <code>VMEPErrorStatus.OK</code>
    */
   static VMEPErrorStatus runWithLimitedTime(String projectName, String algname, String testSetName, 
-          int testID, String comFolder, String dataRoot, int timeLimit) {
+          int testID, String comFolder, String dataRoot, int timeLimit, boolean verbose) {
     
     ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, "");
     
-    Object result =  VMEPExecute.runWithJamVM(projectName,algname, testSetName, testID, comFolder, dataRoot);
+    Object result =  VMEPExecute.runWithVMEP(projectName,algname, testSetName, testID, comFolder, dataRoot, verbose);
       
     // during the process creation, an error occured
     if (result == null || !(result instanceof Process)) {
-      ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_PROCESS_CANT_BE_CREATED, result == null ? "???" : result.toString());
-      return VMEPErrorStatus.JAMVM_ERROR;
+      ErrorStatus.setLastErrorMessage(ErrorStatus.PROCESS_CANT_BE_CREATED, result == null ? "???" : result.toString());
+      return VMEPErrorStatus.VMEPVM_ERROR;
     }
     
     Process externProcess = (Process) result;
-     
+    
     // loop and wait for process to finish
     int loop_per_sec  = 10;
     int secondsPassed = 0;
@@ -158,20 +198,20 @@ public class VMEPExecutor {
       // loop for one second
       for(int i=0; i<loop_per_sec; i++) {
         if (processExitCode(externProcess) >= 0)
-          break whileloop;
-        
+          break whileloop;        
         try {Thread.sleep(1000/loop_per_sec);} catch (InterruptedException e) {}
       }
       timeLimit--; secondsPassed++;
     }
+    
     int exitCode = processExitCode(externProcess);
+    
     if (exitCode < 0) { // process hasn't finised yet, it has to be killed
       try {
-        ErrorStatus.setLastErrorMessage(ErrorStatus.MESSAGE_PROCESS_KILLED, String.format("(after %d sec.)", (int)secondsPassed)); 
+        ErrorStatus.setLastErrorMessage(ErrorStatus.PROCESS_KILLED, String.format("(after %d sec.)", (int)secondsPassed)); 
         externProcess.destroy();
-      } finally {
         return VMEPErrorStatus.KILLED;
-      }
+      } catch (Exception e) {}
     }
     
     try {
@@ -182,15 +222,17 @@ public class VMEPExecutor {
       while ((s = stdInput.readLine()) != null) sb.append(s);            
       while ((s = stdError.readLine()) != null) sb.append(s);
       
-      if (sb.length() != 0) {
-        ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_PROCESS_CANT_BE_CREATED, sb.toString());
-        return VMEPErrorStatus.JAMVM_ERROR;
+      if (exitCode != 0) {
+        ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_EXECUTING_VMPEJVM, sb.toString());
+        return VMEPErrorStatus.getErrorStatusByID(exitCode);
       } else {
-        return  VMEPErrorStatus.getErrorStatusByID(exitCode);
+        if (verbose)
+          System.out.println(sb);
+        return  VMEPErrorStatus.OK;
       }
     } catch (Exception e) {
-      ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_PROCESS_CANT_BE_CREATED, e.toString().replaceAll("\n", ""));
-      return VMEPErrorStatus.JAMVM_ERROR;
+      ErrorStatus.setLastErrorMessage(ErrorStatus.PROCESS_CANT_BE_CREATED, e.toString().replaceAll("\n", ""));
+      return VMEPErrorStatus.VMEPVM_ERROR;
     }  
   }
   

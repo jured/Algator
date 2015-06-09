@@ -83,19 +83,21 @@ public class ParameterSet implements Serializable {
   
   public String toString(String [] order, boolean includeFieldNames, String delim) {
     String result = "";
-      
-    int numPar = order.length;
+    
+    String localOrder [] = order.clone();
+    
+    int numPar = localOrder.length;
     if (numPar > EResultDescription.FIXNUM && parameters.contains(EResultDescription.getErrorParameter(""))) {
         numPar = EResultDescription.FIXNUM;
-        order[numPar++] = EResultDescription.errorParName;
+        localOrder[numPar++] = EResultDescription.errorParName;
     }
     
     for (int i = 0; i < numPar; i++) {
       EParameter p = null;
     
-      // find a parameter with name==order[i]
+      // find a parameter with name==localOrder[i]
       for (int j = 0; j < parameters.size(); j++) {
-        if (parameters.get(j).getField(EParameter.ID_Name).equals(order[i])) {
+        if (parameters.get(j).getField(EParameter.ID_Name).equals(localOrder[i])) {
           p = parameters.get(j);
 	  break;
         }
@@ -104,7 +106,13 @@ public class ParameterSet implements Serializable {
       if (p!=null) {      
        if (includeFieldNames)
          result += p.getField(EParameter.ID_Name) + "=";
-       result += p.getField(EParameter.ID_Value)    + delim;
+       
+       Object value = p.getField(EParameter.ID_Value);
+       if (value instanceof String) {
+         value = ((String)value).replaceAll(delim, " ").replaceAll("\n", " ");
+       }
+       
+       result += value + delim;
       } else
         result += delim;
     }

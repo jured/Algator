@@ -22,7 +22,7 @@ import si.fri.algotest.global.ErrorStatus;
  * @author tomaz
  */
 public class Executor {
-  
+
   /**
    * Compares the creation date of the files at bin directory and compiles the
    * sources if required (bin files are older than src files or bin files are
@@ -34,9 +34,9 @@ public class Executor {
     String projRoot = projekt.getProjectRootDir();
 
     // the classes to be compiled
-    String algTPL     = ATTools.stripFilenameExtension((String)projekt.getField(EProject.ID_AlgorithmClass));
-    String testCase   = ATTools.stripFilenameExtension((String)projekt.getField(EProject.ID_TestCaseClass));
-    String tsIterator = ATTools.stripFilenameExtension((String)projekt.getField(EProject.ID_TestSetIteratorClass));
+    String algTPL = ATTools.stripFilenameExtension((String) projekt.getField(EProject.ID_AlgorithmClass));
+    String testCase = ATTools.stripFilenameExtension((String) projekt.getField(EProject.ID_TestCaseClass));
+    String tsIterator = ATTools.stripFilenameExtension((String) projekt.getField(EProject.ID_TestSetIteratorClass));
 
     // java src and bin dir
     String projSrc = ATGlobal.getPROJECTsrc(projRoot);
@@ -104,8 +104,8 @@ public class Executor {
 
   /**
    * Create a new java class in which all //@COUNT{cnt_name, value} are replaced
-   * with Counters.addToCounter(cnt_name, value) commands. The new class is placed to the
-   * same src folder where the original class resides.
+   * with Counters.addToCounter(cnt_name, value) commands. The new class is
+   * placed to the same src folder where the original class resides.
    */
   static void testAndCreateCOUNTClass(String classRoot, String className) {
     try {
@@ -122,10 +122,11 @@ public class Executor {
       while (sc.hasNextLine()) {
         // skip all the lines that contain @REMOVE_LINE tag
         String line = sc.nextLine();
-        
-        if (line.contains("//@REMOVE_LINE")) 
+
+        if (line.contains("//@REMOVE_LINE")) {
           continue;
-        
+        }
+
         classContent += line + "\n";
       }
       sc.close();
@@ -159,20 +160,20 @@ public class Executor {
    * @return
    */
   public static ErrorStatus algorithmRun(Project project, String algName, String testSetName,
-          MeasurementType mType, Notificator notificator, boolean alwaysCompile, boolean alwaysRun) {
+          MeasurementType mType, Notificator notificator, boolean alwaysCompile, boolean alwaysRun, boolean verbose) {
 
     if (project == null) {
       return ErrorStatus.ERROR;
     }
 
     String runningMsg = String.format("Running [%s, %s, %s]", mType.getExtension(), testSetName, algName);
-    ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK,runningMsg);
-     
-    String projRoot  = project.getProject().getProjectRootDir();
+    ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg);
+
+    String projRoot = project.getProject().getProjectRootDir();
     String proj_name = project.getProject().getName();
 
-    EResultDescription eResDesc = project.getResultDescriptions().get(mType);
-    if (eResDesc == null) {
+    EResultDescription resDesc = project.getResultDescriptions().get(mType);
+    if (resDesc == null) {
       return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_INVALID_RESULTDESCRIPTION, "");
     }
 
@@ -189,7 +190,7 @@ public class Executor {
     int numberOfInstances = eTestSet.getFieldAsInt(ETestSet.ID_N);
     boolean resultsAreUptodate = ATTools.resultsAreUpToDate(projRoot, algName, testSetName, numberOfInstances);
     if (!(alwaysRun || alwaysCompile) && resultsAreUptodate) {
-      return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg +  " - nothing to be done.");
+      return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg + " - nothing to be done.");
     }
 
     if (projectMakeCompile(project.getProject(), alwaysCompile) != ErrorStatus.STATUS_OK) {
@@ -200,46 +201,39 @@ public class Executor {
       return ErrorStatus.getLastErrorStatus();
     }
 
-    AbstractTestSetIterator tsInstance = New.testsetIteratorInstance(project, algName);
-    tsInstance.setTestSet(eTestSet);
+    AbstractTestSetIterator tsIt = New.testsetIteratorInstance(project, algName);
+    tsIt.setTestSet(eTestSet);
 
-    if (mType.equals(MeasurementType.EM) || mType.equals(MeasurementType.EM)) {
+    notificator.setNumberOfInstances(numberOfInstances);
+
+    // prepare file for results
+    File resFile;
     try {
-      notificator.setNumberOfInstances(numberOfInstances);
-
-      // the order of parameters to be printed
-      String[] order = eResDesc.getParamsOrder();
-      String delim = eResDesc.getField(EResultDescription.ID_Delim);
-
-      ArrayList<ParameterSet> resultParameterSets
-              = ExternalExecutor.iterateTestSetAndRunAlgorithm(project, algName, tsInstance, eResDesc, notificator, mType);
-
-      if (ErrorStatus.getLastErrorStatus().isOK()) {
-        String resFilename = ATGlobal.getRESULTfilename(projRoot, algName, testSetName, mType);
-
-        // create result folder if it does not exist
-        File resPath = new File(ATTools.extractFilePath(new File(resFilename)));
-        if (!resPath.exists())
-          resPath.mkdirs();
-        
-        PrintWriter pw = new PrintWriter(resFilename);
-        for (ParameterSet parameterSet : resultParameterSets) {
-          parameterSet.addParameter(EResultDescription.getAlgorithmNameParameter(algName), true);
-          parameterSet.addParameter(EResultDescription.getTestsetNameParameter(testSetName), true);
-          pw.println(parameterSet.toString(order, false, delim));
-        }
-        pw.close();
-        return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg + " - done.");
-      } else // execution failed 
-      {
-        throw new Exception(ErrorStatus.getLastErrorMessage());
+      String resFilename = ATGlobal.getRESULTfilename(projRoot, algName, testSetName, mType);
+      File resPath = new File(ATTools.extractFilePath(new File(resFilename)));
+      if (!resPath.exists()) {
+        resPath.mkdirs();
       }
+      resFile = new File(resFilename);
+      if (resFile.exists())
+        resFile.delete();
     } catch (Exception e) {
       return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
     }
-    } else {
-        VMEPExecutor.iterateTestSetAndRunAlgorithm(project, algName, testSetName, tsInstance, eResDesc, notificator, true);
+
+    try {
+      if (mType.equals(MeasurementType.EM) || mType.equals(MeasurementType.CNT)) 
+        ExternalExecutor.iterateTestSetAndRunAlgorithm(project, algName, tsIt, resDesc, notificator, mType, resFile);
+      else
+        VMEPExecutor.iterateTestSetAndRunAlgorithm(project, algName, testSetName, resDesc, tsIt, notificator, verbose, resFile);
+
+      if (ErrorStatus.getLastErrorStatus().isOK()) 
         return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg + " - done.");
-    } 
+      else // execution failed 
+        return ErrorStatus.getLastErrorStatus();
+        
+      } catch (Exception e) {
+        return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
+      }
   }
 }

@@ -1,5 +1,7 @@
 package si.fri.algotest.execute;
 
+import si.fri.algotest.global.ExecutionStatus;
+
 /**
  * A notificator is a class used to comunicate between ATSystem and ATExecutor. 
  * Each time the executor executes a test, it notifies the Notificator by calling
@@ -29,5 +31,5 @@ public abstract class Notificator {
    * Called when i-th test (out of n) is finished
    * @param i 
    */
-  public abstract void notify(int i);
+  public abstract void notify(int i, ExecutionStatus status);
 }

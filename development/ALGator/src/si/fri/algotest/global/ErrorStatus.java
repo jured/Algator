@@ -106,6 +106,13 @@ public enum ErrorStatus {
     }
   },
 
+  ERROR_INVALID_TEST {
+    public String toString() {
+      return "Error: Invalid test.";
+    }
+  },
+
+  
   ERROR_INVALID_RESULTDESCRIPTION {
     public String toString() {
       return "Warning: Invalid result description file.";
@@ -118,32 +125,38 @@ public enum ErrorStatus {
     }
   },
 
-  ERROR_CANT_WRITE_ALGORITHM_TO_FILE {
+  CANT_WRITE_ALGORITHM_TO_FILE {
     public String toString() {
       return "Error: Algorithm serialization error";
     }
   },
   
   
-  ERROR_CANT_READ_ALGORITHM_FROM_FILE {
+  CANT_READ_ALGORITHM_FROM_FILE {
     public String toString() {
       return "Error: Algorithm deserialization error.";
     }
   },
 
-  ERROR_ALGORITHM_CANT_BE_CREATED {
+  ALGORITHM_CANT_BE_CREATED {
     public String toString() {
       return "Error: Algorithm can not be created." ;
     }
   },  
   
-  ERROR_PROCESS_CANT_BE_CREATED {
+  PROCESS_CANT_BE_CREATED {
     public String toString() {
       return "Error: Process can not be created." ;
     }
   },
   
-  MESSAGE_PROCESS_KILLED {
+  ERROR_EXECUTING_VMPEJVM {
+    public String toString() {
+      return "Error: Problems occured while executing vmep java virtual machine." ;
+    }
+  },
+  
+  PROCESS_KILLED {
     public String toString() {
       return "Msg: Process was killed.";
     }

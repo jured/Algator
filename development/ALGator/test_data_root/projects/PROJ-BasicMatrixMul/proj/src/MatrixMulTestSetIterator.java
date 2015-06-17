@@ -80,10 +80,10 @@ public class MatrixMulTestSetIterator extends DefaultTestSetIterator {
   // TEST
     
     public static void main(String args[]) {
-    String root         = "/Users/Tomaz/Dropbox/FRI/ALGator/data_root"; // a folder with the "projects" folder
+    String dataroot     = "/Users/Tomaz/Dropbox/FRI/ALGator/data_root"; // a folder with the "projects" folder
     String projName     = "MatrixMul";
     
-    ETestSet testSet = ATTools.getFirstTestSetFromProject(root, projName);
+    ETestSet testSet = ATTools.getFirstTestSetFromProject(dataroot, projName);
     MatrixMulTestSetIterator stsi = new MatrixMulTestSetIterator();
     stsi.setTestSet(testSet);
     

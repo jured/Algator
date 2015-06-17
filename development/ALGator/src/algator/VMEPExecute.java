@@ -58,10 +58,17 @@ public class VMEPExecute {
     Option data_root = OptionBuilder.withArgName("data_root_folder")
 	    .withLongOpt("data_root")
 	    .hasArg(true)
-	    .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT")
+	    .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT" )
 	    .create("d");
 
+    Option algator_root = OptionBuilder.withArgName("algator_root_folder")
+            .withLongOpt("algator_root")
+            .hasArg(true)
+            .withDescription("use this folder as algator_root; default value in $ALGATOR_ROOT")
+            .create("r");
+
     options.addOption(data_root);
+    options.addOption(algator_root);
     
     options.addOption("h", "help", false,
 	    "print this message");    
@@ -337,12 +344,17 @@ public class VMEPExecute {
       String testNumberS   = curArgs[3];
       String commFolder    = curArgs[4];
 
+      String algatorRoot = System.getenv("ALGATOR_ROOT");
+      if (line.hasOption("algator_root")) {
+        algatorRoot = line.getOptionValue("algator_root");        
+      }
+      ATGlobal.setALGatorRoot(algatorRoot);
+      
       String dataRoot = System.getenv("ALGATOR_DATA_ROOT");
       if (line.hasOption("data_root")) {
 	dataRoot = line.getOptionValue("data_root");
       }
-      ATGlobal.ALGatorDataRoot = dataRoot;
-      
+      ATGlobal.setALGatorDataRoot(dataRoot);      
       
       int testNumber = 1; // the first test in testset is the default test to run
       try {

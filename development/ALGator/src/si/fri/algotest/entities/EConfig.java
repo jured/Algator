@@ -35,7 +35,7 @@ public class EConfig extends Entity {
  
   public static EConfig getConfig() {
     if (config == null) {
-      config = new EConfig(new File(ATGlobal.getCONFIGfilemane()));
+      config = new EConfig(new File(ATGlobal.getLocalConfigFilename()));
     }
     return config;
   }  

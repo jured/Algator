@@ -142,10 +142,10 @@ public class SortTestSetIterator extends DefaultTestSetIterator {
   
   // TEST
   public static void main(String args[]) {
-    String root         = "../../data_root";
+    String dataroot         = "../../data_root";
     String projName     = "Sorting";
     
-    ETestSet testSet = ATTools.getFirstTestSetFromProject(root, projName);
+    ETestSet testSet = ATTools.getFirstTestSetFromProject(dataroot, projName);
     SortTestSetIterator stsi = new SortTestSetIterator();
     stsi.setTestSet(testSet);
     

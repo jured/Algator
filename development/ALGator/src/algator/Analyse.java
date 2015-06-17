@@ -1,7 +1,6 @@
 package algator;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Scanner;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -38,6 +37,13 @@ public class Analyse {
             .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT")
             .create("d");
 
+    Option algator_root = OptionBuilder.withArgName("algator_root_folder")
+            .withLongOpt("algator_root")
+            .hasArg(true)
+            .withDescription("use this folder as algator_root; default value in $ALGATOR_ROOT")
+            .create("r");
+
+    
     Option query = OptionBuilder.withArgName("query_name")
             .withLongOpt("query")
             .hasArg(true)
@@ -52,6 +58,7 @@ public class Analyse {
     
 
     options.addOption(data_root);
+    options.addOption(algator_root);
     options.addOption(query);
     options.addOption(queryOrigin);
 
@@ -112,11 +119,18 @@ public class Analyse {
 
       boolean printTable = false;
 
+      String algatorRoot = System.getenv("ALGATOR_ROOT");
+      if (line.hasOption("algator_root")) {
+        algatorRoot = line.getOptionValue("algator_root");        
+      }
+      ATGlobal.setALGatorRoot(algatorRoot);
+      
       String dataRoot = System.getenv("ALGATOR_DATA_ROOT");
       if (line.hasOption("data_root")) {
         dataRoot = line.getOptionValue("data_root");        
       }
-      
+      ATGlobal.setALGatorDataRoot(dataRoot);
+            
       ATLog.setLogLevel(ATLog.LOG_LEVEL_OFF);
       if (line.hasOption("verbose")) {
         ATLog.setLogLevel(ATLog.LOG_LEVEL_STDOUT);
@@ -129,7 +143,7 @@ public class Analyse {
         System.exit(0);
       }
 
-      ATGlobal.ALGatorDataRoot = dataRoot;
+      
    
       
       String origin = line.getOptionValue("query_origin");

@@ -406,6 +406,7 @@ public class DataAnalyser {
         ATLog.disableLog(); // to prevent error messages on missing description files
 	  readResults(rPack, project, alg.getName(), ts.getName(), MeasurementType.EM);
           readResults(rPack, project, alg.getName(), ts.getName(), MeasurementType.CNT);
+          readResults(rPack, project, alg.getName(), ts.getName(), MeasurementType.JVM);
         ATLog.enableLog();
       }
       results.put(alg.getName(), rPack);
@@ -534,11 +535,11 @@ public class DataAnalyser {
   }
 
   public static void main(String args[]) {
-    String root = ATGlobal.ALGatorDataRoot;
+    String dataRoot = ATGlobal.getALGatorDataRoot();
     String projName = "Sorting";
 
-    String projRoot = ATGlobal.getPROJECTroot(root, projName);
-    String projFilename = ATGlobal.getPROJECTfilename(root, projName);
+    String projRoot     = ATGlobal.getPROJECTroot(dataRoot, projName);
+    String projFilename = ATGlobal.getPROJECTfilename(dataRoot, projName);
 
     EProject eProject = new EProject(new File(projFilename));
     EQuery query = new EQuery(new File(ATGlobal.getQUERYfilename(projRoot, "q1")));

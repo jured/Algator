@@ -366,7 +366,7 @@ public class TableData {
       String vrstica = "";
       for (int j = 0; j < data.get(i).size(); j++) {
         Object object = data.get(i).get(j);
-        String value  = object.toString();
+        String value  = object != null ? object.toString() : "null";
         
         vrstica = add(vrstica, value, delim);
       }

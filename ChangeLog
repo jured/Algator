@@ -1,5 +1,10 @@
 ChangeLog for project ALGator since November 2014
 
+C9 (June 2015, td)
+- a new folder structure was introduced and implemented; to run ALGator 
+  successfully, only the $ALGATOR_ROOT environment variable has to be set
+  (see ALGator.doc, section 2. The structure of the system).
+
 C8 (May 2015, td)
 - ALGator was extended with 'jvm' measurements. To measure jvm bytecode
   consumption, install jamvm virtual machine in <jamvm> folder and set

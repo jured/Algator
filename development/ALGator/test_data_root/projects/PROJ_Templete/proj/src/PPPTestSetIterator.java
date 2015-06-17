@@ -45,10 +45,10 @@ public class PPPTestSetIterator extends DefaultTestSetIterator {
   // TEST
     
     public static void main(String args[]) {
-    String root         = "path to data root folder"; // a folder with the "projects" folder
+    String dataroot     = "path to data root folder"; // a folder with the "projects" folder
     String projName     = "PPP";
     
-    ETestSet testSet = ATTools.getFirstTestSetFromProject(root, projName);
+    ETestSet testSet = ATTools.getFirstTestSetFromProject(dataroot, projName);
     PPPTestSetIterator stsi = new PPPTestSetIterator();
     stsi.setTestSet(testSet);
     

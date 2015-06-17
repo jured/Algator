@@ -1,5 +1,7 @@
 package algator;
 
+import si.fri.algotest.global.ATGlobal;
+
 /**
  *
  * @author tomaz
@@ -22,5 +24,11 @@ public class Version {
     } catch (Exception e) {
       return "";
     }
+  }
+  
+  public static void main(String[] args) {
+    System.out.println("ALGator, " + getVersion());
+    System.out.println("AlgatorRoot:     " + ATGlobal.getALGatorRoot());
+    System.out.println("AlgatorDataRoot: " + ATGlobal.getALGatorDataRoot());
   }
 }

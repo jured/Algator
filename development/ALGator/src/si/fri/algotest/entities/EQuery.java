@@ -92,26 +92,4 @@ public class EQuery extends Entity {
     return (count != null && count.equals("1"));
   }
   
-  public static void main(String args[]) {
-    String   root = ATGlobal.ALGatorDataRoot;
-    
-    if (root==null || root.isEmpty())
-      root = "/Users/Tomaz/Dropbox/FRI/ALGator/data_root/"; 
-    
-    String projName = "Sorting";
-    String projRoot     = ATGlobal.getPROJECTroot(root, projName);
-    
-    EQuery query = new EQuery(new File(ATGlobal.getQUERYfilename(projRoot, "q1")));
-    Object o = query.get(ID_Algorithms);
-    
-    System.out.println(query);
-    
-    NameAndAbrev [] naa = query.getNATabFromJSONArray(ID_Algorithms);
-    for (int i = 0; i < naa.length; i++) {
-      naa[i].setAbrev(naa[i].getAbrev() + "1");
-    }
-    query.setJSONArrayFromNATab(naa, ID_Algorithms);
-    
-    System.out.println(query.toJSONString());
-  }
 }

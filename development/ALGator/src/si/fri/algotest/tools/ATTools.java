@@ -158,9 +158,9 @@ public class ATTools {
   }
   
   
-    public static ETestSet getFirstTestSetFromProject(String root, String projName) {
-    String projRoot     = ATGlobal.getPROJECTroot(root, projName);
-    String projFilename = ATGlobal.getPROJECTfilename(root, projName);
+    public static ETestSet getFirstTestSetFromProject(String dataroot, String projName) {
+    String projRoot     = ATGlobal.getPROJECTroot    (dataroot, projName);
+    String projFilename = ATGlobal.getPROJECTfilename(dataroot, projName);
     
     EProject   eProject = new EProject(new File(projFilename)); 
     if (ErrorStatus.getLastErrorStatus() != ErrorStatus.STATUS_OK) 

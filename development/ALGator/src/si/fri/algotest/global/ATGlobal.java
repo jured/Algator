@@ -11,59 +11,83 @@ import si.fri.algotest.entities.MeasurementType;
  */
 public class ATGlobal {
 
-  public static String ALGatorDataRoot = System.getenv("ALGATOR_DATA_ROOT");
-
+  private static String ALGatorRoot     = System.getenv("ALGATOR_ROOT");
+  private static String ALGatorDataRoot = System.getenv("ALGATOR_DATA_ROOT");
+    
   // File extensions for AT entities
-  public static final String AT_FILEEXT_project = "atp";
-  public static final String AT_FILEEXT_algorithm = "atal";
-  public static final String AT_FILEEXT_testset = "atts";
+  public static final String AT_FILEEXT_project    = "atp";
+  public static final String AT_FILEEXT_algorithm  = "atal";
+  public static final String AT_FILEEXT_testset    = "atts";
   public static final String AT_FILEEXT_resultdesc = "atrd";
-  public static final String AT_FILEEXT_query = "atqd";
+  public static final String AT_FILEEXT_query      = "atqd";
 
   // For the structure of the Project folder see ALGator.docx documentation
-  private static final String ATDIR_projects = "projects";
+  private static final String ATDIR_data_root      = "data_root";
+  private static final String ATDIR_projects       = "projects";  
+  private static final String ATDIR_projRootDir    = "PROJ-%s";
+  private static final String ATDIR_projConfDir    = "proj";
+  private static final String ATDIR_srcDir         = "src";
+  private static final String ATDIR_binDir         = "bin";
+  private static final String ATDIR_testsDir       = "tests";
+  private static final String ATDIR_resultsDir     = "results";
+  private static final String ATDIR_algsDir        = "algs";
+  private static final String ATDIR_algDir         = "ALG-%s";
+  private static final String ATDIR_queryDir       = "queries";
+  
+  private static final String ATDIR_tmpDir         = "tmp";
 
-  private static final String ATDIR_projRootDir = "PROJ-%s";
-  private static final String ATDIR_projConfDir = "proj";
-  private static final String ATDIR_srcDir = "src";
-  private static final String ATDIR_binDir = "bin";
-  private static final String ATDIR_testsDir = "tests";
-  private static final String ATDIR_resultsDir = "results";
-  private static final String ATDIR_algsDir = "algs";
-  private static final String ATDIR_algDir = "ALG-%s";
-  private static final String ATDIR_queryDir = "queries";
   
-  private static final String ATDIR_tmpDir = "tmp";
-
-  private static final String ATDIR_configDir = "config";
-  private static final String CONFIG_FILENAME = "algator.conf";  // The name of the configuration file
+  private static final String ATDIR_localConfigDir    = "local_config";
+  private static final String LOCAL_CONFIG_FILENAME   = "local.conf";  
+  private static final String ATDIR_globalConfigDir   = "global_config";
+  private static final String GLOBAL_CONFIG_FILENAME  = "global.conf";  
   
-  
-  private static final String ATDIR_libDir = "lib";
+  private static final String ATDIR_libDir         = "lib";
   
   public static final String COUNTER_CLASS_EXTENSION = "_COUNT"; 
-
-
   
+  
+  
+  public static String getALGatorRoot() {
+    String result = ALGatorRoot;
+    if (result == null || result.isEmpty())
+      result = System.getProperty("user.dir", "");
+    return result;
+  }
+  
+  public static String getALGatorDataRoot() {
+    String result = ALGatorDataRoot;
+    if (result == null || result.isEmpty())
+      result = getALGatorRoot() + File.separator + ATDIR_data_root;
+    return result;
+  }
+
+  public static void setALGatorRoot(String algatorRoot) {
+    ALGatorRoot = algatorRoot;
+  }
+  public static void setALGatorDataRoot(String dataRoot) {
+    ALGatorDataRoot = dataRoot;
+  }
+
   /**
    * Returns the root of the project
    *
-   * @param root root for all projects
+   * @param data_root root for all projects
    * @param projName project name
    * @return
    */
-  public static String getPROJECTroot(String root, String projName) {
-    return root + File.separator + ATDIR_projects + File.separator + String.format(ATDIR_projRootDir, projName);
+  public static String getPROJECTroot(String data_root, String projName) {
+    return data_root + File.separator + ATDIR_projects + File.separator + String.format(ATDIR_projRootDir, projName);
   }
 
   /**
    * Returns the name of the project configuration file
    *
-   * @param root root for all projects
+   * @param data_root root for all projects
    * @param projName project name
    */
-  public static String getPROJECTfilename(String root, String projName) {
-    return getPROJECTroot(root, projName) + File.separator
+  public static String getPROJECTfilename(String data_root, String projName) {
+    return getPROJECTroot(data_root, projName) + File.separator
             + ATDIR_projConfDir + File.separator + projName + "." + AT_FILEEXT_project;
   }
 
@@ -123,8 +147,8 @@ public class ATGlobal {
     return projectRoot + File.separator + ATDIR_testsDir;
   }
 
-  public static String getRESULTDESCfilename(String projRoot, String projName, MeasurementType measurementType) {
-    return projRoot + File.separator + ATDIR_projConfDir + File.separator + projName + "-" + measurementType.getExtension() + "." + AT_FILEEXT_resultdesc;
+  public static String getRESULTDESCfilename(String projectRoot, String projName, MeasurementType measurementType) {
+    return projectRoot + File.separator + ATDIR_projConfDir + File.separator + projName + "-" + measurementType.getExtension() + "." + AT_FILEEXT_resultdesc;
   }
 
   public static String getRESULTSroot(String projectRoot) {
@@ -156,12 +180,12 @@ public class ATGlobal {
     return getQUERIESroot(projectRoot) + File.separator + query + "." + AT_FILEEXT_query;
   }
     
-  public static String getTMProot(String root, String projName) {
-    return getPROJECTroot(root, projName) + File.separator + ATDIR_tmpDir;
+  public static String getTMProot(String data_root, String projName) {
+    return getPROJECTroot(data_root, projName) + File.separator + ATDIR_tmpDir;
   }
   
-  public static String getTMPDir(String root, String projName) {
-    String folderName = getTMProot(root, projName) + File.separator + "alg" + (new Random()).nextLong();
+  public static String getTMPDir(String data_root, String projName) {
+    String folderName = getTMProot(data_root, projName) + File.separator + "alg" + (new Random()).nextLong();
     File tmpFolder = new File(folderName);
     if (!tmpFolder.exists())
       tmpFolder.mkdirs();
@@ -169,7 +193,12 @@ public class ATGlobal {
     return folderName;
   }
   
-  public static String getCONFIGfilemane() {
-    return ALGatorDataRoot + File.separator + ATDIR_configDir + File.separator + CONFIG_FILENAME;
+  public static String getLocalConfigFilename() {
+    return ALGatorRoot + File.separator + ATDIR_localConfigDir + File.separator + LOCAL_CONFIG_FILENAME;
   }
+  
+  public static String getGlobalConfigFilename() {
+    return ALGatorDataRoot + File.separator + ATDIR_globalConfigDir + File.separator + GLOBAL_CONFIG_FILENAME;
+  }
+
 }

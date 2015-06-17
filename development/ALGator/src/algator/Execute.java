@@ -61,11 +61,19 @@ public class Execute {
 	    .hasArg(true)
 	    .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT")
 	    .create("d");
+    
+    Option algator_root = OptionBuilder.withArgName("algator_root_folder")
+            .withLongOpt("algator_root")
+            .hasArg(true)
+            .withDescription("use this folder as algator_root; default value in $ALGATOR_ROOT")
+            .create("r");
+
 
 
     options.addOption(algorithm);
     options.addOption(testset);
     options.addOption(data_root);
+    options.addOption(algator_root);
     options.addOption(measurement);
     
 
@@ -148,12 +156,18 @@ public class Execute {
       boolean alwaysRunTests = false;
 
       boolean listOnly = false;
+      
+      String algatorRoot = System.getenv("ALGATOR_ROOT");
+      if (line.hasOption("algator_root")) {
+        algatorRoot = line.getOptionValue("algator_root");        
+      }
+      ATGlobal.setALGatorRoot(algatorRoot);
 
       String dataRoot = System.getenv("ALGATOR_DATA_ROOT");
       if (line.hasOption("data_root")) {
 	dataRoot = line.getOptionValue("data_root");
       }
-      ATGlobal.ALGatorDataRoot = dataRoot;
+      ATGlobal.setALGatorDataRoot(dataRoot);
       
       if (line.hasOption("algorithm")) {
 	algorithmName = line.getOptionValue("algorithm");

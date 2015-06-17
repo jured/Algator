@@ -344,13 +344,13 @@ public class VMEPExecute {
       String testNumberS   = curArgs[3];
       String commFolder    = curArgs[4];
 
-      String algatorRoot = System.getenv("ALGATOR_ROOT");
+      String algatorRoot = ATGlobal.getALGatorRoot();
       if (line.hasOption("algator_root")) {
         algatorRoot = line.getOptionValue("algator_root");        
       }
       ATGlobal.setALGatorRoot(algatorRoot);
       
-      String dataRoot = System.getenv("ALGATOR_DATA_ROOT");
+      String dataRoot = ATGlobal.getALGatorDataRoot();
       if (line.hasOption("data_root")) {
 	dataRoot = line.getOptionValue("data_root");
       }

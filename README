@@ -22,21 +22,32 @@ https://github.com/ALGatorDevel/Algator/blob/master/doc/ALGator.docx?raw=true
 3) Kratka navodila za uporabo programa ALGator.jar
 *****************************************************************************
 1. Preveden program ALGator z vsemi potrebnimi dodatki se nahaja v datoteki
-ALGator.zip. Za uporabo programa prenesite datoteko 
+ALGator.zip. Za uporabo programa prenesemo datoteko 
 
 https://github.com/ALGatorDevel/Algator/blob/master/ALGator.zip?raw=true
 
-in jo odpakirajte v poljuben direktorij (<algator_root>).
+in jo odpakiramo v poljuben direktorij (imenujmo ga <algator_root>).
+
+2. Ustvarimo mapi <algator_root>/app in <algator_root>/app/ALGator in v slednjo
+   prenesemo datoteko ALGator.jar in mapo lib. Končen cilj je taka struktura:
+
+   <algator_root>
+     app
+       ALGator
+         ALGator.jar
+         lib
+     schema
+     test_data_root    
  
-2. V CLASSPATH dodamo pot do programa ALGator.jar
+3. Nastavimo tri sistemske spremenljivke 
+  
+       ALGATOR_ROOT=<algator_root>
+       ALGATOR_DATA_ROOT=<algator_root>/test_data_root
+       CLASSPATH=$CLASSPATH;<algator_root>/app/ALGator/ALGator.jar
 
-       set CLASSPATH=$CLASSPATH;<algator_root>/ALGator.jar
+   (v zgornjih ukazih <algator_root> zamenjamo s pravim imenom mape)
 
-3. Nastavimo premenjlivko ALGATOR_DATA_ROOT, da kaže na <data_root> (mapa s 
-   podatki o ALGator projektih)
-
-       set ALGATOR_DATA_ROOT=<algator_root>/test_data_root
-
+       
 4. Izvajalni del ALGatorja poženemo z ukazom
 
        java algator.Execute

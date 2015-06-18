@@ -1,5 +1,9 @@
 ChangeLog for project ALGator since November 2014
 
+C10 (June 2015, td)
+- new entities (EGlobalConfig, ELocalConfig, EComputerFamily
+  and EComputer) were added
+
 C9 (June 2015, td)
 - a new folder structure was introduced and implemented; to run ALGator 
   successfully, only the $ALGATOR_ROOT environment variable has to be set

@@ -10,7 +10,7 @@ import org.apache.commons.cli.Options;
 import si.fri.algotest.timer.Timer;
 
 import java.io.File;
-import si.fri.algotest.entities.EConfig;
+import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.entities.MeasurementType;
 
 /**
@@ -138,8 +138,8 @@ public class ExternalExecute {
     
       String jvmCommand = "java";
       if (mType.equals(MeasurementType.JVM)) {
-        String vmepCmd = EConfig.getConfig().getField(EConfig.ID_VMEP);
-        String vmepCP  = EConfig.getConfig().getField(EConfig.ID_VMEPClasspath);
+        String vmepCmd = ELocalConfig.getConfig().getField(ELocalConfig.ID_VMEP);
+        String vmepCP  = ELocalConfig.getConfig().getField(ELocalConfig.ID_VMEPClasspath);
         if (!vmepCmd.isEmpty()) 
           jvmCommand = vmepCmd;
         if (!vmepCP.isEmpty())

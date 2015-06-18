@@ -12,7 +12,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import si.fri.algotest.entities.EAlgorithm;
-import si.fri.algotest.entities.EConfig;
+import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.entities.EResultDescription;
 import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.MeasurementType;
@@ -257,7 +257,7 @@ public class Execute {
       System.exit(0);
     }
     if (mType.equals(MeasurementType.JVM)) {
-      String vmep = EConfig.getConfig().getField(EConfig.ID_VMEP);
+      String vmep = ELocalConfig.getConfig().getField(ELocalConfig.ID_VMEP);
       File vmepFile = new File(vmep == null ? "":vmep);
 
       if (vmep == null || vmep.isEmpty() /*|| !vmepFile.exists()  || !vmepFile.canExecute()*/) {

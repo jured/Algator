@@ -229,7 +229,7 @@ public class Execute {
 	System.out.println("Invalid algorithm.");
 	System.exit(0);
       }
-      eAlgs = new ArrayList<>(); 
+      eAlgs = new ArrayList(); 
       eAlgs.add(alg);
     } else {
        eAlgs = new ArrayList(projekt.getAlgorithms().values());

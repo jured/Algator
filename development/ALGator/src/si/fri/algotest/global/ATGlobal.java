@@ -2,6 +2,7 @@ package si.fri.algotest.global;
 
 import java.io.File;
 import java.util.Random;
+import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.entities.MeasurementType;
 
 /**
@@ -152,7 +153,7 @@ public class ATGlobal {
   }
 
   public static String getRESULTSroot(String projectRoot) {
-    return projectRoot + File.separator + ATDIR_resultsDir;
+    return projectRoot + File.separator + ATDIR_resultsDir + File.separator + getThisComputerID();
   }
 
   /**
@@ -199,6 +200,19 @@ public class ATGlobal {
   
   public static String getGlobalConfigFilename() {
     return getALGatorDataRoot() + File.separator + ATDIR_globalConfigDir + File.separator + GLOBAL_CONFIG_FILENAME;
+  }
+  
+  public static String getThisComputerID() {
+    try {
+      ELocalConfig config = ELocalConfig.getConfig();
+      String id = config.getField(ELocalConfig.ID_COMPID);
+      if (id == null || id.isEmpty())
+        return "C0";
+      else
+        return id;
+    } catch (Exception e) {
+      return "C0";
+    }
   }
 
 }

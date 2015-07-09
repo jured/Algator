@@ -1,7 +1,9 @@
 package si.fri.algotest.global;
 
 import java.io.File;
+import java.util.MissingResourceException;
 import java.util.Random;
+import java.util.ResourceBundle;
 import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.entities.MeasurementType;
 
@@ -214,5 +216,19 @@ public class ATGlobal {
       return "C0";
     }
   }
+  
+  
+  public static final String getBuildNumber() { 
+   String msg = "/unknown/"; 
+   try { 
+     // resource bundle that provides the build number
+     ResourceBundle versionRB = ResourceBundle.getBundle("version"); 
+     msg = versionRB.getString("BUILD"); 
+   } catch (MissingResourceException e) { 
+     msg = e.toString();
+   } 
+   return msg; 
+  } 
+
 
 }

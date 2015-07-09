@@ -27,7 +27,7 @@ public class Version {
   }
   
   public static void main(String[] args) {
-    System.out.println("ALGator, " + getVersion());
+    System.out.printf("ALGator, %s, build %s\n", getVersion(), ATGlobal.getBuildNumber());
     System.out.println("AlgatorRoot:     " + ATGlobal.getALGatorRoot());
     System.out.println("AlgatorDataRoot: " + ATGlobal.getALGatorDataRoot());
   }

@@ -11,6 +11,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import si.fri.adeserver.ADETools;
+import si.fri.adeserver.TaskStatus;
 import si.fri.algotest.entities.EAlgorithm;
 import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.entities.EResultDescription;
@@ -67,6 +69,13 @@ public class Execute {
             .hasArg(true)
             .withDescription("use this folder as algator_root; default value in $ALGATOR_ROOT")
             .create("r");
+    
+    Option taskID = OptionBuilder.withArgName("task_id")
+            .withLongOpt("id")
+            .hasArg(true)
+            .withDescription("task identification number")
+            .create("i");
+    
 
 
 
@@ -75,8 +84,9 @@ public class Execute {
     options.addOption(data_root);
     options.addOption(algator_root);
     options.addOption(measurement);
+    options.addOption(taskID);
     
-
+    
     options.addOption("h", "help", false,
 	    "print this message");
     options.addOption("c", "compile", false,
@@ -112,13 +122,20 @@ public class Execute {
     System.exit(0);
   }
 
-  private static Notificator getNotificator(final String alg, final String testSet, final MeasurementType mt) {
-    return new Notificator() {
+  private static Notificator getNotificator(final String alg, final String testSet, final MeasurementType mt, int taskID) {
+    Notificator notificator = 
+      new Notificator() {
+      
       public void notify(int i, ExecutionStatus status) {
         System.out.println(String.format("[%s, %s, %s]: test %3d / %-3d - %s", 
           alg, testSet, mt.getExtension(), i, this.getN(),status.toString()));
+        
+        String statusMsg = String.format("%d%c (%d/%d)", 100*i/this.getN(), '%', i, getN());
+        ADETools.writeTaskStatus(taskID,  TaskStatus.PROCESSING, statusMsg);
       }
     };
+    notificator.setTaskID(taskID);
+    return notificator;
   }
   
   /**
@@ -148,7 +165,6 @@ public class Execute {
 
       String projectName = curArgs[0];
 
-
       String algorithmName = "";
       String testsetName = "";
 
@@ -156,7 +172,7 @@ public class Execute {
       boolean alwaysRunTests = false;
 
       boolean listOnly = false;
-      
+            
       String algatorRoot = ATGlobal.getALGatorRoot();
       if (line.hasOption("algator_root")) {
         algatorRoot = line.getOptionValue("algator_root");        
@@ -201,9 +217,15 @@ public class Execute {
       if (verbose) {
         ATLog.setLogLevel(ATLog.LOG_LEVEL_STDOUT);
       }
+      
+      int taskID = 0; // default task id (if run manually without -i switch) 
+      if (line.hasOption("id")) {
+        try {
+          taskID = Integer.parseInt(line.getOptionValue("task_id"));        
+        } catch (Exception e) {}
+      }
 
-      runAlgorithms(dataRoot, projectName, algorithmName, testsetName, mType, alwaysCompile, alwaysRunTests, listOnly, verbose);
-
+      runAlgorithms(dataRoot, projectName, algorithmName, testsetName, mType, alwaysCompile, alwaysRunTests, listOnly, verbose, taskID);
 
     } catch (ParseException ex) {
       printMsg(options);
@@ -212,7 +234,7 @@ public class Execute {
 
   private static void runAlgorithms(String dataRoot, String projName, String algName,
 	  String testsetName, MeasurementType mType, boolean alwaysCompile, 
-          boolean alwaysRun, boolean printOnly, boolean verbose) {
+          boolean alwaysRun, boolean printOnly, boolean verbose, int taskID) {
     
     // Test the project
     Project projekt = new Project(dataRoot, projName);
@@ -284,7 +306,7 @@ public class Execute {
     } else {
       for (int i = 0; i < eAlgs.size(); i++) {
 	for (int j = 0; j < eTests.size(); j++) {
-          Notificator notificator = getNotificator(eAlgs.get(i).getName(), eTests.get(j).getName(), mType);
+          Notificator notificator = getNotificator(eAlgs.get(i).getName(), eTests.get(j).getName(), mType, taskID);
 	  ErrorStatus error = Executor.algorithmRun(projekt, eAlgs.get(i).getName(), 
 		  eTests.get(j).getName(),  mType, notificator, alwaysCompile, alwaysRun, verbose);          
 	}

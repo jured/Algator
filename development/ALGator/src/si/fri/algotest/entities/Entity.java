@@ -225,7 +225,7 @@ public class Entity implements Cloneable, Serializable {
 
   @Override
   public String toString() {
-    String desc = getName();
+    String desc = getName().length() > 1 ? getName() : "";
     for (String rep : representatives) 
       desc += (desc.isEmpty() ? "" : ", ") + rep + "=" + fields.get(rep);
     

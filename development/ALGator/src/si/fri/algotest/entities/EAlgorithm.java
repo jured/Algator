@@ -22,15 +22,15 @@ public class EAlgorithm extends Entity {
   
   
   public EAlgorithm() {
-   super(ID_Algorithm, 
+    super(ID_Algorithm, 
 	 new String [] {ID_ShortName, ID_Description, ID_HtmlDescFile, 
                         ID_Author, ID_Date, ID_Classes, ID_MainClassName});
+    setRepresentatives(ID_ShortName, ID_Author);
   }
   
   public EAlgorithm(File fileName) {
     this();
     initFromFile(fileName);
-    setRepresentatives(ID_ShortName, ID_Author);
   } 
   
   public ErrorStatus copyAndComplile(String workingDir) {

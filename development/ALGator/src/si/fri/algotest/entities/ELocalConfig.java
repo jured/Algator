@@ -20,6 +20,7 @@ public class ELocalConfig extends Entity {
   public static final String ID_COMPID            = "ComputerID";	// String
   public static final String ID_VMEP              = "VMEP";	        // String
   public static final String ID_VMEPClasspath     = "VMEPClasspath";    // String
+  public static final String ID_TaskServer        = "TastServer";    // String
   
   
   public ELocalConfig() {

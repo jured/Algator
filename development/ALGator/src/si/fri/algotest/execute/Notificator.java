@@ -11,6 +11,9 @@ import si.fri.algotest.global.ExecutionStatus;
 public abstract class Notificator {
   // number of instances
   private int n = 0;
+  
+  // the number of task (used to write status messages)
+  protected int taskID = 0;
 
   public Notificator() {
   }
@@ -25,6 +28,10 @@ public abstract class Notificator {
   
   public int getN() {
     return this.n;
+  }
+  
+  public void setTaskID(int taskID) {
+    this.taskID = taskID;
   }
   
   /**

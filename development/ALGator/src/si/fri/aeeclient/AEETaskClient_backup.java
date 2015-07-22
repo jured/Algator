@@ -17,23 +17,16 @@ import si.fri.algotest.global.ATGlobal;
  *
  * @author tomaz
  */
-public class AEETaskClient {
+public class AEETaskClient_backup {
   
   private static void runTask(String task) {
     String [] parts = task.split(ADEGlobal.STRING_DELIMITER);
     if (parts.length != 5) return; // error in task format
     
-    DefaultExecutor executor = new DefaultExecutor();
-    executor.setExitValue(0);
-    // max time to wait for task to finish : 10 minutes
-    ExecuteWatchdog watchdog = new ExecuteWatchdog(10*60*1000);
-    executor.setWatchdog(watchdog);
-
-    
     CommandLine cmdLine = new CommandLine("java");    
 //  to potrebujem samo v primeru, da TaskClient poganjam iz NetBeansa    
-  cmdLine.addArgument("-cp");
-  cmdLine.addArgument("/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar");
+//  cmdLine.addArgument("-cp");
+//  cmdLine.addArgument("/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar");
     cmdLine.addArgument("algator.Execute"); 
     
     // Project
@@ -56,13 +49,15 @@ public class AEETaskClient {
     // Always execute
     cmdLine.addArgument("-e");
 
+    DefaultExecutor executor = new DefaultExecutor();
+    executor.setExitValue(0);
+    // max time to wait for task to finish : 10 minutes
+    ExecuteWatchdog watchdog = new ExecuteWatchdog(10*60*1000);
+    executor.setWatchdog(watchdog);
     
     AEELog.log(": Starting    - " + task);
     try {
       int exitValue = executor.execute(cmdLine);
-      
-      MyExecuteResultHandler resultHandler = new MyExecuteResultHandler(exitValue);
-      resultHandler.waitFor();
       
       if (watchdog.killedProcess()) {
         AEELog.log(": Killed      - " + task);

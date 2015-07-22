@@ -163,9 +163,9 @@ public class ADETaskServer implements Runnable {
       case "WHO": 
         return Integer.toString(ID);
       case "LIST":
-        StringBuffer sb = new StringBuffer();
+          StringBuffer sb = new StringBuffer();
         for (ADETask tsk : taskQueue) {
-          sb.append((sb.length() > 0 ? "\n" : "") + tsk.toStringPlus());
+          sb.append((sb.length() > 0 ? "\n" : "")).append(tsk.toStringPlus());
         }
         return sb.toString();
 

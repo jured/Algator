@@ -113,7 +113,7 @@ public class TaskServer {
   }
   
   private static String askServer(String question) {
-    String hostName   = "localhost";
+    String hostName   = "localhost"; // it has to be local host, since this method only tries to communicate with the server installed in this machine
     int    portNumber = ADEGlobal.ADEPort;
     
     try (   Socket kkSocket = new Socket(hostName, portNumber);

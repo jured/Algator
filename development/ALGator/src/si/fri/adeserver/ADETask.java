@@ -74,7 +74,7 @@ public class ADETask extends Entity {
   }
   
   public String toStringPlus() {
-    return toString() + "  [Status: "+ getField(ID_Status) + "  Assigned computer: " + getField(ID_AssignedComputer + "]");
+    return toString() + "  [Status: "+ get(ID_Status) + "  Assigned computer: " + get(ID_AssignedComputer) + "]";
   }
   
 }

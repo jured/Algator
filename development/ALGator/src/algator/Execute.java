@@ -135,7 +135,7 @@ public class Execute {
           alg, testSet, mt.getExtension(), i, this.getN(),status.toString()));
         
         String statusMsg = String.format("%d%c (%d/%d)", 100*i/this.getN(), '%', i, getN());
-        ADETools.setTaskStatus(taskID,  TaskStatus.RUNNING, statusMsg);
+        ADETools.setTaskStatus(taskID,  TaskStatus.RUNNING, statusMsg, null);
       }
     };
     notificator.setTaskID(tID);

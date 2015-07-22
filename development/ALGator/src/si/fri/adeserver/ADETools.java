@@ -52,18 +52,21 @@ public class ADETools {
    */
   public static void setTaskStatus(ADETask task, TaskStatus status, String msg, String computer) {
     task.setTaskStatus(status, computer);
+    if (computer == null)
+      computer = task.getField(ADETask.ID_AssignedComputer);
     
     int idt = task.getFieldAsInt(ADETask.ID_TaskID);
-    setTaskStatus(idt, status, msg);
+    setTaskStatus(idt, status, msg, computer);
     
     ADETools.writeADETasks(taskQueue);
-    ADELog.log(status + " " + task.toString());
+    ADELog.log(status + " " + task.toString() + " [Computer:"+computer+"]");
   }
   
   /**
-   * Writes the status of a task to the task status file
+   * Writes the status of a task to the task status file.
+   * Computer name is valid only when task status is "COMPLETED"
    */
-  public static void setTaskStatus(int idt, TaskStatus status, String msg) {
+  public static void setTaskStatus(int idt, TaskStatus status, String msg, String computer) {
     String idtFilename = ADEGlobal.getTaskStatusFilename(idt);
     String startDate="", statusMsg = "", endDate="";
     if (status.equals(TaskStatus.QUEUED)) {      
@@ -80,12 +83,12 @@ public class ADETools {
       statusMsg = msg;
 
     if (status.equals(TaskStatus.RUNNING)) {           
-      statusMsg = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ": Task running" 
+      statusMsg = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ": Task running"  
               + (statusMsg.isEmpty() ? "" : " - ") + statusMsg;
     }
   
     if (status.equals(TaskStatus.COMPLETED))
-      endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ": Task completed";
+      endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ": Task completed by " + computer ;
     
     try (PrintWriter pw = new PrintWriter(new File(idtFilename))) {
      pw.println(startDate);

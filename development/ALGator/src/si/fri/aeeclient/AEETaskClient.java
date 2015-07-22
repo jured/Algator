@@ -1,14 +1,11 @@
 package si.fri.aeeclient;
 
-import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -28,8 +25,8 @@ public class AEETaskClient {
     
     CommandLine cmdLine = new CommandLine("java");    
 //  to potrebujem samo v primeru, da TaskClient poganjam iz NetBeansa    
-//  cmdLine.addArgument("-cp");
-//  cmdLine.addArgument("/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar");
+  cmdLine.addArgument("-cp");
+  cmdLine.addArgument("/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar");
     cmdLine.addArgument("algator.Execute"); 
     
     // Project
@@ -113,8 +110,8 @@ public class AEETaskClient {
         AEELog.log("Not connected - unknown host name.");
       } catch (java.net.ConnectException e) {
         if (logTaskServerProblem) {
-          System.out.println("TaskServer is not running.");
-          AEELog.log("Not connected - TaskServer is not running.");
+          System.out.println("TaskServer is not running at "+ hostName);
+          AEELog.log("Not connected - TaskServer is not running at " + hostName);
           logTaskServerProblem = false;
         }
       } catch (IOException e) {

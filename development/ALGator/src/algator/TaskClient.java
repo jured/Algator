@@ -91,7 +91,7 @@ public class TaskClient {
       
       String serverName = null;
       if (line.hasOption("server")) {
-	dataRoot = line.getOptionValue("server");
+	serverName = line.getOptionValue("server");
       }
       
       si.fri.aeeclient.AEETaskClient.runClient(serverName);

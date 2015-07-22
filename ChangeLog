@@ -1,5 +1,8 @@
 ChangeLog for project ALGator since November 2014
 
+C11 (July 2015, td)
+  - TaskServer and TaskClient programs were added
+
 C10 (June 2015, td)
 - new entities (EGlobalConfig, ELocalConfig, EComputerFamily
   and EComputer) were added

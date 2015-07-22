@@ -19,7 +19,6 @@ import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import org.math.plot.Plot2DPanel;
-import org.math.plot.plots.Plot;
 import si.fri.algotest.analysis.DataAnalyser;
 import si.fri.algotest.analysis.TableData;
 import si.fri.algotest.entities.EQuery;

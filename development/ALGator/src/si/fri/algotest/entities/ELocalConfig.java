@@ -10,6 +10,8 @@ import si.fri.algotest.global.ATGlobal;
  * @author tomaz
  */
 public class ELocalConfig extends Entity {
+  public static final String    DEFAULT_TASK_SERVER_NAME = "localhost";
+  
   // a single instance of a local configuration file
   private static ELocalConfig config;
   
@@ -20,7 +22,7 @@ public class ELocalConfig extends Entity {
   public static final String ID_COMPID            = "ComputerID";	// String
   public static final String ID_VMEP              = "VMEP";	        // String
   public static final String ID_VMEPClasspath     = "VMEPClasspath";    // String
-  public static final String ID_TaskServer        = "TastServer";    // String
+  public static final String ID_TaskServerName    = "TastServerName";   // String
   
   
   public ELocalConfig() {
@@ -40,4 +42,11 @@ public class ELocalConfig extends Entity {
     }
     return config;
   }  
+  
+  public String getTaskServerName() {
+    String taskServerName = getField(ID_TaskServerName);
+    if (taskServerName == null || taskServerName.isEmpty())
+      taskServerName = DEFAULT_TASK_SERVER_NAME;
+    return taskServerName;
+  }
 }

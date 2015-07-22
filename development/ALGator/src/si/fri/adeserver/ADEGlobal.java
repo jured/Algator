@@ -11,12 +11,44 @@ import si.fri.algotest.global.ATGlobal;
  */
 public class ADEGlobal {
   
-  public static final int ADEPort = 21221;
+  public static final int ADEPort = 12321;
+
+  /*
+   * REQUESTS
+   */
+  public static final String REQ_ADD_TASK       = "addTask";
+  public static final String REQ_GET_NEXT_TASK  = "getNextTask";
+  public static final String REQ_COMPLETE_TASK  = "completeTask";
+  public static final String REQ_STATUS         = "status";
+
+  /**
+   * TaskServer healthy checking question and answer
+   */
+  public static final String REQ_CHECK_Q        = "hello?";
+  public static final String REQ_CHECK_A        = "TaskServer status: OK";
   
-  private static final String TASK_SERVER_FOLDER  = "tasks";
-  private static final String TASK_STATUS_FOLDER  = "status";
+  /*
+   * ERROR string  (the error message between client/server always starts with this string
+   */
+  public static final String ERROR_PREFIX  = "ERROR:: ";
+  
+  // the answer string, if on tasks is available for a given computer
+  public static final String NO_TASKS = "NONE AVAILABLE";
+  
+  
+  public static final String ERROR_INVALID_NPARS     = "Invalid number of parameters";
+  public static final String ERROR_ERROR_CREATE_TASK = "Error occured when creating a task";
+  
+  // if a string holds more than one information, data if separated by STRING_DELIMITER
+  public static final String STRING_DELIMITER  = " ";
+  
+  
+  private static final String TASK_SERVER_FOLDER  = "server";
+  private static final String TASK_STATUS_FOLDER  = "tasks";
   private static final String TASK_ID_FILENAME    = "task.number";
   private static final String TASK_LIST_FILENAME  = "task.list";
+  private static final String LOG_FILENAME        = "taskserver.log";
+  
 
   public static String getTaskServerFolder() {
     String adeFolderName = ATGlobal.getALGatorDataRoot() + File.separator + TASK_SERVER_FOLDER;
@@ -42,8 +74,11 @@ public class ADEGlobal {
   public static String getADETasklistFilename() {
     return  getTaskServerFolder() + File.separator + TASK_LIST_FILENAME;
   }
-  
-  
+
+  public static String getLogFilename() {
+    return getTaskServerFolder() + File.separator + LOG_FILENAME;
+  }
+ 
   public static int getNextTaskID() {
     try {
      File folder = new File(getTaskServerFolder());
@@ -62,6 +97,19 @@ public class ADEGlobal {
     } catch (Exception e) {
       return 0;
     }
+  } 
+  
+  public static boolean isError(String msg) {
+    return msg.startsWith(ERROR_PREFIX);
+  }
+  public static String getErrorString(String errorMsg) {
+    return ERROR_PREFIX + errorMsg;
+  }
+  public static String getErrorMsg(String errorMsg) {
+    if (isError(errorMsg)) 
+      return errorMsg.substring(ERROR_PREFIX.length());
+    else
+      return "";
   }
   
 }

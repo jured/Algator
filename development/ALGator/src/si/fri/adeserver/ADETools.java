@@ -7,9 +7,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
+import java.util.Vector;
+import static si.fri.adeserver.ADETaskServer.taskQueue;
 
 /**
  *
@@ -17,8 +18,8 @@ import java.util.Scanner;
  */
 public class ADETools {
   
-  public static ArrayList<ADETask> readADETasks() {
-    ArrayList<ADETask> tasks = new ArrayList<>();
+  public static Vector<ADETask> readADETasks() {
+    Vector<ADETask> tasks = new Vector<>();
     File taskFile = new File(ADEGlobal.getADETasklistFilename());
     if (taskFile.exists()) {
       try (DataInputStream dis = new DataInputStream(new FileInputStream(taskFile));) {
@@ -33,7 +34,7 @@ public class ADETools {
     return tasks;
   }
 
-  public static void writeADETasks(ArrayList<ADETask> tasks) {
+  public static void writeADETasks(Vector<ADETask> tasks) {
     File taskFile = new File(ADEGlobal.getADETasklistFilename());
     try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(taskFile));) {
       for (ADETask aDETask : tasks) {
@@ -43,23 +44,48 @@ public class ADETools {
       // if error ocures, nothing can be done
     }
   }
+
+
   
-  public static void writeTaskStatus(int idt, TaskStatus status, String msg) {
+  /**
+   * Sets the status of a task and writes this status to the task status file
+   */
+  public static void setTaskStatus(ADETask task, TaskStatus status, String msg) {
+    task.setTaskStatus(status);
+    
+    int idt = task.getFieldAsInt(ADETask.ID_TaskID);
+    setTaskStatus(idt, status, msg);
+    
+    ADETools.writeADETasks(taskQueue);
+    ADELog.log(status + " " + task.toString());
+  }
+  
+  /**
+   * Writes the status of a task to the task status file
+   */
+  public static void setTaskStatus(int idt, TaskStatus status, String msg) {
     String idtFilename = ADEGlobal.getTaskStatusFilename(idt);
     String startDate="", statusMsg = "", endDate="";
-    if (status.equals(TaskStatus.CREATED)) {      
-      startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    if (status.equals(TaskStatus.QUEUED)) {      
+      startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ": Task queued";
     } else try (Scanner sc = new Scanner(new File(idtFilename))) {
-        startDate = sc.nextLine();
-        statusMsg = sc.nextLine();
-        endDate   = sc.nextLine();
-      } catch (Exception e) {
-        // on error - use default values
-      }
+      startDate = sc.nextLine();
+      statusMsg = sc.nextLine();
+      endDate   = sc.nextLine();
+    } catch (Exception e) {
+      // on error - use default values
+    }
+    
     if (msg != null)
       statusMsg = msg;
+
+    if (status.equals(TaskStatus.RUNNING)) {           
+      statusMsg = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ": Task running" 
+              + (statusMsg.isEmpty() ? "" : " - ") + statusMsg;
+    }
+  
     if (status.equals(TaskStatus.COMPLETED))
-      endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+      endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ": Task completed";
     
     try (PrintWriter pw = new PrintWriter(new File(idtFilename))) {
      pw.println(startDate);

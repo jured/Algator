@@ -1,5 +1,6 @@
 package algator;
 
+import java.awt.Toolkit;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -11,6 +12,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import si.fri.adeserver.ADEGlobal;
 import si.fri.adeserver.ADETools;
 import si.fri.adeserver.TaskStatus;
 import si.fri.algotest.entities.EAlgorithm;
@@ -61,7 +63,7 @@ public class Execute {
     Option data_root = OptionBuilder.withArgName("data_root_folder")
 	    .withLongOpt("data_root")
 	    .hasArg(true)
-	    .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT")
+	    .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT (if defined) or $ALGATOR_ROOT/data_root")
 	    .create("d");
     
     Option algator_root = OptionBuilder.withArgName("algator_root_folder")
@@ -122,7 +124,9 @@ public class Execute {
     System.exit(0);
   }
 
-  private static Notificator getNotificator(final String alg, final String testSet, final MeasurementType mt, int taskID) {
+  private static Notificator getNotificator(final String alg, final String testSet, final MeasurementType mt, final int tID) {
+    String idtFilename = ADEGlobal.getTaskStatusFilename(tID);
+    
     Notificator notificator = 
       new Notificator() {
       
@@ -131,10 +135,10 @@ public class Execute {
           alg, testSet, mt.getExtension(), i, this.getN(),status.toString()));
         
         String statusMsg = String.format("%d%c (%d/%d)", 100*i/this.getN(), '%', i, getN());
-        ADETools.writeTaskStatus(taskID,  TaskStatus.PROCESSING, statusMsg);
+        ADETools.setTaskStatus(taskID,  TaskStatus.RUNNING, statusMsg);
       }
     };
-    notificator.setTaskID(taskID);
+    notificator.setTaskID(tID);
     return notificator;
   }
   
@@ -143,7 +147,7 @@ public class Execute {
    *
    * @param args
    */
-  public static void main(String args[]) {
+  public static void main(String args[]) {    
     Options options = getOptions();
 
     CommandLineParser parser = new BasicParser();
@@ -221,7 +225,7 @@ public class Execute {
       int taskID = 0; // default task id (if run manually without -i switch) 
       if (line.hasOption("id")) {
         try {
-          taskID = Integer.parseInt(line.getOptionValue("task_id"));        
+          taskID = Integer.parseInt(line.getOptionValue("id"));        
         } catch (Exception e) {}
       }
 

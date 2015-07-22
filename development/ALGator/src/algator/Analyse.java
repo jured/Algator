@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import si.fri.algotest.analysis.DataAnalyser;
 import si.fri.algotest.analysis.view.Analyser;
 import si.fri.algotest.analysis.TableData;
+import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.entities.EQuery;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.global.ATGlobal;
@@ -34,7 +35,7 @@ public class Analyse {
     Option data_root = OptionBuilder.withArgName("data_root_folder")
             .withLongOpt("data_root")
             .hasArg(true)
-            .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT")
+            .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT (if defined) or $ALGATOR_ROOT/data_root")
             .create("d");
 
     Option algator_root = OptionBuilder.withArgName("algator_root_folder")
@@ -56,11 +57,19 @@ public class Analyse {
             .withDescription("the origin of the query (R=data root folder, F=custom folder, S=standard input); default: R")
             .create("o");
     
+    Option computerID = OptionBuilder.withArgName("computer_id")
+            .withLongOpt("cid")
+            .hasArg(true)
+            .withDescription("the ID of computer that produced results; default: this computer ID")
+            .create("c");
+    
+    
 
     options.addOption(data_root);
     options.addOption(algator_root);
     options.addOption(query);
     options.addOption(queryOrigin);
+    options.addOption(computerID);
 
     options.addOption("h", "help", false,
             "print this message");
@@ -143,8 +152,12 @@ public class Analyse {
         System.exit(0);
       }
 
+      String cid = ATGlobal.getThisComputerID();
+      if (line.hasOption("cid")) {
+        cid = line.getOptionValue("cid");        
+      }
       
-   
+      System.out.println(cid);
       
       String origin = line.getOptionValue("query_origin");
       if (origin == null) origin = "R";

@@ -6,21 +6,27 @@ package si.fri.adeserver;
  */
 
 public enum TaskStatus {
-  CREATED, SCHEDULED, PROCESSING, COMPLETED;
+  UNKNOWN, QUEUED, RUNNING, COMPLETED;
 
   @Override
   public String toString() {
     switch (this) {
-      case CREATED:
-        return "unknown";
-      case SCHEDULED:
-        return "aee_em";
-      case PROCESSING:
-        return "aee_cnt";
+      case QUEUED:
+        return "QUEUED";
+      case RUNNING:
+        return "RUNNING";
       case COMPLETED:
-        return "aee_jvm";
-      default:
-        return "/unknown/";
+        return "COMPLETED";
     }
+    return "/unknown/";
+  }
+  
+  public static TaskStatus getTaskStatus(String status) {
+    for (TaskStatus sts : TaskStatus.values()) {
+      if (status.equals(sts.toString())) {
+        return sts;
+      }
+    }
+    return UNKNOWN;
   }
 }

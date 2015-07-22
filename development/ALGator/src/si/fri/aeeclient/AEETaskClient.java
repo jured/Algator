@@ -72,8 +72,10 @@ public class AEETaskClient {
     }
   }
 
-  public static void runClient()  {
-    String hostName   = ELocalConfig.getConfig().getTaskServerName();
+  public static void runClient(String hostName)  {
+    if (hostName == null)
+      hostName   = ELocalConfig.getConfig().getTaskServerName();
+    
     int    portNumber = ADEGlobal.ADEPort;
     
     String compID = ELocalConfig.getConfig().getField(ELocalConfig.ID_COMPID);

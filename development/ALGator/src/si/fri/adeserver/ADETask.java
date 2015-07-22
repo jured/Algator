@@ -25,7 +25,7 @@ public class ADETask extends Entity {
   
   public ADETask() {
     super(ID_ADETask, 
-	 new String [] {ID_TaskID, ID_Project, ID_Algorithm, ID_Testset, ID_MType, ID_Status, ID_StatusDate});
+	 new String [] {ID_TaskID, ID_Project, ID_Algorithm, ID_Testset, ID_MType, ID_Status, ID_StatusDate, ID_AssignedComputer});
    
     setRepresentatives(ID_Project, ID_Algorithm, ID_Testset, ID_MType);
   }
@@ -74,7 +74,7 @@ public class ADETask extends Entity {
   }
   
   public String toStringPlus() {
-    return toString() + "Status: "+ getField(ID_Status) + "Assigned computer: " + getField(ID_AssignedComputer);
+    return toString() + "  [Status: "+ getField(ID_Status) + "  Assigned computer: " + getField(ID_AssignedComputer + "]");
   }
   
 }

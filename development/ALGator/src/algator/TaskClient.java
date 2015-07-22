@@ -40,8 +40,16 @@ public class TaskClient {
             .withDescription("use this folder as algator_root; default value in $ALGATOR_ROOT")
             .create("r");
 
+    Option server = OptionBuilder.withArgName("server_name")
+            .withLongOpt("server")
+            .hasArg(true)
+            .withDescription("the name of the server with TaskServer")
+            .create("s");
+
+    
     options.addOption(data_root);
     options.addOption(algator_root);
+    options.addOption(server);
 
     options.addOption("h", "help", false,
             "print this message");
@@ -81,7 +89,13 @@ public class TaskClient {
       }
       ATGlobal.setALGatorDataRoot(dataRoot);
       
-      si.fri.aeeclient.AEETaskClient.runClient();
+      String serverName = null;
+      if (line.hasOption("server")) {
+	dataRoot = line.getOptionValue("server");
+      }
+      
+      si.fri.aeeclient.AEETaskClient.runClient(serverName);
+      
     } catch (ParseException ex) {
       printMsg(options);
     }

@@ -17,8 +17,10 @@ public class ADETask extends Entity {
   public static final String ID_Algorithm  = "Algorithm";  // String
   public static final String ID_Testset    = "Testset";    // String
   public static final String ID_MType      = "MType";      // String
-  public static final String ID_Status     = "Status";     // String
-  public static final String ID_StatusDate = "StatusDate"; // String
+  
+  public static final String ID_Status           = "Status";           // String
+  public static final String ID_StatusDate       = "StatusDate";       // String
+  public static final String ID_AssignedComputer = "AssignedComputer"; // String
   
   
   public ADETask() {
@@ -37,7 +39,7 @@ public class ADETask extends Entity {
     set(ID_Testset,    testset);
     set(ID_MType,      mType);
     
-    setTaskStatus(TaskStatus.QUEUED);
+    setTaskStatus(TaskStatus.QUEUED, "none");
   }
  
     
@@ -46,9 +48,12 @@ public class ADETask extends Entity {
     initFromJSON(json);
   }
 
-  public void setTaskStatus(TaskStatus status) {
+  public void setTaskStatus(TaskStatus status, String computer) {
     set(ID_Status,     status.toString());
-    set(ID_StatusDate, Long.toString(new Date().getTime()));    
+    set(ID_StatusDate, Long.toString(new Date().getTime())); 
+    
+    if (computer != null)
+      set(ID_AssignedComputer, computer);
   }
   
   public TaskStatus getTaskStatus() {
@@ -67,4 +72,9 @@ public class ADETask extends Entity {
            getField(ID_Testset)   + ADEGlobal.STRING_DELIMITER +
            getField(ID_MType);
   }
+  
+  public String toStringPlus() {
+    return toString() + "Status: "+ getField(ID_Status) + "Assigned computer: " + getField(ID_AssignedComputer);
+  }
+  
 }

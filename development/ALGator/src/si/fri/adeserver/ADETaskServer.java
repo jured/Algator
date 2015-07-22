@@ -51,7 +51,7 @@ public class ADETaskServer implements Runnable {
     if (task != null) {
       taskQueue.add(task);
     
-      ADETools.setTaskStatus(task, TaskStatus.QUEUED, null);
+      ADETools.setTaskStatus(task, TaskStatus.QUEUED, null, null);
       Integer taskID = task.getField(ADETask.ID_TaskID);
       
       return taskID.toString();
@@ -91,7 +91,7 @@ public class ADETaskServer implements Runnable {
     String cid = parts[1];
     ADETask task = getNextTaskFor(cid);
     if (task != null) {
-        ADETools.setTaskStatus(task, TaskStatus.RUNNING, null);
+        ADETools.setTaskStatus(task, TaskStatus.RUNNING, null, cid);
         return task.toString();
     } else
     return ADEGlobal.NO_TASKS;
@@ -119,7 +119,7 @@ public class ADETaskServer implements Runnable {
     }
     if (task != null) {
       taskQueue.remove(task);
-      ADETools.setTaskStatus(task, TaskStatus.COMPLETED, null);
+      ADETools.setTaskStatus(task, TaskStatus.COMPLETED, null, null);
     }
     
     return "";
@@ -165,7 +165,7 @@ public class ADETaskServer implements Runnable {
       case "LIST":
         StringBuffer sb = new StringBuffer();
         for (ADETask tsk : taskQueue) {
-          sb.append((sb.length() > 0 ? "\n" : "") + tsk.toString());
+          sb.append((sb.length() > 0 ? "\n" : "") + tsk.toStringPlus());
         }
         return sb.toString();
 

@@ -87,8 +87,8 @@ public class AEETaskClient {
               BufferedReader fromServer  = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()));) 
       {
         logTaskServerProblem = true;
-        AEELog.log("Task client connected to server");
-        System.out.println("Task client connected to server");
+        AEELog.log("Task client connected to server - " + hostName);
+        System.out.println("Task client connected to server - " + hostName);
         while (true) {
           String taskRequset = ADEGlobal.REQ_GET_NEXT_TASK + ADEGlobal.STRING_DELIMITER + compID;
           toServer.println(taskRequset);

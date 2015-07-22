@@ -50,8 +50,8 @@ public class ADETools {
   /**
    * Sets the status of a task and writes this status to the task status file
    */
-  public static void setTaskStatus(ADETask task, TaskStatus status, String msg) {
-    task.setTaskStatus(status);
+  public static void setTaskStatus(ADETask task, TaskStatus status, String msg, String computer) {
+    task.setTaskStatus(status, computer);
     
     int idt = task.getFieldAsInt(ADETask.ID_TaskID);
     setTaskStatus(idt, status, msg);

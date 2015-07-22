@@ -27,7 +27,7 @@ public class ELocalConfig extends Entity {
   
   public ELocalConfig() {
    super(ID_Query, 
-	 new String [] {ID_COMPID, ID_VMEP, ID_VMEPClasspath});
+	 new String [] {ID_COMPID, ID_VMEP, ID_VMEPClasspath, ID_TaskServerName});
    setRepresentatives(ID_COMPID);
   }
   

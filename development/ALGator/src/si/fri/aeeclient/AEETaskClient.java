@@ -32,8 +32,8 @@ public class AEETaskClient {
     
     CommandLine cmdLine = new CommandLine("java");    
 //  to potrebujem samo v primeru, da TaskClient poganjam iz NetBeansa    
-  cmdLine.addArgument("-cp");
-  cmdLine.addArgument("/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar");
+//  cmdLine.addArgument("-cp");
+//  cmdLine.addArgument("/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar");
     cmdLine.addArgument("algator.Execute"); 
     
     // Project

@@ -203,6 +203,13 @@ public class ADETaskServer implements Runnable {
           String answer  =  processRequest(request);
           pw.println(answer);
           pw.flush();
+          
+          // some requests finish the communication imediately
+          if (request.startsWith(ADEGlobal.REQ_STATUS) ||
+              request.startsWith(ADEGlobal.REQ_CHECK_Q)) {
+            pw.close(); 
+            return;
+          }
         }                
     } catch (IOException e) {
       e.printStackTrace();

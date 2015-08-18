@@ -15,6 +15,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import si.fri.adeserver.ADEGlobal;
+import si.fri.aeeclient.AEELog;
+import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.global.ATGlobal;
 
 /**
@@ -46,10 +48,16 @@ public class TaskClient {
             .withDescription("the name of the server with TaskServer")
             .create("s");
 
+    Option ask = OptionBuilder.withArgName("request")
+            .withLongOpt("ask")
+            .hasArg(true)
+            .withDescription("send a <request> to TaskServer and print servers's response")
+            .create("a");
     
     options.addOption(data_root);
     options.addOption(algator_root);
     options.addOption(server);
+    options.addOption(ask);
 
     options.addOption("h", "help", false,
             "print this message");
@@ -64,6 +72,30 @@ public class TaskClient {
     formatter.printHelp("algator.TaskClient [options]", options);
 
     System.exit(0);
+  }
+  
+  
+  private static String askTaskServer(String hostName, String request) {
+    if (hostName == null)
+      hostName   = ELocalConfig.getConfig().getTaskServerName();
+    
+    int    portNumber = ADEGlobal.ADEPort;
+    
+    String compID = ELocalConfig.getConfig().getField(ELocalConfig.ID_COMPID);
+
+      try (
+        Socket kkSocket = new Socket(hostName, portNumber);
+        PrintWriter    toServer    = new PrintWriter(kkSocket.getOutputStream(), true);
+        BufferedReader fromServer  = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()));) 
+      {
+          String taskRequset = ADEGlobal.REQ_STATUS;
+          toServer.println(taskRequset);
+          String response = fromServer.readLine();
+          return response;
+
+      } catch (Exception e) {
+        return String.format("TaskServer on '%s' is not running.", hostName);
+      }          
   }
 
   public static void main(String args[]) {
@@ -92,6 +124,13 @@ public class TaskClient {
       String serverName = null;
       if (line.hasOption("server")) {
 	serverName = line.getOptionValue("server");
+      }
+      
+      if (line.hasOption("ask")) {
+        String request = line.getOptionValue("ask");        
+
+        System.out.println(askTaskServer(serverName, request));
+        System.exit(0);
       }
       
       si.fri.aeeclient.AEETaskClient.runClient(serverName);

@@ -9,6 +9,11 @@ import java.util.Date;
 import java.util.Scanner;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
+import si.fri.algotest.analysis.DataAnalyser;
+import si.fri.algotest.entities.Project;
+import si.fri.algotest.global.ATGlobal;
+import si.fri.algotest.global.ErrorStatus;
+import si.fri.algotest.tools.ATTools;
 
 /**
  *
@@ -30,9 +35,7 @@ public class ADETaskServer implements Runnable {
     this.connection = connection;
     this.ID = count;
   }
-  
-
-  
+ 
   
   
   /**
@@ -40,15 +43,16 @@ public class ADETaskServer implements Runnable {
    * Call: addTask project_name algorithm_name testset_name measurement_type
    * Return: task_id or error messsage if task can not be created.
    */
-  public String addTask(String request) {
-    String [] parts = request.split(ADEGlobal.STRING_DELIMITER);
-    if (parts.length != 5)
+  public String addTask(ArrayList<String> params) {
+    if (params.size() != 4)
       return ADEGlobal.getErrorString(ADEGlobal.ERROR_INVALID_NPARS);
     
-    String project = parts[1], algorithm = parts[2], testset = parts[3], mType=parts[4];
-    ADETask task = new ADETask(project, algorithm, testset, mType); 
+    String project = params.get(0), algorithm = params.get(1), testset = params.get(2), mType=params.get(3);
+    ADETask task = new ADETask(project, algorithm, testset, mType, false); 
     
     if (task != null) {
+      task.setCandidateComputers(ADETools.getCondidateComputersFor(task));
+      
       taskQueue.add(task);
     
       ADETools.setTaskStatus(task, TaskStatus.QUEUED, null, null);
@@ -56,26 +60,84 @@ public class ADETaskServer implements Runnable {
       
       return taskID.toString();
     } else
-      ADELog.log(ADEGlobal.ERROR_PREFIX + request);
+      ADELog.log(ADEGlobal.ERROR_PREFIX + "AddTask " + params.toString());
       return ADEGlobal.getErrorString(ADEGlobal.ERROR_ERROR_CREATE_TASK);
   }
 
   
+  public String taskStatus(ArrayList<String> params) {
+    if (params.size() != 1)
+      return ADEGlobal.getErrorString(ADEGlobal.ERROR_INVALID_NPARS);
+    
+    for (ADETask task : taskQueue)
+      if (task.toString().startsWith(params.get(0) + " "))
+        return task.toString();
+    
+    return "Unknown task";
+  }
+  
+  
   /**
-   * Returns the next task that can be executed on cid or null if none exists
+   * Given task is String with four parameters (i.e. "Sorting_BubbleSort_TestSet1_em").
+   * Method returns status of a task, which can be one of the following: QUEUED, RUNNING, 
+   * DONE, NEW, OUTDATED, INCOMPLETE.
+   * @return 
    */
-  private ADETask getNextTaskFor(String cid) {      
-      ADETask task = null;
+  private String getStatusOfTask(Project project, String task) {
+    String [] params = task.split("_");
+    if (params.length != 4) return "UNKNOWN";
+    
+    ADETask tmpTask = new ADETask(params[0], params[1], params[2], params[3], true);
+    int idx = taskQueue.indexOf(tmpTask);
+    String statusLine = ADETools.getTaskStatus(tmpTask);
+    
+    String result = "";
+    
+    if (idx != -1) {
+      ADETask tTask = taskQueue.get(idx);
+      if (tTask.getTaskStatus().equals(TaskStatus.RUNNING)) {
+        String stts = ADETask.HTML_TAG_RUNNING;
+        
+        // do i have information about % completed
+        String delez = "";
+        String status = ADETools.getTaskStatus(tTask);
+        if (status != null) {
+          String [] parts = status.split(" # ");
+          if (parts.length > 3) 
+            delez = parts[3];
+        }
+        stts = stts.replaceAll("!_!", delez);
+                
+        result = stts;
+      } else           
+        result = ADETask.HTML_TAG_QUEUED;
+    } else {
+      if (statusLine.isEmpty()) 
+        result = ADETask.HTML_TAG_NEW;
+      else {        
+        result = ADETools.getTaskResultFileStatus(project, tmpTask);
+      }                
+    }
+    return result.replaceAll("info", statusLine);
+  }
+  
+  /**
+   * Returns JSON string describing all tasks for a given request
+   */
+  public String projectStatus(ArrayList<String> params) {
+    String result = "";
+    if (params.size() < 1) return "{}";
+    
+    ArrayList<String> projectTasks = ADETools.getProjectTasks(params);
+    
+    
+    Project project = new Project(ATGlobal.getALGatorDataRoot(), params.get(0));
 
-    // currently every computer can execute every task
-    // TODO: add logic for proper computer-task matching      
-    for (ADETask aDETask : taskQueue) {
-      if (aDETask.getTaskStatus().equals(TaskStatus.QUEUED)) {
-        task = aDETask; break;
-      }
-    }            
+    for (String projectTask : projectTasks) {
+      result += (result.isEmpty() ? "" : ", ") + "\"" + projectTask + "\" : \"" + getStatusOfTask(project, projectTask) + "\"";
       
-    return task;
+    }
+    return "{" + result + "}";
   }
   
   /**
@@ -83,46 +145,73 @@ public class ADETaskServer implements Runnable {
    * Call: getNextTask cid                                                    <br>
    * Return: NO_TASKS or nextTask (id proj alg testset mtype)
    */
-  private String getNextTask(String request) {
-    String [] parts = request.split(ADEGlobal.STRING_DELIMITER);
-    if (parts.length != 2)
+  private String getNextTask(ArrayList<String> params) {
+    if (params.size() != 1)
       return ADEGlobal.getErrorString(ADEGlobal.ERROR_INVALID_NPARS);
     
-    String cid = parts[1];
-    ADETask task = getNextTaskFor(cid);
+    String cid = params.get(0);
+
+    ADETask task = null;
+    for (ADETask aDETask : taskQueue) {
+      if (aDETask.getTaskStatus().equals(TaskStatus.QUEUED) && aDETask.getCandidateComputers().contains(cid)) {
+        task = aDETask; break;
+      }
+    }            
+    
     if (task != null) {
         ADETools.setTaskStatus(task, TaskStatus.RUNNING, null, cid);
+        ADETools.setComputerFamilyForProject(task, cid);
         return task.toString();
     } else
-    return ADEGlobal.NO_TASKS;
+      return ADEGlobal.NO_TASKS;
   }
   
   /**
    * Removes task from tasksProcessed list and writes status to the file
-   * Call: completeTask tid
+   * Call: completeTask tid exitCode
    * Return: "" or error message
    */
-  private String completeTask(String request) {
-    String [] parts = request.split(ADEGlobal.STRING_DELIMITER);
-    if (parts.length != 2)
+  private String completeTask(ArrayList<String> params) {
+    if (params.size() != 2)
       return ADEGlobal.getErrorString(ADEGlobal.ERROR_INVALID_NPARS);
     
-    String tid = parts[1];
+    String tid = params.get(0);
     ADETask task = null;
     
     // find a task 
-    for (ADETask tsk: taskQueue) {
+      for (ADETask tsk: taskQueue) {
       if (tsk.toString().startsWith(tid + ADEGlobal.STRING_DELIMITER)) {
         task = tsk;
         break;
       }        
     }
     if (task != null) {
-      taskQueue.remove(task);
-      ADETools.setTaskStatus(task, TaskStatus.COMPLETED, null, null);
+      taskQueue.remove(task);                                             
+      if (params.get(1).equals("0"))
+        ADETools.setTaskStatus(task, TaskStatus.COMPLETED,  null,    null);
+      else if (params.get(1).equals(Integer.toString(ErrorStatus.PROCESS_KILLED.ordinal())))
+        ADETools.setTaskStatus(task, TaskStatus.KILLED,  null,    null);
+      else                                                                                     // exitCode
+        ADETools.setTaskStatus(task, TaskStatus.FAILED,   "Execution failed, error code: " + params.get(1),    null);
     }
     
     return "";
+  }
+  
+  /**
+   * Method returns an array of results produced by a given query. At least two 
+   * parameters are required (projectName and queryName) all other parameters are 
+   * passed to the query as query parameters.
+   */
+  public String queryResult(ArrayList<String> params) {
+    String result = "";
+    if (params.size() < 2) return "";
+    
+    String [] queryParams = new String[params.size()-2];
+    for (int i = 2; i < params.size(); i++) {
+      queryParams[i-2] = params.get(i);
+    }
+    return DataAnalyser.getQueryResultTableAsString(params.get(0), params.get(1), queryParams);
   }
   
   
@@ -144,6 +233,14 @@ public class ADETaskServer implements Runnable {
     return result;
   }
   
+  private String listTasks() {
+    StringBuffer sb = new StringBuffer();
+    for (ADETask tsk : taskQueue) {
+      sb.append((sb.length() > 0 ? "\n" : "")).append(tsk.toStringPlus());
+    }
+    return sb.toString();
+  }
+  
   private String serverStatus() {
     int q=0, e=0;
     for (ADETask aDETask : taskQueue) {
@@ -155,34 +252,60 @@ public class ADETaskServer implements Runnable {
   }
   
   private String processRequest(String request) {
+    ADELog.log("REQUEST: " + request);
+    
     String [] parts = request.split(" ");
     if (parts.length == 0) return "";
     
+    parts[0] = parts[0].toUpperCase(); // request command
+    
+    // request parameters
+    ArrayList<String> params = new ArrayList<>();
+    for (int i = 1; i < parts.length; i++) 
+      params.add(parts[i]);
+    
     switch (parts[0]) {
         
-      case "WHO": 
+      // return my ID (ID of caller; taskClient's ID); no parameters
+      case ADEGlobal.REQ_WHO: 
         return Integer.toString(ID);
-      case "LIST":
-          StringBuffer sb = new StringBuffer();
-        for (ADETask tsk : taskQueue) {
-          sb.append((sb.length() > 0 ? "\n" : "")).append(tsk.toStringPlus());
-        }
-        return sb.toString();
-
         
-      // verifying server presence
+      // return the list of all tasks in the queue; no parameters  
+      case ADEGlobal.REQ_LIST:
+        return listTasks();
+        
+      // verifying server presence; no parameters
       case ADEGlobal.REQ_CHECK_Q:
         return ADEGlobal.REQ_CHECK_A;
         
+      // prints server status; no parameters  
       case ADEGlobal.REQ_STATUS:
         return serverStatus();
         
+      // appends task to the queue; parameters required: project algorithm testset mtype
       case ADEGlobal.REQ_ADD_TASK:
-        return addTask(request);
-      case ADEGlobal.REQ_GET_NEXT_TASK:
-        return getNextTask(request);
+        return addTask(params);
+        
+      // prints the status of given task; parameters required: taskID
+      case ADEGlobal.REQ_TASK_STATUS:
+        return taskStatus(params);
+        
+      // returns task (project algorithm testset mtype); paramaters: computerID  
+      case ADEGlobal.REQ_GET_NEXT_TASK:        
+        return getNextTask(params);
+        
+      // removes task from the queue; parameters: taskID  
       case ADEGlobal.REQ_COMPLETE_TASK:
-        return completeTask(request);
+        return completeTask(params);
+        
+      // return JSON array with the status of tasks; parameters: 1, 2, 3, or 4 parameters are excepted.
+      // if only one parameter is given, all tasks of a given project are checked; if 2 parameters are given, 
+      // all tasks of a given project and algorithm are given; ...
+      case ADEGlobal.REQ_PROJ_STATUS:
+        return projectStatus(params);
+        
+      case ADEGlobal.REQ_QUERY_RES:
+        return queryResult(params);                      
         
       default:
         return ADEGlobal.getErrorString("Unknown request");
@@ -200,7 +323,7 @@ public class ADETaskServer implements Runnable {
             break;
           }
           
-          String answer  =  processRequest(request);
+          String answer  =  processRequest(request).replaceAll("\n", "<br>");
           pw.println(answer);
           pw.flush();
           

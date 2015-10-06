@@ -7,9 +7,9 @@ import java.io.RandomAccessFile;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import static si.fri.algotest.global.ATLog.LOG_LEVEL_FILE;
-import static si.fri.algotest.global.ATLog.LOG_LEVEL_OFF;
-import static si.fri.algotest.global.ATLog.LOG_LEVEL_STDOUT;
+import static si.fri.algotest.global.ATLog.LOG_TARGET_FILE;
+import static si.fri.algotest.global.ATLog.LOG_TARGET_OFF;
+import static si.fri.algotest.global.ATLog.LOG_TARGET_STDOUT;
 
 /**
  *
@@ -24,7 +24,7 @@ public class ADELog {
   
   public static void log(String msg) {
     if (logFileName == null) {
-      logFileName = ADEGlobal.getLogFilename();
+      logFileName = ADEGlobal.getTaskserverLogFilename();
     }
     
     msg = msg.substring(0, Math.min(msg.length(), MAX_ERROR_SIZE));

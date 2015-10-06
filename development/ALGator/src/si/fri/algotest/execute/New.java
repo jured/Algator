@@ -91,7 +91,7 @@ public class New {
         URL[] urls = getClassPathsForAlgorithm(project, algName);
         classloaders.put(key, (result = URLClassLoader.newInstance(urls)));
       } catch (Exception e) {
-        ATLog.log("Error creating class loader: " + e.toString());
+        ATLog.log("Error creating class loader: " + e.toString(), 2);
       }
     }
     return result;
@@ -115,7 +115,7 @@ public class New {
       
       result.setmType(mType);
     } catch (Exception e) {
-      ATLog.log("Can't make an instance of algorithm " + algName + ": " + e);
+      ATLog.log("Can't make an instance of algorithm " + algName + ": " + e, 2);
     }
     return result;
   }
@@ -128,12 +128,12 @@ public class New {
       ClassLoader classLoader = getClassloader(getClassPathsForAlgorithm(project, algName));
       
       String testSetIteratorClassName
-              = ATTools.stripFilenameExtension((String) project.getProject().getField(EProject.ID_TestSetIteratorClass));
+              = project.getProject().getTestSetIteratorClassName();
       Class tsClass = Class.forName(testSetIteratorClassName, true, classLoader);
       
       result = (AbstractTestSetIterator) tsClass.newInstance();
     } catch (Exception e) {
-      ATLog.log("Can't make an instance of testset iterator for project " + project.getName() + ": " + e);
+      ATLog.log("Can't make an instance of testset iterator for project " + project.getName() + ": " + e, 2);
     }
     return result;
   }

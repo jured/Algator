@@ -32,13 +32,13 @@ public class Analyse {
   private static Options getOptions() {
     Options options = new Options();
 
-    Option data_root = OptionBuilder.withArgName("data_root_folder")
+    Option data_root = OptionBuilder.withArgName("folder")
             .withLongOpt("data_root")
             .hasArg(true)
             .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT (if defined) or $ALGATOR_ROOT/data_root")
             .create("d");
 
-    Option algator_root = OptionBuilder.withArgName("algator_root_folder")
+    Option algator_root = OptionBuilder.withArgName("folder")
             .withLongOpt("algator_root")
             .hasArg(true)
             .withDescription("use this folder as algator_root; default value in $ALGATOR_ROOT")
@@ -63,20 +63,22 @@ public class Analyse {
             .withDescription("the ID of computer that produced results; default: this computer ID")
             .create("c");
     
-    
+    Option verbose = OptionBuilder.withArgName("verbose_level")
+            .withLongOpt("verbose")
+            .hasArg(true)
+            .withDescription("print additional information (0 = OFF, 1 = some (default), 2 = all")
+            .create("v");
+
 
     options.addOption(data_root);
     options.addOption(algator_root);
     options.addOption(query);
     options.addOption(queryOrigin);
     options.addOption(computerID);
+    options.addOption(verbose);
 
     options.addOption("h", "help", false,
             "print this message");
-
-
-    options.addOption("v", "verbose", false,
-            "print additional information on error");
 
     options.addOption("u", "usage", false,
             "print usage guide");
@@ -139,10 +141,13 @@ public class Analyse {
         dataRoot = line.getOptionValue("data_root");        
       }
       ATGlobal.setALGatorDataRoot(dataRoot);
-            
-      ATLog.setLogLevel(ATLog.LOG_LEVEL_OFF);
+
+      ATGlobal.verboseLevel = 1;
       if (line.hasOption("verbose")) {
-        ATLog.setLogLevel(ATLog.LOG_LEVEL_STDOUT);
+        if (line.getOptionValue("verbose").equals("0"))
+          ATGlobal.verboseLevel = 0;
+        if (line.getOptionValue("verbose").equals("2"))
+          ATGlobal.verboseLevel = 2;
       }
 
       String projectName = curArgs[0];

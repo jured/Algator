@@ -55,28 +55,39 @@ public class VMEPExecute {
   private static Options getOptions() {
     Options options = new Options();
 
-    Option data_root = OptionBuilder.withArgName("data_root_folder")
+    Option data_root = OptionBuilder.withArgName("folder")
 	    .withLongOpt("data_root")
 	    .hasArg(true)
 	    .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT" )
 	    .create("d");
 
-    Option algator_root = OptionBuilder.withArgName("algator_root_folder")
+    Option algator_root = OptionBuilder.withArgName("folder")
             .withLongOpt("algator_root")
             .hasArg(true)
             .withDescription("use this folder as algator_root; default value in $ALGATOR_ROOT")
             .create("r");
+        
+    Option verbose = OptionBuilder.withArgName("verbose_level")
+            .withLongOpt("verbose")
+            .hasArg(true)
+            .withDescription("print additional information (0 = OFF, 1 = some (default), 2 = all")
+            .create("v");
+
+    Option logTarget = OptionBuilder.withArgName("log_target")
+            .hasArg(true)
+            .withDescription("where to print information (1 = stdout (default), 2 = file, 3 = both")
+            .create("log");
 
     options.addOption(data_root);
     options.addOption(algator_root);
+    options.addOption(verbose);
+    options.addOption(logTarget);
     
+    options.addOption("u", "usage",    false, "print usage guide");
     options.addOption("h", "help", false,
 	    "print this message");    
-        
-    options.addOption("v0", "silent",  false, "no information on error");
-    options.addOption("v1", "print",   false, "print   information on error");
-    options.addOption("v2", "verbose", false, "verbose information on error");
-    options.addOption("u", "usage",    false, "print usage guide");
+
+    
     
     return options;
   }
@@ -101,41 +112,42 @@ public class VMEPExecute {
   }
     
   public static void runTest(String dataRoot, String projName, String algName, 
-          String testsetName, int testNumber, String commFolder, int verboseLevel) {
+          String testsetName, int testNumber, String commFolder) {
 
+    ATLog.setPateFilename(ATGlobal.getTaskHistoryFilename(projName, algName, testsetName, "jvm"));
+    
     // Test the project
     Project projekt = new Project(dataRoot, projName);
     if (!projekt.getErrors().get(0).equals(ErrorStatus.STATUS_OK)) {
-      if (verboseLevel > 0)
-        System.out.println("Invalid project name.");
+      if (ATGlobal.verboseLevel > 0)
+        ATLog.log("VMEP Execute: Invalid project name - " + projName, 1);
       System.exit(VMEPErrorStatus.INVALID_PROJECT.getValue()); // invalid project
     }
 
     // Test algorithms
     if (algName == null || algName.isEmpty()) {
-      if (verboseLevel > 0)
-        System.out.println("Invalid algorithm name.");
+      if (ATGlobal.verboseLevel > 0)
+        ATLog.log("VMEP Execute: Invalid algorithm name - " + algName, 1);
       System.exit(VMEPErrorStatus.INVALID_ALGORITHM.getValue());
     }
     EAlgorithm alg = projekt.getAlgorithms().get(algName);
     if (alg == null) {
-      if (verboseLevel > 0)
-        System.out.println("Invalid algorithm name.");
-
+      if (ATGlobal.verboseLevel > 0)
+        ATLog.log("VMEP Execute: Invalid algorithm name - " + algName, 1);
       System.exit(VMEPErrorStatus.INVALID_ALGORITHM.getValue()); // invalid algorithm
     }
 
     // Test testsets
     if (testsetName == null || testsetName.isEmpty()) {
-      if (verboseLevel > 0)
-        System.out.println("Invalid testset name.");
+      if (ATGlobal.verboseLevel > 0)
+        ATLog.log("VMEP Execute: Invalid testset name - " + testsetName, 1);
       System.exit(VMEPErrorStatus.INVALID_TESTSET.getValue());
     }
     
     ETestSet testSet = projekt.getTestSets().get(testsetName);
     if (testSet == null) {
-      if (verboseLevel > 0)
-        System.out.println("Invalid testset name.");
+      if (ATGlobal.verboseLevel > 0)
+        ATLog.log("VMEP Execute: Invalid testset name - " + testsetName, 1);
 
       System.exit(VMEPErrorStatus.INVALID_TESTSET.getValue()); // invalid testset
     }    
@@ -144,15 +156,15 @@ public class VMEPExecute {
     if (testsetIterator != null) 
       testsetIterator.setTestSet(testSet);    
     if (testsetIterator == null || !ErrorStatus.getLastErrorStatus().equals(ErrorStatus.STATUS_OK)) {
-      if (verboseLevel > 0)
-        System.out.println("Can not create testset iterator.");
+      if (ATGlobal.verboseLevel > 0)
+        ATLog.log("VMEP Execute: Can not create testset iterator - " + projName + ", " + algName, 3);
       System.exit(VMEPErrorStatus.INVALID_ITERATOR.getValue()); // testset iterator can not be created
     }
     
     EResultDescription resultDescription = projekt.getResultDescriptions().get(MeasurementType.JVM);
     if (resultDescription == null) {
-      if (verboseLevel > 0)
-        System.out.println("JVM result description file does not exist.");
+      if (ATGlobal.verboseLevel > 0)
+        ATLog.log("VMEP Execute: JVM result description file does not exist - " + projName + ", " + algName, 3);
       System.exit(VMEPErrorStatus.INVALID_RESULTDESCRIPTION.getValue()); // JVM result descritpion does not exist
     }
 
@@ -161,15 +173,15 @@ public class VMEPExecute {
     // Test testNumber
     int allTests = testsetIterator.getNumberOfTestInstances();
     if (testNumber > allTests) {
-      if (verboseLevel > 0)
-        System.out.println("Invalid test number.");
+      if (ATGlobal.verboseLevel > 0)
+        ATLog.log("VMEP Execute: Invalid test number - " + projName + ", " + algName + " - " + testNumber, 3);
 
       System.exit(VMEPErrorStatus.INVALID_TEST.getValue()); // invalid testset   
     }
     
     String resFilename = ATGlobal.getJVMRESULTfilename(commFolder, algName, testsetName, testNumber);
     
-    runAlgorithmOnATest(projekt, algName, testsetName, testNumber, resultDescription, testsetIterator, verboseLevel, resFilename);
+    runAlgorithmOnATest(projekt, algName, testsetName, testNumber, resultDescription, testsetIterator, resFilename);
   }
 
   
@@ -179,9 +191,8 @@ public class VMEPExecute {
    */
   public static void runAlgorithmOnATest(
     Project project, String algName, String testsetName, int testNumber, EResultDescription resultDesc,
-          AbstractTestSetIterator testsetIterator, int verboseLevel, String resFilename) {
-        
-    
+          AbstractTestSetIterator testsetIterator, String resFilename) {
+                
     // the order of parameters to be printed
     String[] order = resultDesc.getParamsOrder();
     String delim   = resultDesc.getField(EResultDescription.ID_Delim);
@@ -208,10 +219,10 @@ public class VMEPExecute {
         // add test ID (if execution fails, result should contain correct testID parameter)
         result.addParameter(testCase.getParameters().getParamater(EResultDescription.testIDParName), true);
            
-        if (verboseLevel == 2) {
-          System.out.printf("Project: %s, Algorithm: %s, TestSet: %s, Test: %d\n", project.projectName, algName, testsetName, testNumber);
-          System.out.println("********* Before execution       *********************************************");
-          System.out.println(testCase);
+        if (ATGlobal.verboseLevel == 2) {           
+          ATLog.log(String.format("Project: %s, Algorithm: %s, TestSet: %s, Test: %d\n", project.projectName, algName, testsetName, testNumber), 2);
+          ATLog.log(String.format("********* Before execution       *********************************************"), 2);
+          ATLog.log(testCase.toString(), 2);
         }
         
         InstructionMonitor instrMonitor = new InstructionMonitor();
@@ -221,27 +232,28 @@ public class VMEPExecute {
 
         result = curAlg.done();
         
-        if (verboseLevel == 2) {
-          System.out.println("********* After execution        *********************************************");
-          System.out.println(testCase);
+        if (ATGlobal.verboseLevel == 2) {
+          ATLog.log("********* After execution        *********************************************", 2);
+          ATLog.log(testCase.toString(), 3);
         }
 
-        if (verboseLevel == 2) 
-          System.out.println("********* Bytecode commands used *********************************************");
+        if (ATGlobal.verboseLevel == 2) 
+          ATLog.log("********* Bytecode commands used *********************************************", 2);
                 
         // write results to the result set.
         ParameterSet pSet = resultDesc.getParameters();
         int[] instFreq=instrMonitor.getCounts();
+        String toLog = "";
         for(int i=0;i<instFreq.length;i++){
           String pName = Opcode.getNameFor(i);
           if (pSet.getParamater(pName) != null) {
             result.addParameter(new EParameter(pName, "", ParameterType.INT, instFreq[i]), true);
           }
-          if (verboseLevel == 2 && instFreq[i]!=0)
-            System.out.print(pName + " ");
+          if (ATGlobal.verboseLevel == 2 && instFreq[i]!=0)
+            toLog += " " + pName;
         }  
-        if (verboseLevel == 2)
-            System.out.println("");
+        if (ATGlobal.verboseLevel == 2)
+            ATLog.log(toLog, 2);
         
         
         result.addParameter(EResultDescription.getExecutionStatusParameter(ExecutionStatus.DONE), true);
@@ -259,8 +271,8 @@ public class VMEPExecute {
 
       ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
 
-      if (verboseLevel == 1)
-        System.out.println(e);
+      if (ATGlobal.verboseLevel > 0)
+        ATLog.log(e.toString(), 3);
       
     } finally {
       if (!success) {
@@ -269,8 +281,8 @@ public class VMEPExecute {
       try (PrintWriter pw = new PrintWriter(new FileWriter(resFilename, true))) {                  
           pw.println(result.toString(order, false, delim));
       } catch (IOException e) {
-        if (verboseLevel == 1)
-          System.out.println(e);
+        if (ATGlobal.verboseLevel > 0)
+          ATLog.log(e.toString(), 3);
       }
     }
   }
@@ -280,7 +292,7 @@ public class VMEPExecute {
    * created process is returned else the error message is returned as a String
    */
   public static Object runWithVMEP(String project_name, String alg_name, String testset_name,
-          int testID, String commFolder, String data_root, boolean verbose) {    
+          int testID, String commFolder, String data_root) {    
     try {
       ///* For real-time execution (classPath=..../ALGator.jar)
       String classPath = Version.getClassesLocation();
@@ -302,7 +314,8 @@ public class VMEPExecute {
           classPath += File.pathSeparator + vmepCP;
             
       String[] command = {jvmCommand, "-cp", classPath, "-Xss1024k", "algator.VMEPExecute", 
-        project_name, alg_name, testset_name, Integer.toString(testID), commFolder, "-d", data_root, verbose ? "-v2" : "-v0"};
+        project_name, alg_name, testset_name, Integer.toString(testID), commFolder, 
+        "-d", data_root, "-v", Integer.toString(ATGlobal.verboseLevel), "-log", Integer.toString(ATGlobal.logTarget)};
       
       
       ProcessBuilder probuilder = new ProcessBuilder( command );
@@ -361,24 +374,30 @@ public class VMEPExecute {
         testNumber = Integer.parseInt(testNumberS);
       } catch (Exception e) {}
       
-      int verboseLevel = 0;
-      if (line.hasOption("print")) verboseLevel = 1;
-      if (line.hasOption("verbose")) verboseLevel = 2;
-
-      ATLog.setLogLevel(ATLog.LOG_LEVEL_OFF);
-      if (verboseLevel > 0) {
-        ATLog.setLogLevel(ATLog.LOG_LEVEL_STDOUT);
+      ATGlobal.verboseLevel = 1;
+      if (line.hasOption("verbose")) {
+        if (line.getOptionValue("verbose").equals("0"))
+          ATGlobal.verboseLevel = 0;
+        if (line.getOptionValue("verbose").equals("2"))
+          ATGlobal.verboseLevel = 2;
       }
+      
+      ATGlobal.logTarget = ATLog.LOG_TARGET_STDOUT;
+      if (line.hasOption("log")) {
+        if (line.getOptionValue("log").equals("2"))
+          ATGlobal.logTarget = ATLog.LOG_TARGET_FILE;
+        if (line.getOptionValue("log").equals("3"))
+          ATGlobal.logTarget = ATLog.LOG_TARGET_FILE + ATLog.LOG_TARGET_STDOUT;
+      }     
+      ATLog.setLogTarget(ATGlobal.logTarget);
 
-      if (verboseLevel > 0)
-        System.out.println(introMsg + "\n");
       
       // Notify to the caller (message: JVM has started) 
       ExternalExecutor.initCommunicationFile(commFolder);
       ExternalExecutor.addToCommunicationFile(commFolder);
       
       
-      runTest(dataRoot, projectName, algorithmName, testsetName, testNumber, commFolder, verboseLevel);
+      runTest(dataRoot, projectName, algorithmName, testsetName, testNumber, commFolder);
 
     } catch (ParseException ex) {
       printMsg(options);

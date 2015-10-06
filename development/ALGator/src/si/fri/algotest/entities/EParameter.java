@@ -12,7 +12,6 @@ public class EParameter extends Entity  implements Serializable {
   public static final String ID_ResultParameter   = "Parameter";
   
   // Fields
-  public static final String ID_Name     = "Name";
   public static final String ID_Desc     = "Description";
   public static final String ID_Type     = "Type";
   public static final String ID_Subtype  = "Subtype";
@@ -24,9 +23,9 @@ public class EParameter extends Entity  implements Serializable {
   
   public EParameter() {
    super(ID_ResultParameter, 
-	 new String [] {ID_Name, ID_Desc, ID_Type, ID_Subtype, ID_Value});
+	 new String [] {ID_Desc, ID_Type, ID_Subtype, ID_Value});
   
-   setRepresentatives(ID_Name, ID_Value);
+   setRepresentatives(ID_Value);
   }
   
   public EParameter(File fileName) {
@@ -46,7 +45,7 @@ public class EParameter extends Entity  implements Serializable {
   public EParameter(String name, String desc, ParameterType type, Object value) {
     this();
     
-    set(ID_Name, name);
+    set(ID_NAME, name);
     set(ID_Desc, desc);
     set(ID_Value, value);
 
@@ -127,6 +126,6 @@ public class EParameter extends Entity  implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    return (obj instanceof EParameter && ((EParameter)obj).getField(ID_Name).equals(this.getField(ID_Name)));
+    return (obj instanceof EParameter && ((EParameter)obj).getName().equals(this.getName()));
   }  
 }

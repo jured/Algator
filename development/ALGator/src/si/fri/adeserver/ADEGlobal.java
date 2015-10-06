@@ -12,14 +12,22 @@ import si.fri.algotest.global.ATGlobal;
 public class ADEGlobal {
   
   public static final int ADEPort = 12321;
-
+  
   /*
    * REQUESTS
    */
-  public static final String REQ_ADD_TASK       = "addTask";
-  public static final String REQ_GET_NEXT_TASK  = "getNextTask";
-  public static final String REQ_COMPLETE_TASK  = "completeTask";
-  public static final String REQ_STATUS         = "status";
+  public static final String REQ_WHO            = "WHO";            // no parameters
+  public static final String REQ_LIST           = "LIST";           // no parameters
+  public static final String REQ_ADD_TASK       = "ADDTASK";        // parameters: project_name algorithm_name testset_name measurement_type
+  public static final String REQ_GET_NEXT_TASK  = "GETNEXTTASK";    // parameters: computerID
+  public static final String REQ_COMPLETE_TASK  = "COMPLETETASK";   // parameters: taskID
+  public static final String REQ_STATUS         = "STATUS";         // no parameters
+  public static final String REQ_TASK_STATUS    = "TASKSTATUS";     // parameters: taskID
+  public static final String REQ_PROJ_STATUS    = "PROJECTSTATUS";  // parameters: projectName
+  public static final String REQ_QUERY_RES      = "GETQUERYRESULT"; // parameters: projectName
+  
+  
+  
 
   /**
    * TaskServer healthy checking question and answer
@@ -43,45 +51,32 @@ public class ADEGlobal {
   public static final String STRING_DELIMITER  = " ";
   
   
-  private static final String TASK_SERVER_FOLDER  = "server";
-  private static final String TASK_STATUS_FOLDER  = "tasks";
-  private static final String TASK_ID_FILENAME    = "task.number";
-  private static final String TASK_LIST_FILENAME  = "task.list";
-  private static final String LOG_FILENAME        = "taskserver.log";
+  private static final String TASKSERVER_LOG_FOLDER  = "taskserver";
+  private static final String TASK_ID_FILENAME       = "task.number";
+  private static final String TASK_LIST_FILENAME     = "task.list";
+  private static final String TASKSERVER_LOG_FILENAME           = "taskserver.log";
   
 
-  public static String getTaskServerFolder() {
-    String adeFolderName = ATGlobal.getALGatorDataRoot() + File.separator + TASK_SERVER_FOLDER;
+  public static String getTaskServerLogFolder() {
+    String adeFolderName = ATGlobal.getLogFolder() + File.separator + TASKSERVER_LOG_FOLDER;
     File adeFolder       = new File(adeFolderName);
     if (!adeFolder.exists())
       adeFolder.mkdirs();
     
     return adeFolderName;
   }
-  
-  public static String getTaskStatusFolder() {
-    String folderName = getTaskServerFolder() + File.separator + TASK_STATUS_FOLDER;
-    File folder = new File(folderName);
-    if (!folder.exists())
-      folder.mkdir();
-    return folderName;
-  }
-  
-  public static String getTaskStatusFilename(int idt) {
-    return getTaskStatusFolder() + File.separator + idt;
-  }
-  
+    
   public static String getADETasklistFilename() {
-    return  getTaskServerFolder() + File.separator + TASK_LIST_FILENAME;
+    return  getTaskServerLogFolder() + File.separator + TASK_LIST_FILENAME;
   }
 
-  public static String getLogFilename() {
-    return getTaskServerFolder() + File.separator + LOG_FILENAME;
+  public static String getTaskserverLogFilename() {
+    return getTaskServerLogFolder() + File.separator + TASKSERVER_LOG_FILENAME;
   }
  
   public static int getNextTaskID() {
     try {
-     File folder = new File(getTaskServerFolder());
+     File folder = new File(getTaskServerLogFolder());
      File file   = new File(folder, TASK_ID_FILENAME);
      
      int taskID = 0;

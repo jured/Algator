@@ -20,6 +20,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import si.fri.algotest.entities.EParameter;
 import si.fri.algotest.entities.EResultDescription;
 import si.fri.algotest.entities.ETestSet;
+import si.fri.algotest.entities.Entity;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.ParameterSet;
 import si.fri.algotest.entities.ParameterType;
@@ -331,7 +332,7 @@ public class ExternalExecutor {
 
             Long time = (Long) StatFunction.getFunctionValue(fs, list);
             EParameter timeP = new EParameter(
-                    (String) rdP.getField(EParameter.ID_Name), null, null, time);
+                    (String) rdP.getField(Entity.ID_NAME), null, null, time);
             timeParameters.addParameter(timeP, true);
           } catch (Exception e) {
             ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR, "Subtype parameter invalid (" + e.toString() + ")");
@@ -349,7 +350,7 @@ public class ExternalExecutor {
       ParameterSet pSet = resultDesc.getParameters();
       for (int i = 0; i < pSet.size(); i++) {
         if (ParameterType.COUNTER.equals(pSet.getParameter(i).getType())) {
-          String counterName = (String) pSet.getParameter(i).getField(EParameter.ID_Name);
+          String counterName = (String) pSet.getParameter(i).getField(Entity.ID_NAME);
           int value = 0;
           if (counters.containsKey(counterName)) {
             value = counters.get(counterName);

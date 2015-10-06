@@ -2,7 +2,6 @@ package si.fri.algotest.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import si.fri.algotest.global.ATLog;
 
 /**
@@ -24,7 +23,7 @@ public class ParameterSet implements Serializable {
       try {
 	addParameter((EParameter) parameters.getParameter(i).clone(), true);
       } catch (CloneNotSupportedException ex) {
-	ATLog.log("Can't clone (EParameter)");
+	ATLog.log("Can't clone (EParameter)", 2);
       }
     } 
   }
@@ -64,7 +63,7 @@ public class ParameterSet implements Serializable {
   
   public EParameter getParamater(String name) {
     for (int i = 0; i < parameters.size(); i++) {
-      if (parameters.get(i).getField(EParameter.ID_Name).equals(name))
+      if (parameters.get(i).getField(Entity.ID_NAME).equals(name))
 	return parameters.get(i);
     }
     return null;
@@ -76,7 +75,7 @@ public class ParameterSet implements Serializable {
     for (int i = 0; i < parameters.size(); i++) {
       if (!result.isEmpty()) result+="; ";
       EParameter p = parameters.get(i);
-      result += p.getField(EParameter.ID_Name) + "=" + p.getField(EParameter.ID_Value);
+      result += p.getField(Entity.ID_NAME) + "=" + p.getField(EParameter.ID_Value);
     }
     return result;
   }
@@ -97,7 +96,7 @@ public class ParameterSet implements Serializable {
     
       // find a parameter with name==localOrder[i]
       for (int j = 0; j < parameters.size(); j++) {
-        if (parameters.get(j).getField(EParameter.ID_Name).equals(localOrder[i])) {
+        if (parameters.get(j).getField(Entity.ID_NAME).equals(localOrder[i])) {
           p = parameters.get(j);
 	  break;
         }
@@ -105,7 +104,7 @@ public class ParameterSet implements Serializable {
       
       if (p!=null) {      
        if (includeFieldNames)
-         result += p.getField(EParameter.ID_Name) + "=";
+         result += p.getField(EParameter.ID_NAME) + "=";
        
        Object value = p.getField(EParameter.ID_Value);
        if (value instanceof String) {

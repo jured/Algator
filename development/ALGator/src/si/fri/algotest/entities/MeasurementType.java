@@ -5,7 +5,7 @@ package si.fri.algotest.entities;
  * @author tomaz
  */
 public enum MeasurementType  {
-  EM, JVM, CNT;
+  UNKNOWN, EM, JVM, CNT;
 
   @Override
   public String toString() {

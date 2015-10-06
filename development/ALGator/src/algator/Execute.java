@@ -1,6 +1,5 @@
 package algator;
 
-import java.awt.Toolkit;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -12,7 +11,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import si.fri.adeserver.ADEGlobal;
+import si.fri.adeserver.ADETask;
 import si.fri.adeserver.ADETools;
 import si.fri.adeserver.TaskStatus;
 import si.fri.algotest.entities.EAlgorithm;
@@ -28,6 +27,7 @@ import si.fri.algotest.global.ATLog;
 import si.fri.algotest.tools.ATTools;
 import si.fri.algotest.global.ErrorStatus;
 import si.fri.algotest.global.ExecutionStatus;
+import static si.fri.algotest.tools.ATTools.getTaskResultFileName;
 
 /**
  *
@@ -60,34 +60,37 @@ public class Execute {
 	    .create("m");
     
 
-    Option data_root = OptionBuilder.withArgName("data_root_folder")
+    Option data_root = OptionBuilder.withArgName("folder")
 	    .withLongOpt("data_root")
 	    .hasArg(true)
 	    .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT (if defined) or $ALGATOR_ROOT/data_root")
 	    .create("d");
     
-    Option algator_root = OptionBuilder.withArgName("algator_root_folder")
+    Option algator_root = OptionBuilder.withArgName("folder")
             .withLongOpt("algator_root")
             .hasArg(true)
             .withDescription("use this folder as algator_root; default value in $ALGATOR_ROOT")
             .create("r");
     
-    Option taskID = OptionBuilder.withArgName("task_id")
-            .withLongOpt("id")
+    Option verbose = OptionBuilder.withArgName("verbose_level")
+            .withLongOpt("verbose")
             .hasArg(true)
-            .withDescription("task identification number")
-            .create("i");
+            .withDescription("print additional information (0 = OFF, 1 = some (default), 2 = all")
+            .create("v");
+
+    Option logTarget = OptionBuilder.withArgName("log_target")
+            .hasArg(true)
+            .withDescription("where to print information (1 = stdout (default), 2 = file, 3 = both")
+            .create("log");
     
-
-
-
     options.addOption(algorithm);
     options.addOption(testset);
     options.addOption(data_root);
     options.addOption(algator_root);
     options.addOption(measurement);
-    options.addOption(taskID);
-    
+        
+    options.addOption(verbose);
+    options.addOption(logTarget);
     
     options.addOption("h", "help", false,
 	    "print this message");
@@ -97,9 +100,7 @@ public class Execute {
 	    "execute test(s) without checking; if this option is omitted, only outdated tests will be executed");
     options.addOption("l", "list_jobs", false,
 	    "list the jobs (i.e. the pairs (algorithm, testset)) that are to be executed");
-    
-    options.addOption("v", "verbose", false, "print additional information on error");
-    
+        
     options.addOption("u", "usage", false, "print usage guide");
     
     return options;
@@ -124,9 +125,7 @@ public class Execute {
     System.exit(0);
   }
 
-  private static Notificator getNotificator(final String alg, final String testSet, final MeasurementType mt, final int tID) {
-    String idtFilename = ADEGlobal.getTaskStatusFilename(tID);
-    
+  private static Notificator getNotificator(final String proj, final String alg, final String testSet, final MeasurementType mt) {
     Notificator notificator = 
       new Notificator() {
       
@@ -134,11 +133,11 @@ public class Execute {
         System.out.println(String.format("[%s, %s, %s]: test %3d / %-3d - %s", 
           alg, testSet, mt.getExtension(), i, this.getN(),status.toString()));
         
-        String statusMsg = String.format("%d%c (%d/%d)", 100*i/this.getN(), '%', i, getN());
-        ADETools.setTaskStatus(taskID,  TaskStatus.RUNNING, statusMsg, null);
+        String statusMsg = String.format("%d/%d # %d%c", i, getN(), 100*i/this.getN(), '%');
+        ADETask tmpTask = new ADETask(proj, alg, testSet, mt.getExtension(), true);
+        ADETools.writeTaskStatus(tmpTask,  TaskStatus.RUNNING, statusMsg, ATGlobal.getThisComputerID());
       }
     };
-    notificator.setTaskID(tID);
     return notificator;
   }
   
@@ -215,21 +214,24 @@ public class Execute {
         } catch (Exception e) {}  
       }
 
-      boolean verbose = line.hasOption("verbose");
-      
-      ATLog.setLogLevel(ATLog.LOG_LEVEL_OFF);
-      if (verbose) {
-        ATLog.setLogLevel(ATLog.LOG_LEVEL_STDOUT);
+      ATGlobal.verboseLevel = 1;
+      if (line.hasOption("verbose")) {
+        if (line.getOptionValue("verbose").equals("0"))
+          ATGlobal.verboseLevel = 0;
+        if (line.getOptionValue("verbose").equals("2"))
+          ATGlobal.verboseLevel = 2;
       }
       
-      int taskID = 0; // default task id (if run manually without -i switch) 
-      if (line.hasOption("id")) {
-        try {
-          taskID = Integer.parseInt(line.getOptionValue("id"));        
-        } catch (Exception e) {}
-      }
-
-      runAlgorithms(dataRoot, projectName, algorithmName, testsetName, mType, alwaysCompile, alwaysRunTests, listOnly, verbose, taskID);
+      ATGlobal.logTarget = ATLog.LOG_TARGET_STDOUT;
+      if (line.hasOption("log")) {
+        if (line.getOptionValue("log").equals("2"))
+          ATGlobal.logTarget = ATLog.LOG_TARGET_FILE;
+        if (line.getOptionValue("log").equals("3"))
+          ATGlobal.logTarget = ATLog.LOG_TARGET_FILE + ATLog.LOG_TARGET_STDOUT;
+      }     
+      ATLog.setLogTarget(ATGlobal.logTarget);
+            
+      runAlgorithms(dataRoot, projectName, algorithmName, testsetName, mType, alwaysCompile, alwaysRunTests, listOnly);
 
     } catch (ParseException ex) {
       printMsg(options);
@@ -238,12 +240,13 @@ public class Execute {
 
   private static void runAlgorithms(String dataRoot, String projName, String algName,
 	  String testsetName, MeasurementType mType, boolean alwaysCompile, 
-          boolean alwaysRun, boolean printOnly, boolean verbose, int taskID) {
+          boolean alwaysRun, boolean printOnly) {
     
     // Test the project
     Project projekt = new Project(dataRoot, projName);
     if (!projekt.getErrors().get(0).equals(ErrorStatus.STATUS_OK)) {
-      System.out.println(projekt.getErrors().get(0));
+      ATLog.log("Invalid project: " + projekt.getErrors().get(0).toString(), 1);
+
       System.exit(0);
     }
      
@@ -252,7 +255,7 @@ public class Execute {
     if (!algName.isEmpty()) {
       EAlgorithm alg = projekt.getAlgorithms().get(algName);
       if (alg == null) {
-	System.out.println("Invalid algorithm.");
+	ATLog.log("Invalid algorithm - " + algName, 1);
 	System.exit(0);
       }
       eAlgs = new ArrayList(); 
@@ -266,7 +269,7 @@ public class Execute {
     if (!testsetName.isEmpty()) {
       ETestSet test = projekt.getTestSets().get(testsetName);
       if (test == null) {
-	System.out.println("Invalid testset.");
+	ATLog.log("Invalid testset - " + testsetName, 1);
 	System.exit(0);
       }
       eTests = new ArrayList<>(); 
@@ -294,27 +297,39 @@ public class Execute {
     
     
     if (printOnly) {    
-      String algs = "none";
       System.out.println("DataRoot       : " + dataRoot);
       System.out.println("Project        : " + projName);
-      System.out.print("Outdated tests : ");
+      System.out.println("Tasks          :  Algorithm             TestSet        MType  UpToDate Complete");
       for (EAlgorithm eAlg : eAlgs) {      
         for (ETestSet eTestSet : eTests) {
-	  if (!ATTools.resultsAreUpToDate(projekt, eAlg.getName(), eTestSet.getName())) {
-	    System.out.printf("\n   (%s, %s)", eAlg.getName(), eTestSet.getName());
-	    algs = "";
+          for (String mtype : new String[] {"EM", "CNT", "JVM"}) {
+            String resultFileName = getTaskResultFileName(projekt, eAlg.getName(), eTestSet.getName(), mtype);
+            int expectedNumberOfInstances = eTestSet.getFieldAsInt(ETestSet.ID_N);            
+            
+            boolean uptodate = ATTools.resultsAreUpToDate(projekt, eAlg.getName(), eTestSet.getName(), mtype, resultFileName);
+            boolean complete = ATTools.resultsAreComplete(resultFileName, expectedNumberOfInstances);
+	    
+	    System.out.printf("                 %-23s%-15s%-7s%-9s%-9s\n", eAlg.getName(), eTestSet.getName(), mtype, new Boolean(uptodate), new Boolean(complete));
 	  }
         }
       }
-      System.out.println(algs);
     } else {
+      ErrorStatus error = ErrorStatus.STATUS_OK;
       for (int i = 0; i < eAlgs.size(); i++) {
 	for (int j = 0; j < eTests.size(); j++) {
-          Notificator notificator = getNotificator(eAlgs.get(i).getName(), eTests.get(j).getName(), mType, taskID);
-	  ErrorStatus error = Executor.algorithmRun(projekt, eAlgs.get(i).getName(), 
-		  eTests.get(j).getName(),  mType, notificator, alwaysCompile, alwaysRun, verbose);          
+          ATLog.setPateFilename(ATGlobal.getTaskHistoryFilename(projName, algName, testsetName, mType.getExtension()));
+          Notificator notificator = getNotificator(projName, eAlgs.get(i).getName(), eTests.get(j).getName(), mType);
+	  error = Executor.algorithmRun(projekt, eAlgs.get(i).getName(), 
+		  eTests.get(j).getName(),  mType, notificator, alwaysCompile, alwaysRun); 
+          
+          // when execution failes, all batch is canceled
+          // Is this a good idea? 
+          if (!error.equals(ErrorStatus.STATUS_OK)) {
+            System.exit(error.ordinal());
+          }
 	}
-      }
+        System.exit(ErrorStatus.STATUS_OK.ordinal()); // 0
+      }      
     }
   }
 }

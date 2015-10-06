@@ -9,19 +9,25 @@ import java.io.Writer;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.TreeSet;
 import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import org.apache.commons.io.FileUtils;
+import si.fri.algotest.entities.EAlgorithm;
+import si.fri.algotest.entities.EComputer;
+import si.fri.algotest.entities.EComputerFamily;
+import si.fri.algotest.entities.EGlobalConfig;
 import si.fri.algotest.entities.EProject;
+import si.fri.algotest.entities.EQuery;
 import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.MeasurementType;
+import si.fri.algotest.entities.NameAndAbrev;
 import si.fri.algotest.entities.Project;
-import si.fri.algotest.execute.AbstractTestSetIterator;
 import si.fri.algotest.global.ATGlobal;
-import si.fri.algotest.global.ATLog;
 
 /**
  *
@@ -157,8 +163,22 @@ public class ATTools {
     return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, String.format("Compiling %s  - done.", msg));
   }
   
+  public static boolean isSourceNewer(String srcDir, String binDir, String [] srcNames) {
+    for (String srcName : srcNames) {
+      File f1 = new File(srcDir + File.separator + srcName + ".java");
+      File f2 = new File(binDir + File.separator + srcName + ".class");
+      try {
+        if (FileUtils.isFileNewer(f1, f2)) return true; 
+      } catch (Exception e) {
+	// this happens, for example, if bin folder does not exist
+        return true;
+      }
+    }
+    return false;
+  }
+
   
-    public static ETestSet getFirstTestSetFromProject(String dataroot, String projName) {
+  public static ETestSet getFirstTestSetFromProject(String dataroot, String projName) {
     String projRoot     = ATGlobal.getPROJECTroot    (dataroot, projName);
     String projFilename = ATGlobal.getPROJECTfilename(dataroot, projName);
     
@@ -179,81 +199,281 @@ public class ATTools {
     else
       return testSet;
   }
-  
-  public static void iterateAndPrintTests(AbstractTestSetIterator it) {
-    try {
-      while(it.hasNext()) {
-	it.readNext();
-        System.out.println(it.getCurrent());
-      }
-      it.close();
-    } catch (Exception e) {
-      ATLog.log(e.toString());
-    }
-  }
+    
   
   /**
-   * Wrapper for resultsAreUpToDate(String, String , String, int) method. 
+   * Returns all the files that this query depends on. If any of these files chenges, 
+   * the query has to be run again.
    */
-  public static boolean resultsAreUpToDate(Project project, String algName, String testsetName) {
-    if (project==null) return false;
-    ETestSet eTestSet = project.getTestSets().get(testsetName);
+  public static HashSet<String> getFilesForQuery(String projectname, String queryname, String [] params) {    
+    HashSet<String> result = new HashSet<>();    
     
-    int instances = eTestSet.getFieldAsInt(ETestSet.ID_N);
+    try {
+      Project project = new Project(ATGlobal.getALGatorDataRoot(), projectname);    
+      EQuery   query   = new EQuery(new File(ATGlobal.getQUERYfilename(project.getProject().getProjectRootDir(), queryname)), params);
 
-    return resultsAreUpToDate(project.getProject().getProjectRootDir(), algName, testsetName, instances);
+      result.add(query.entity_file_name);
+      
+      // Project
+      result.addAll(getFilesForProject(project));
+      // Algorithms
+      NameAndAbrev [] algs = query.getNATabFromJSONArray(EQuery.ID_Algorithms);
+      for (NameAndAbrev alg : algs) {
+        result.addAll(getFilesForAlgorithm(project, alg.getName()));
+      }
+      // Algorithms
+      NameAndAbrev [] tss = query.getNATabFromJSONArray(EQuery.ID_TestSets);
+      for (NameAndAbrev ts : tss) {
+        result.addAll(getFilesForTestSet(project, ts.getName()));
+      }
+      
+    } catch (Exception e) {}
+        
+    return result;
   }
+  
+  private static HashSet<String> getFilesForProject(Project project) {
+    HashSet<String> result = new HashSet<>();  
+    if (project==null ||  project.getProject()== null) return result;
+    
+    try {
+      // Project.atp
+      result.add(ATGlobal.getPROJECTfilename(project.dataRoot, project.getName()));
+      
+      // project src files
+      String algTPL     = project.getProject().getAlgorithmClassname();
+      String testCase   = project.getProject().getTestCaseClassname();
+      String tsIterator = project.getProject().getTestSetIteratorClassName();
+      
+      String projSrc    = ATGlobal.getPROJECTsrc(project.getProject().getProjectRootDir());
+      result.add(projSrc + File.separator + algTPL     + ".java");
+      result.add(projSrc + File.separator + testCase   + ".java");
+      result.add(projSrc + File.separator + tsIterator + ".java");
+      
+      URL[] proJARs = ATTools.getURLsFromJARs(project.getProject().getStringArray(EProject.ID_ProjectJARs), ATGlobal.getPROJECTlib(project.getProject().getProjectRootDir()));
+      for (URL url : proJARs) result.add(url.toString());
+
+      URL[] algJARs = ATTools.getURLsFromJARs(project.getProject().getStringArray(EProject.ID_AlgorithmJARs), ATGlobal.getPROJECTlib(project.getProject().getProjectRootDir()));
+      for (URL url : algJARs) result.add(url.getFile());                        
+    } catch (Exception e) {}
+    return result;
+  }
+private static HashSet<String> getFilesForAlgorithm(Project project, String algName) {
+    HashSet<String> result = new HashSet<>();    
+    try {
+      // <algorithm>.atal
+      result.add(ATGlobal.getALGORITHMfilename(project.getProject().getProjectRootDir(), algName));  
+            
+      // MainClass.java
+      String mainClass = ATTools.stripFilenameExtension((String)project.getAlgorithms().get(algName).getField(EAlgorithm.ID_MainClassName));
+      String srcDir    = ATGlobal.getALGORITHMsrc(project.getProject().getProjectRootDir(), algName);
+      result.add(srcDir + File.separator + mainClass + ".java");
+    } catch (Exception e) {}
+    return result;
+  }
+  
+  private static HashSet<String> getFilesForTestSet(Project project, String testsetName) {
+    HashSet<String> result = new HashSet<>();    
+    try {
+      // TestSetX.atts
+      result.add(ATGlobal.getTESTSETfilename(project.getProject().getProjectRootDir(), testsetName));
+
+      // testsetX.txt
+      String descFile = project.getTestSets().get(testsetName).getField(ETestSet.ID_DescFile);
+      result.add(ATGlobal.getTESTSroot(project.getProject().getProjectRootDir()) + File.separator + descFile);      
+    } catch (Exception e) {}
+    return result;
+  }
+
+  private static HashSet<String> getFilesForMeasurementType(Project project, String mType) {
+    HashSet<String> result = new HashSet<>();    
+    try {
+      // Project-[mtype].atrd
+      result.add(ATGlobal.getRESULTDESCfilename(project.getProject().getProjectRootDir(), project.getName(), MeasurementType.valueOf(mType)));    
+    } catch (Exception e) {}
+    return result;
+  }
+
+  /**
+   * Returns filenames of all files composing the project-algorithm-testset-mtype 
+   * (apt, atts, atrd, ..., jars, *.java, ...)
+   */  
+  private static HashSet<String> getFilesForProjectAlgorithmTestSetMType(Project project, String algName, String testsetName, String mType) {
+    HashSet<String> result = new HashSet<>();
+    
+    result.addAll(getFilesForProject(project));
+    result.addAll(getFilesForAlgorithm(project, algName));
+    result.addAll(getFilesForTestSet(project, testsetName));
+    result.addAll(getFilesForMeasurementType(project, mType));
+    
+    return result;
+  }  
     
     
   /**
-   * Checks for the existance of the result file for given algorithm. If the file does not exist
-   * or if testset file is newer than the results file or if it contains less than 
-   * expectedNumberOfInstances lines, method returns false, otherwise true.
+   * Compate the date of last change of the file with results with the date of last change of all 
+   * files of the project-algoritgm-testset-mtype and returns true if results file is 
+   * the youngest file and false otherwise.
    */
-  public static boolean resultsAreUpToDate(String projRoot, String algName, String testsetName, int expectedNumberOfInstances) {
-    String resFilename     = ATGlobal.getRESULTfilename(projRoot, algName, testsetName, MeasurementType.EM);
-    String testsetFilename = ATGlobal.getTESTSETfilename(projRoot, testsetName);
+  public static boolean resultsAreUpToDate(Project project, String algorithmName, String testsetName, String mtype) {
+    String resultFileName = getTaskResultFileName(project, algorithmName, testsetName, mtype);
+    return resultsAreUpToDate(project, algorithmName, testsetName, mtype, resultFileName);
+  }  
+  public static boolean resultsAreUpToDate(Project project, String algorithmName, String testsetName, 
+          String mtype, String resultFileName) {
+        
+    HashSet<String> depFiles = getFilesForProjectAlgorithmTestSetMType(project, algorithmName, testsetName, mtype);
+    return resultsAreUpToDate(depFiles, resultFileName);
+  }
+
+
+  /** 
+   * Compare the date of last change of resultFile with the date of last change of all
+   * files in a given set (depFiles). Method returns true if resultFile is the youngest.
+   */
+  public static boolean resultsAreUpToDate(HashSet<String> depFiles, String resultFileName) {    
+    File curFile = new File(resultFileName);
+    if (!curFile.exists()) return false;
     
-    File resFile = new File(resFilename);
-    if (!resFile.exists()) return false;
+    for (String file : depFiles) {
+      File f = new File(file);
+      if (!f.exists()) continue;      
+      if (FileUtils.isFileNewer(f, curFile))
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Result file is considered to be complete if it contains exactly expectedNumberOfLines lines
+   */
+  public static boolean resultsAreComplete(String resultFileName, int expectedNumberOfInstances) {
+    return expectedNumberOfInstances == getNumberOfLines(resultFileName);
+  }
+  
+    /**
+   * Za vse aktualne pare [familyID].[computerID] v folderju PROJ-[project]/results/[familyID].[computerID] 
+   * pogleda za obstoj datoteke [algorithm]-[testset].[mtype].  Če med temi datotekami najde up-to-date datoteko 
+   * (ima pravilno število vrstic (zapisno v testset.N) in je mlajša od konfiguracijksih datotek), vrne njemo ime 
+   * (če obstaja več takih datotek, vrne prvo, na katero naleti). Če nobena datoteka ni up-to-date, vrne prvo, 
+   * ki ima pravilno število vrstic. Sicer vrne prvo neprazno datoteko. Če pa tudi nobena neprazna datoteka ne 
+   * obstaja, vrne ime datoteke na thisComputerID() ("C0").<br><br>
+   * 
+   * Namen: metoda vrne datoteko z rezultati za dan trojček algoritem-testset-mtype. Ker lahko obstaja več datotek, 
+   * ki vsebujejo te rezultate (če so, na primer, različni računalniki izvedli isti task), moram izbrati eno izmed 
+   * njih. Izbiram po naslednjem postopku: najprej določim aktualne družine računalnikov. To je project.family, če 
+   * obstaja, sicer so to vse obstoječe družine. Potem za vse računalnike obstoječih družin po vrsti pregledujem
+   * datoteke in vrnem PRVO up-todat ali complete ali non-empty datoteko.
+   */
+  public static String getTaskResultFileName(Project project, String algorithmName, String testsetName, String mType) {              
+    MeasurementType mt = MeasurementType.UNKNOWN;
+    try {mt = MeasurementType.valueOf(mType.toUpperCase());} catch (Exception e) {}
+
+    String familyName = project.getProject().getProjectFamily(mt);
+    EGlobalConfig config = EGlobalConfig.getConfig();
     
-    File testFile = new File(testsetFilename);
-    
-    if (FileUtils.isFileNewer(testFile, resFile))
-      return false;
-    
-    try {
-      int numberOfInstances = 0;
-      Scanner sc = new Scanner(resFile);
-      while(sc.hasNextLine()) {
-	numberOfInstances++;
-	String line = sc.nextLine();
+    // The families that are to be checked
+    TreeSet<String> families = new TreeSet<>();
+    // If family is known, check only results for this family ...
+    if (familyName != null && !familyName.isEmpty()) {
+      families.add(familyName);
+    } else { // ... else check all families        
+      for(EComputerFamily family : config.getFamilies()) {
+        String familyID = family.getField(EComputerFamily.ID_FamilyID);
+        if (familyID != null && !familyID.isEmpty())
+          families.add(familyID);
       }
-      sc.close();
-	
-      return (numberOfInstances == expectedNumberOfInstances);
+    }
+    
+    int expectedNumberOfLines = 0;
+    ETestSet testset = project.getTestSets().get(testsetName);
+    if (testset != null) try {
+      expectedNumberOfLines = Integer.parseInt((String) testset.getField(ETestSet.ID_N));
+    } catch (Exception e) {}
+    
+    String firstNonEmptyFile = "", firstCompleteFile = "";
+    // loop all families ...
+    for (EComputerFamily compFamily : config.getFamilies()) {
+      String thisFamilyID = compFamily.getField(EComputerFamily.ID_FamilyID);
+      // ... and check all that are in the set "families"
+      if (families.contains(thisFamilyID)) {
+        String threeFiles [] = 
+          getTaskResultFilesNameForFamily(project, algorithmName, testsetName, mt, compFamily, expectedNumberOfLines);
+        if (!threeFiles[2].isEmpty()) {
+          // uptodate file was found!
+          return threeFiles[2];
+        }
+        if (firstNonEmptyFile.isEmpty() && !threeFiles[0].isEmpty())
+          firstNonEmptyFile = threeFiles[0];
+        if (firstCompleteFile.isEmpty() && !threeFiles[1].isEmpty())
+          firstCompleteFile = threeFiles[1];                 
+      }
+    }
+    if (!firstCompleteFile.isEmpty())
+      return firstCompleteFile;
+    else
+      return firstNonEmptyFile;
+    
+    // default result filename
+    //return ATGlobal.getRESULTfilename(project.getProject().getProjectRootDir(), algorithmName, testsetName, mt);          
+  }
+
+  
+  /**
+   * Po vrsti za vsak računalnik [comp] iz družine [family] pregleda datoteke 
+   *   results/[family].[comp]/algorithm-testset.mtype in tri vrne imena datotek: 
+   * prvo neprazno datoteko, prvo popolno datoteko in prvi ažurno datoteko, na katero 
+   * je naletel med pregledom.
+  */
+  private static String [] getTaskResultFilesNameForFamily(Project project, String algorithmName, String testsetName, 
+    MeasurementType mType, EComputerFamily compFamily, int expectedNumberOfLines) { 
+
+    String firstNonEmptyFile = "", firstCompletFile = "", firstUptodateFile = "";
+    
+    String thisFamilyID = compFamily.getField(EComputerFamily.ID_FamilyID);
+
+    // for all computer in given family ...
+    for (EComputer computer : compFamily.getComputers()) {
+      String computerID = thisFamilyID + "." + computer.getField(EComputer.ID_ComputerID); 
+      String resultFileName = ATGlobal.getRESULTfilename(project.getProject().getProjectRootDir(), 
+              algorithmName, testsetName, mType, computerID);             
+        
+      // check the corresponding [algorithm]-[testset].[mtype] file 
+      File resultFile = new File(resultFileName);
+      if (!resultFile.exists())
+        continue;
+      if ((resultFile.length() > 0) && firstNonEmptyFile.isEmpty())
+        firstNonEmptyFile = resultFileName;
+         
+      int numberOfLines = getNumberOfLines(resultFileName);
+      if (numberOfLines == expectedNumberOfLines) {
+        if (firstCompletFile.isEmpty()) 
+          firstCompletFile = resultFileName;
+        
+        if (resultsAreUpToDate(project, algorithmName, testsetName, mType.getExtension(), resultFileName)) {
+          firstUptodateFile = resultFileName;
+          break; // all results are known, method returns
+        }
+      }
+        
+    }          
+    
+    return new String[] {firstNonEmptyFile, firstCompletFile, firstUptodateFile};
+  }             
+
+    
+  public static int getNumberOfLines(String filename) {
+    int noLines = 0;
+    try (Scanner sc = new Scanner(new File(filename))) {
+      while (sc.hasNextLine()) {
+        sc.nextLine(); noLines++;
+      }
     } catch (Exception e) {
-      return false;
+      noLines = 0;
     }
-  }
-  
-  
-  public static boolean isSourceNewer(String srcDir, String binDir, String [] srcNames) {
-    for (String srcName : srcNames) {
-      File f1 = new File(srcDir + File.separator + srcName + ".java");
-      File f2 = new File(binDir + File.separator + srcName + ".class");
-      try {
-        if (FileUtils.isFileNewer(f1, f2)) return true; 
-      } catch (Exception e) {
-	// this happens, for example, if bin folder does not exist
-        return true;
-      }
-    }
-    return false;
-  }
-  
-  
-  
+    return noLines;
+  }  
+    
   /**
    * Returns null if all the sources exists or the name of the missing source
    */
@@ -367,6 +587,16 @@ public class ATTools {
       return urls;
     } catch (Exception e) {
       return new URL[0];
+    }
+  }
+  
+  public static void main(String[] args) {
+    Project project = new Project("/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGATOR_ROOT/data_root", "Sorting");
+    
+    HashSet<String> files = getFilesForProjectAlgorithmTestSetMType(project, "Cormen", "TestSet1", "JVM");
+    for (String string : files) {
+      File f = new File(string);
+      System.out.println(f.exists() + " " + string);
     }
   }
 }

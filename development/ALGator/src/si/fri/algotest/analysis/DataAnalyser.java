@@ -1,8 +1,10 @@
 package si.fri.algotest.analysis;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -13,11 +15,13 @@ import si.fri.algotest.entities.EParameter;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.EQuery;
 import si.fri.algotest.entities.EResultDescription;
+import si.fri.algotest.entities.Entity;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.NameAndAbrev;
 import si.fri.algotest.entities.ParameterSet;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ATLog;
+import si.fri.algotest.tools.ATTools;
 
 /**
  *
@@ -97,7 +101,7 @@ public class DataAnalyser {
 
 	    algResults.put(alg, oneAlgResults);
 	  } catch (Exception e) {
-	    ATLog.log("Can't read results: " + e);
+	    ATLog.log("Can't read results: " + e, 1);
 	    return null;
 	  }
 	}
@@ -122,7 +126,7 @@ public class DataAnalyser {
 	EParameter refPar = filter.getParameter(i);
 	Object refVal = refPar.get(EParameter.ID_Value);
 
-	EParameter param = params.getParamater((String) refPar.getField(EParameter.ID_Name));
+	EParameter param = params.getParamater((String) refPar.getField(Entity.ID_NAME));
 	Object value = param.get(EParameter.ID_Value);
 
 	if (!value.equals(refVal)) {
@@ -260,7 +264,7 @@ public class DataAnalyser {
 	  }
 	}
       } catch (Exception e) {
-	ATLog.log("Can't read results: " + e);
+	ATLog.log("Can't read results: " + e, 1);
       }
     }
   }
@@ -316,7 +320,66 @@ public class DataAnalyser {
   public static String getFilterHeaderName(String [] filter) {
     return "#";
   }
-   
+
+  
+  
+  public static String getQueryResultTableAsString(String projectname, String query) {
+    return getQueryResultTableAsString(projectname, query, null);
+  }
+  
+  /**
+   * Gets the query result as table of values. The input query can be a) query written in json format
+   * and b) filename of a query written in a file. If query is json, EQuery is generated and result 
+   * is returned: otherwise, if query is filename, method checks the file with name queryName+parameters. 
+   * If file exists and is fresh (never than project configuration files), method returns its content, 
+   * else it runs a query, writes the result to file and returns the result.
+   */
+  public static String getQueryResultTableAsString(String projectname, String query, String [] params) {    
+    if (query.startsWith("{")) {
+      EProject project = new EProject(new File(ATGlobal.getPROJECTfilename(ATGlobal.getALGatorDataRoot(), projectname)));  
+      EQuery eQuery = new EQuery(query, params);
+      return runQuery(project, eQuery).toString();
+    } else try {
+      String queryname = query;
+      String projectRoot = ATGlobal.getPROJECTroot(ATGlobal.getALGatorDataRoot(), projectname);
+      String qResultFileName = ATGlobal.getQUERYOutputFilename(projectRoot, queryname, params);            
+      HashSet<String> queryDepFiles = ATTools.getFilesForQuery(projectname, queryname, params);
+            
+      if (ATTools.resultsAreUpToDate(queryDepFiles, qResultFileName)) {
+        File qResultFile = new File(qResultFileName);
+        String content = "";
+        Scanner sc = new Scanner(qResultFile);
+        while (sc.hasNextLine()) {
+          String vrstica = sc.nextLine();
+          content += (content.isEmpty() ? "" : "\n") + vrstica;
+        }
+        sc.close();
+        return content;
+      } else {
+        TableData td = runQuery(projectname, queryname, params);
+        String result = td.toString();
+        PrintWriter pw = new PrintWriter(qResultFileName);
+        pw.print(result);
+        pw.close();
+        
+        return result;
+      }
+    } catch (Exception e) {
+      return "";
+    }
+  }
+  
+  
+  public static TableData runQuery(String projectname, String queryname) {
+    return runQuery(projectname, queryname, null);
+  }   
+  public static TableData runQuery(String projectname, String queryname, String [] params) { 
+    EProject project = new EProject(new File(ATGlobal.getPROJECTfilename(ATGlobal.getALGatorDataRoot(), projectname)));  
+    EQuery   query   = new EQuery(new File(ATGlobal.getQUERYfilename(project.getProjectRootDir(), queryname)), params);
+    
+    return runQuery(project, query);
+  }
+  
   /**
    * Methos runs a given query. For NO_COUNT queries it calls  runQuery_NO_COUNT once, while for COUNT queries
    * runQuery_NO_COUNT is called n times (n=number of algorithm selected in query) and the results 
@@ -535,22 +598,27 @@ public class DataAnalyser {
   }
 
   public static void main(String args[]) {
-    String dataRoot = ATGlobal.getALGatorDataRoot();
-    String projName = "Sorting";
+    ATGlobal.setALGatorRoot("/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGATOR_ROOT");
+    ATGlobal.setALGatorDataRoot("/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGATOR_ROOT/data_root");
 
-    String projRoot     = ATGlobal.getPROJECTroot(dataRoot, projName);
-    String projFilename = ATGlobal.getPROJECTfilename(dataRoot, projName);
-
-    EProject eProject = new EProject(new File(projFilename));
-    EQuery query = new EQuery(new File(ATGlobal.getQUERYfilename(projRoot, "q1")));
-
-    // scanQuery(eProject, query);
-
-    ResultPack rPack = new ResultPack();
-    readResults(rPack, eProject, "QuickSort", "TestSet1", MeasurementType.EM);
-    readResults(rPack, eProject, "QuickSort", "TestSet2", MeasurementType.EM);
-    System.out.println(rPack);
-
-    runQuery(eProject, query);
+    String projectname="Sorting";
+    String queryName="query1";
+    String [] params = new String[] {"BubbleSort"};
+    
+    String projectRoot = ATGlobal.getPROJECTroot(ATGlobal.getALGatorDataRoot(), projectname);
+    String qResultFileName = ATGlobal.getQUERYOutputFilename(projectRoot, queryName, params);
+    
+    HashSet<String> dep = ATTools.getFilesForQuery(projectname, queryName, params);
+    for (String dep1 : dep) {
+      System.out.println(dep1);
+    }
+        
+    System.out.println(ATTools.resultsAreUpToDate(dep, qResultFileName));
+    
+    String r = getQueryResultTableAsString(projectname, queryName, params);
+    
+    System.out.println(ATTools.resultsAreUpToDate(dep, qResultFileName));
+    
+    System.out.println(r);
   }
 }

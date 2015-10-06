@@ -69,6 +69,8 @@ public class EResultDescription extends Entity {
       ParameterSet result = new ParameterSet();
       
       // add FIXNUM default parameters
+      EParameter ep = getAlgorithmNameParameter("/");
+      String name = ep.getName();
       result.addParameter(getAlgorithmNameParameter("/"), true);
       result.addParameter(getTestsetNameParameter("/"), true);
       result.addParameter(getTestIDParameter("/"), true);

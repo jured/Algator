@@ -1,6 +1,7 @@
 package si.fri.algotest.entities;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +29,9 @@ public class Entity implements Cloneable, Serializable {
 
   private final String unknown_value = "?";
   
+  // The name of the entity (property Name)
+  public static final String ID_NAME  = "Name";
+  
   /**
    * The ID of an entity in an JSON file
    */
@@ -40,18 +44,31 @@ public class Entity implements Cloneable, Serializable {
   public String entity_rootdir;
   
   /**
-   * The prefix of the name of the file from which the entity was read (if entity was read from a file), null otherwise
+   * The value of ID_NAME property. If this property does not exist, the prefix of the name 
+   * of the file from which the entity was read (if entity was read from a file), unknown_value otherwise
    */
   private String entity_name;
   
   /**
-   * The extension of the file where entity was written 
+   * The extension of the file from which the entity was read, or null if it was initialized by json string
    */
   private String entity_file_ext;
+  
+  /**
+   * The of the file from which the entity was read, or null if it was initialized by json string
+   */
+  public String entity_file_name;
 
   
   protected TreeSet<String> fieldNames;
   protected HashMap<String, Object> fields;
+  
+  /**
+   * An array of parameters values. This array has to be set before initFromJSON is called. 
+   * If array is not empty, each parameter $x in json representation of entity is replaced 
+   * by x-th string in array. 
+   */
+  protected String [] entityParams = null;
   
   
   // a list of representative fields (fields that represent this entity)
@@ -66,9 +83,9 @@ public class Entity implements Cloneable, Serializable {
   public Entity(String entityID, String [] fieldNames) {
     this();
     
-    entity_id   = entityID;
-    entity_name = "?";
-    entity_file_ext = "?";
+    entity_id       = entityID;
+    entity_name     = unknown_value;
+    entity_file_ext = unknown_value;
     
     this.fieldNames.addAll(Arrays.asList(fieldNames));
     
@@ -76,7 +93,16 @@ public class Entity implements Cloneable, Serializable {
   }
   
   public String getName() {
-    return entity_name;
+    // first try property Name ...
+    String name = getField(ID_NAME);
+    // ... if property doesn't exist, try entity_name (filename without extension) ...
+    if (name == null || name.isEmpty())
+      name = entity_name;
+    // ... it even this doesn't exist, return unknown_value
+    if (name == null || name.isEmpty())
+      name = unknown_value;
+    
+    return name;
   }
   
   /**
@@ -87,9 +113,10 @@ public class Entity implements Cloneable, Serializable {
    * @return 
    */
   public ErrorStatus initFromFile(File entityFile) {
-    entity_rootdir = ATTools.extractFilePath(entityFile);
-    entity_name    = ATTools.extractFileNamePrefix(entityFile);
-    entity_file_ext= ATTools.getFilenameExtension(entityFile.getAbsolutePath());
+    entity_rootdir   = ATTools.extractFilePath(entityFile);
+    entity_name      = ATTools.extractFileNamePrefix(entityFile);
+    entity_file_ext  = ATTools.getFilenameExtension(entityFile.getAbsolutePath());
+    entity_file_name = entityFile.getPath();
     
     try (Scanner sc = new Scanner(entityFile, "UTF-8")) {
       String vsebina = "";
@@ -117,18 +144,39 @@ public class Entity implements Cloneable, Serializable {
    * @return 
    */
   public ErrorStatus initFromJSON(String json) {
+    
+    if (entityParams != null) {
+      for (int i=0; i<entityParams.length; i++) {
+        String ithParam = "[$]"+i;
+        json = json.replaceAll(ithParam, entityParams[i]);
+      }
+    }
+    
     try {
       JSONObject jsonObj = new JSONObject(json);
+      
+      // every entity should have Name
+      fields.put(ID_NAME, jsonObj.opt(ID_NAME));
+      
       for(String sp : fieldNames) {
         fields.put(sp, jsonObj.opt(sp));
-      }
+      }      
       return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, "");
     } catch (Exception e) {
       return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_INIT_FROM_JSON, "");      
-    }
+    }    
+  }
+  
+  public void saveEntity() {
+    if (entity_file_name == null) return; // can not save 
     
+    File f = new File(entity_file_name);
+    try (PrintWriter pw = new PrintWriter(f)) {
+      pw.println(toJSONString(true));
+    } catch (Exception e) {}
   }
 
+  
   public String toJSONString() {
     return toJSONString(false);
   }
@@ -156,7 +204,7 @@ public class Entity implements Cloneable, Serializable {
   
   
   public Object get(String fieldKey) {
-    if (fieldNames.contains(fieldKey))
+    if (fields.containsKey(fieldKey))
       return fields.get(fieldKey);
     else
       return unknown_value;
@@ -173,7 +221,7 @@ public class Entity implements Cloneable, Serializable {
    */
   public <E> E getField(String fieldKey) {
     E result = null;
-    if (fieldNames.contains(fieldKey)) {
+    if (fields.containsKey(fieldKey)) {
       result = (E) fields.get(fieldKey);
       
     }
@@ -240,37 +288,5 @@ public class Entity implements Cloneable, Serializable {
     myClone.representatives = (ArrayList) this.representatives.clone();
     return myClone;
   }
-  
-  
-  
-  
-  public static void main(String args[]) {
-    Entity e = new Entity("MojaE", new String[] {"A", "B"});
-    e.setRepresentatives("A", "B");
-    e.set("A", "eA");
-    e.set("B", "eB");
-
-    Entity b = null;
-    try {
-      b = (Entity) e.clone();
-    } catch (CloneNotSupportedException ex) {
-      System.out.println(ex);
-    }
-    
-    System.out.println(e);
-    System.out.println(b);
-    System.out.println("");
-    
-    b.set("A", "xyA");
-    b.set("B", "xyB");
-    b.setRepresentatives("A");
-    b.entity_id = "Bluks";
-  
-    System.out.println(e);
-    System.out.println(b);
-    
-    System.out.println(b.toJSONString());
-    
-  }
-  
+   
 }

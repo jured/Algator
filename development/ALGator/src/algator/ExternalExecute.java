@@ -32,9 +32,7 @@ public class ExternalExecute {
   
   private static Options getOptions() {
     Options options = new Options();
-    
-    options.addOption("v", "verbose", false, "print additional information");
-    
+        
     return options;
   }
   
@@ -42,7 +40,7 @@ public class ExternalExecute {
     System.out.println(introMsg + "\n");
     
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp("algator.ExternalExecut [options] <path>", options);
+    formatter.printHelp("algator.ExternalExecut <path>", options);
 
     System.exit(0);
   }
@@ -56,7 +54,7 @@ public class ExternalExecute {
    * The final version of algorithm instance (which includes the result parameters
    * in the testCase and timer parameters in the timer array) is written to file.
    */
-  public static void run(String tmpFolderName, boolean verbose) {
+  public static void run(String tmpFolderName) {
     AbsAlgorithm curAlg = ExternalExecutor.getAlgorithmFromFile(tmpFolderName, ExternalExecutor.SER_ALG_TYPE.TEST);
     if (curAlg == null) return;
     
@@ -71,9 +69,6 @@ public class ExternalExecute {
     ExternalExecutor.initCommunicationFile(tmpFolderName);
     
     for (int i = 0; curAlg!=null && i < timesToExecute; i++) {
-
-      if (verbose) 
-        System.out.printf("%5d ", i);
       
       Counters.resetCounters();
       curAlg.timer = new Timer();
@@ -93,25 +88,18 @@ public class ExternalExecute {
       if (i < timesToExecute - 1)
         curAlg = ExternalExecutor.getAlgorithmFromFile(tmpFolderName, ExternalExecutor.SER_ALG_TYPE.TEST);
     }
-    
-    if (verbose) 
-      System.out.println("");
-    
+        
     if (curAlg != null) {
       // save execution times ...
       for (int i = 0; i < timesToExecute; i++) {
         for (int tID = 0; tID < Timer.MAX_TIMERS; tID++)  {
-          curAlg.setExectuionTime(tID, i, times[tID][i]);
-          
-          if (verbose && tID==0)
-            System.out.printf("%5d", times[tID][i]);
+          curAlg.setExectuionTime(tID, i, times[tID][i]);          
         }
       }
       
       // ... and counters
       curAlg.setCounters(Counters.getCounters());
       
-      System.out.println("");
       ExternalExecutor.saveAlgToFile(urls, curAlg, tmpFolderName, ExternalExecutor.SER_ALG_TYPE.RESULT);
     }
   }
@@ -159,15 +147,11 @@ public class ExternalExecute {
     Options options = getOptions();
 
     String path = "";
-    boolean verbose = false;
     
     CommandLineParser parser = new BasicParser();
     try {
       CommandLine line = parser.parse(options, args);
 
-      if (line.hasOption("v")) {
-	verbose = true;
-      }
       
       String[] curArgs = line.getArgs();
       if (curArgs.length != 1) {
@@ -178,8 +162,8 @@ public class ExternalExecute {
     } catch (Exception ex) {
       printMsg(options);
     }
-    
-    run(path, verbose);
+
+    run(path);
   }
   
 }

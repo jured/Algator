@@ -16,6 +16,11 @@ public class ATGlobal {
 
   private static String ALGatorRoot     = System.getenv("ALGATOR_ROOT");
   private static String ALGatorDataRoot = System.getenv("ALGATOR_DATA_ROOT");
+  
+  
+  public static int logTarget = 1;    // stdout
+  public static int verboseLevel = 1; // print some information
+  
     
   // File extensions for AT entities
   public static final String AT_FILEEXT_project    = "atp";
@@ -36,6 +41,11 @@ public class ATGlobal {
   private static final String ATDIR_algsDir        = "algs";
   private static final String ATDIR_algDir         = "ALG-%s";
   private static final String ATDIR_queryDir       = "queries";
+  private static final String ATDIR_queryOutput    = "output";
+  
+  private static final String ATDIR_logDir         = "log";
+  private static final String ATDIR_algatorLOGfile = "log";
+  private static final String ATDIR_taskLogDir     = "tasks";
   
   private static final String ATDIR_tmpDir         = "tmp";
 
@@ -72,6 +82,39 @@ public class ATGlobal {
     ALGatorDataRoot = dataRoot;
   }
 
+  
+  public static String getLogFolder() {
+    String folderName = getALGatorDataRoot() + File.separator + ATDIR_logDir;
+    File folder = new File(folderName);
+    if (!folder.exists())
+      folder.mkdir();
+    return folderName;
+  }
+
+  public static String getTaskLogFolder() {
+    String folderName = getLogFolder() + File.separator + ATDIR_taskLogDir;
+    File folder = new File(folderName);
+    if (!folder.exists())
+      folder.mkdir();
+    return folderName;    
+  }
+  
+  public static String getAlgatorLogFilename() {
+    return getLogFolder() + File.separator + ATDIR_algatorLOGfile;
+  }
+  
+  public static String getTaskStatusFilename(String project, String algorithm, String testset, String mtype) {
+    return getTaskLogFolder() + File.separator + 
+       String.format("%s-%s-%s-%s.status", project, algorithm, testset, mtype);
+  }
+
+  public static String getTaskHistoryFilename(String project, String algorithm, String testset, String mtype) {
+    return getTaskLogFolder() + File.separator + 
+       String.format("%s-%s-%s-%s.history", project, algorithm, testset, mtype);
+  }
+
+  
+  
   /**
    * Returns the root of the project
    *
@@ -138,33 +181,39 @@ public class ATGlobal {
     return getALGORITHMroot(projectRoot, algName) + File.separator + ATDIR_binDir;
   }
 
+  
+  /************* TESTS *+++++++++++++++++++++*/
+  public static String getTESTSroot(String projectRoot) {
+    return projectRoot + File.separator + ATDIR_testsDir;
+  }
   /**
    * Returns the name of a test set configuration file. This file is placed in
    * the projects tests folder
    */
   public static String getTESTSETfilename(String projectRoot, String testSetName) {
-    return projectRoot + File.separator + ATDIR_testsDir + File.separator + testSetName + "." + AT_FILEEXT_testset;
+    return getTESTSroot(projectRoot) + File.separator + testSetName + "." + AT_FILEEXT_testset;
   }
 
-  public static String getTESTSroot(String projectRoot) {
-    return projectRoot + File.separator + ATDIR_testsDir;
-  }
 
   public static String getRESULTDESCfilename(String projectRoot, String projName, MeasurementType measurementType) {
     return projectRoot + File.separator + ATDIR_projConfDir + File.separator + projName + "-" + measurementType.getExtension() + "." + AT_FILEEXT_resultdesc;
   }
 
-  public static String getRESULTSroot(String projectRoot) {
-    return projectRoot + File.separator + ATDIR_resultsDir + File.separator + getThisComputerID();
-  }
+  public static String getRESULTSroot(String projectRoot, String computerID) {
+    return projectRoot + File.separator + ATDIR_resultsDir + File.separator + computerID;
+  }    
 
   /**
    * The name of a file containing results of the execution of the algorithm
    * {@code algName} on test set {@code testSetName}.
    */
   public static String getRESULTfilename(String projectRoot, String algName, String testSetName, MeasurementType measurementType) {
-    return getRESULTSroot(projectRoot) + File.separator + algName + "-" + testSetName + "." + measurementType.getExtension();
+    return getRESULTfilename(projectRoot, algName, testSetName, measurementType, getThisComputerID());
   }
+  public static String getRESULTfilename(String projectRoot, String algName, String testSetName, MeasurementType measurementType, String computerID) {
+    return getRESULTSroot(projectRoot, computerID) + File.separator + algName + "-" + testSetName + "." + measurementType.getExtension();
+  }
+
 
   /**
    * The name of a file on tmpFolder to hold info of one test
@@ -182,6 +231,23 @@ public class ATGlobal {
   public static String getQUERYfilename(String projectRoot, String query) {
     return getQUERIESroot(projectRoot) + File.separator + query + "." + AT_FILEEXT_query;
   }
+  
+  public static String getQUERYOutputFilename(String projectRoot, String query, String [] params) {
+    String folderName = getQUERIESroot(projectRoot) + File.separator + ATDIR_queryOutput;
+    File tmpFolder = new File(folderName);
+    if (!tmpFolder.exists())
+      tmpFolder.mkdirs();
+    
+    String fileName = query; 
+    if (params != null) 
+      for (String param : params) {
+        param = param.replaceAll("[^a-zA-Z0-9.-]", "_");
+        fileName += "_"+param;
+      }
+    
+    return folderName + File.separator + fileName;
+  }
+  
     
   public static String getTMProot(String data_root, String projName) {
     return getPROJECTroot(data_root, projName) + File.separator + ATDIR_tmpDir;
@@ -207,7 +273,7 @@ public class ATGlobal {
   public static String getThisComputerID() {
     try {
       ELocalConfig config = ELocalConfig.getConfig();
-      String id = config.getField(ELocalConfig.ID_COMPID);
+      String id = config.getComputerID();
       if (id == null || id.isEmpty())
         return "C0";
       else

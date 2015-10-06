@@ -6,7 +6,7 @@ package si.fri.adeserver;
  */
 
 public enum TaskStatus {
-  UNKNOWN, QUEUED, RUNNING, COMPLETED;
+  UNKNOWN, QUEUED, RUNNING, COMPLETED, FAILED, KILLED;
 
   @Override
   public String toString() {
@@ -17,6 +17,10 @@ public enum TaskStatus {
         return "RUNNING";
       case COMPLETED:
         return "COMPLETED";
+      case FAILED:
+        return "FAILED";
+      case KILLED:
+        return "KILLED";        
     }
     return "/unknown/";
   }

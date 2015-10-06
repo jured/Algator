@@ -1,11 +1,9 @@
 package algator;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -15,7 +13,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import si.fri.adeserver.ADEGlobal;
-import si.fri.aeeclient.AEELog;
 import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.global.ATGlobal;
 
@@ -30,13 +27,13 @@ public class TaskClient {
   private static Options getOptions() {
     Options options = new Options();
 
-    Option data_root = OptionBuilder.withArgName("data_root_folder")
+    Option data_root = OptionBuilder.withArgName("folder")
             .withLongOpt("data_root")
             .hasArg(true)
             .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT (if defined) or $ALGATOR_ROOT/data_root")
             .create("d");
 
-    Option algator_root = OptionBuilder.withArgName("algator_root_folder")
+    Option algator_root = OptionBuilder.withArgName("folder")
             .withLongOpt("algator_root")
             .hasArg(true)
             .withDescription("use this folder as algator_root; default value in $ALGATOR_ROOT")
@@ -81,7 +78,7 @@ public class TaskClient {
     
     int    portNumber = ADEGlobal.ADEPort;
     
-    String compID = ELocalConfig.getConfig().getField(ELocalConfig.ID_COMPID);
+    String compID = ELocalConfig.getConfig().getComputerID();
 
       try (
         Socket kkSocket = new Socket(hostName, portNumber);
@@ -89,10 +86,8 @@ public class TaskClient {
         BufferedReader fromServer  = new BufferedReader(new InputStreamReader(kkSocket.getInputStream()));) 
       {
           String taskRequset = ADEGlobal.REQ_STATUS;
-          toServer.println(taskRequset);
-          String response = fromServer.readLine();
-          return response;
-
+          toServer.println(request);
+          return fromServer.readLine().replaceAll("<br>", "\n");
       } catch (Exception e) {
         return String.format("TaskServer on '%s' is not running.", hostName);
       }          

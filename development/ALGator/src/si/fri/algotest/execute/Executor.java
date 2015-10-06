@@ -5,6 +5,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import org.apache.commons.io.FileUtils;
+import si.fri.adeserver.ADETask;
+import si.fri.adeserver.ADETools;
+import si.fri.adeserver.TaskStatus;
 import si.fri.algotest.entities.EAlgorithm;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.EResultDescription;
@@ -16,6 +19,7 @@ import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.tools.ATTools;
 import static si.fri.algotest.tools.ATTools.compile;
 import si.fri.algotest.global.ErrorStatus;
+import static si.fri.algotest.tools.ATTools.getTaskResultFileName;
 
 /**
  *
@@ -34,9 +38,9 @@ public class Executor {
     String projRoot = projekt.getProjectRootDir();
 
     // the classes to be compiled
-    String algTPL = ATTools.stripFilenameExtension((String) projekt.getField(EProject.ID_AlgorithmClass));
-    String testCase = ATTools.stripFilenameExtension((String) projekt.getField(EProject.ID_TestCaseClass));
-    String tsIterator = ATTools.stripFilenameExtension((String) projekt.getField(EProject.ID_TestSetIteratorClass));
+    String algTPL     = projekt.getAlgorithmClassname();
+    String testCase   = projekt.getTestCaseClassname();
+    String tsIterator = projekt.getTestSetIteratorClassName();
 
     // java src and bin dir
     String projSrc = ATGlobal.getPROJECTsrc(projRoot);
@@ -74,8 +78,8 @@ public class Executor {
 
     String algName = eAlgorithm.getName();
 
-    String algSrc = ATGlobal.getALGORITHMsrc(projRoot, algName);
-    String algBin = ATGlobal.getALGORITHMbin(projRoot, algName);
+    String algSrc   = ATGlobal.getALGORITHMsrc(projRoot, algName);
+    String algBin   = ATGlobal.getALGORITHMbin(projRoot, algName);
     String algClass = eAlgorithm.getField(EAlgorithm.ID_MainClassName);
 
     if (mType.equals(MeasurementType.CNT)) {
@@ -160,7 +164,7 @@ public class Executor {
    * @return
    */
   public static ErrorStatus algorithmRun(Project project, String algName, String testSetName,
-          MeasurementType mType, Notificator notificator, boolean alwaysCompile, boolean alwaysRun, boolean verbose) {
+          MeasurementType mType, Notificator notificator, boolean alwaysCompile, boolean alwaysRun) {
 
     if (project == null) {
       return ErrorStatus.ERROR;
@@ -188,8 +192,12 @@ public class Executor {
     }
 
     int numberOfInstances = eTestSet.getFieldAsInt(ETestSet.ID_N);
-    boolean resultsAreUptodate = ATTools.resultsAreUpToDate(projRoot, algName, testSetName, numberOfInstances);
-    if (!(alwaysRun || alwaysCompile) && resultsAreUptodate) {
+    String mt = mType.getExtension().toUpperCase();
+    String resultFileName = getTaskResultFileName(project, algName, testSetName, mt);
+
+    boolean resultsAreUptodate = ATTools.resultsAreUpToDate(project, algName, testSetName, mt, resultFileName);
+    boolean resultsAreComplete = ATTools.resultsAreComplete(resultFileName, numberOfInstances);
+    if (!(alwaysRun || alwaysCompile) && resultsAreUptodate && resultsAreComplete) {
       return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg + " - nothing to be done.");
     }
 
@@ -221,19 +229,25 @@ public class Executor {
       return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
     }
 
+    ADETask tmpTask = new ADETask(project.getName(), algName, testSetName, mType.getExtension(), false);
+    tmpTask.set(ADETask.ID_AssignedComputer, ATGlobal.getThisComputerID());
     try {
+
       if (mType.equals(MeasurementType.EM) || mType.equals(MeasurementType.CNT)) 
         ExternalExecutor.iterateTestSetAndRunAlgorithm(project, algName, tsIt, resDesc, notificator, mType, resFile);
       else
-        VMEPExecutor.iterateTestSetAndRunAlgorithm(project, algName, testSetName, resDesc, tsIt, notificator, verbose, resFile);
+        VMEPExecutor.iterateTestSetAndRunAlgorithm(project, algName, testSetName, resDesc, tsIt, notificator, resFile);
 
-      if (ErrorStatus.getLastErrorStatus().isOK()) 
+      if (ErrorStatus.getLastErrorStatus().isOK()) {  
+        ADETools.writeTaskStatus(tmpTask,  TaskStatus.COMPLETED, null, ATGlobal.getThisComputerID());
         return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg + " - done.");
-      else // execution failed 
+      } else  {// execution failed 
+        ADETools.writeTaskStatus(tmpTask,  TaskStatus.FAILED, ErrorStatus.getLastErrorStatus().toString(), ATGlobal.getThisComputerID());
         return ErrorStatus.getLastErrorStatus();
-        
-      } catch (Exception e) {
+      } 
+    } catch (Exception e) {
+        ADETools.writeTaskStatus(tmpTask,  TaskStatus.FAILED, ErrorStatus.ERROR_CANT_RUN.toString(), ATGlobal.getThisComputerID());
         return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
-      }
+    }
   }
 }

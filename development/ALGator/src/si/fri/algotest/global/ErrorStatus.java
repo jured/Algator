@@ -7,7 +7,7 @@ package si.fri.algotest.global;
  * @author tomaz
  */
 public enum ErrorStatus {
-
+  // OK should be in first position (exit code 0)
   STATUS_OK {
     public String toString() {
       return "OK";
@@ -183,13 +183,13 @@ public enum ErrorStatus {
       return status;
     
     if (status.isOK())
-      ATLog.log(msg);
+      ATLog.log(msg, 2);
     else {      
       String where = String.format(" (Class: %s, Method: %s, line: %d)", 
 	      Thread.currentThread().getStackTrace()[2].getClassName(), 
 	      Thread.currentThread().getStackTrace()[2].getMethodName(),
 	      Thread.currentThread().getStackTrace()[2].getLineNumber());   
-      ATLog.log(status + (msg.isEmpty() ? "" : " -- ") + msg + where);
+      ATLog.log(status + (msg.isEmpty() ? "" : " -- ") + msg + where, 2);
     }
     
     return status;

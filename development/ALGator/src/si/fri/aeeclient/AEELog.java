@@ -1,16 +1,10 @@
 package si.fri.aeeclient;
 
-import si.fri.adeserver.*;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.io.RandomAccessFile;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import static si.fri.algotest.global.ATLog.LOG_LEVEL_FILE;
-import static si.fri.algotest.global.ATLog.LOG_LEVEL_OFF;
-import static si.fri.algotest.global.ATLog.LOG_LEVEL_STDOUT;
 
 /**
  *
@@ -25,7 +19,7 @@ public class AEELog {
   
   public static void log(String msg) {
     if (logFileName == null) {
-      logFileName = AEEGlobal.getTaskLogFilename();
+      logFileName = AEEGlobal.getTaskClientLogFilename();
     }
     
     msg = msg.substring(0, Math.min(msg.length(), MAX_ERROR_SIZE));

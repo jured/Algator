@@ -32,6 +32,7 @@ public class EQuery extends Entity {
    super(ID_Query, 
 	 new String [] {ID_Description, ID_Algorithms, ID_TestSets, ID_inParameters, ID_outParameters, 
                         ID_GroupBy, ID_Filter, ID_SortBy, ID_Count});
+   setRepresentatives(ID_Algorithms, ID_TestSets);
   }
   
   public EQuery(String [] algs, String [] tsts, String [] inParams, String [] outParams,
@@ -52,7 +53,20 @@ public class EQuery extends Entity {
   public EQuery(File fileName) {
     this();
     initFromFile(fileName);
-    setRepresentatives(ID_Algorithms, ID_TestSets);
+  }
+  
+  public EQuery(File fileName, String [] params) {
+    this();
+    
+    entityParams = params;    
+    initFromFile(fileName);
+  }
+  
+  public EQuery(String json, String [] params) {
+    this();
+    
+    entityParams = params;    
+    initFromJSON(json);
   }
   
   /**
@@ -90,6 +104,10 @@ public class EQuery extends Entity {
   public boolean isCount() {
     Object count = get(ID_Count);
     return (count != null && count.equals("1"));
+  }
+  
+  public void applyParameters(String [] parameters) {
+    
   }
   
 }

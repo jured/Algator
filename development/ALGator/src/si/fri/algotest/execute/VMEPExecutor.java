@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Scanner;
 import org.apache.commons.io.FileUtils;

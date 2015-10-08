@@ -241,7 +241,7 @@ public class ATTools {
       result.add(ATGlobal.getPROJECTfilename(project.dataRoot, project.getName()));
       
       // project src files
-      String algTPL     = project.getProject().getAlgorithmClassname();
+      String algTPL     = project.getProject().getAbstractAlgorithmClassname();
       String testCase   = project.getProject().getTestCaseClassname();
       String tsIterator = project.getProject().getTestSetIteratorClassName();
       
@@ -265,7 +265,7 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
       result.add(ATGlobal.getALGORITHMfilename(project.getProject().getProjectRootDir(), algName));  
             
       // MainClass.java
-      String mainClass = ATTools.stripFilenameExtension((String)project.getAlgorithms().get(algName).getField(EAlgorithm.ID_MainClassName));
+      String mainClass = project.getAlgorithms().get(algName).getAlgorithmClassname();
       String srcDir    = ATGlobal.getALGORITHMsrc(project.getProject().getProjectRootDir(), algName);
       result.add(srcDir + File.separator + mainClass + ".java");
     } catch (Exception e) {}

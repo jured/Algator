@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import si.fri.adeserver.ADETask;
 import si.fri.adeserver.ADETools;
 import si.fri.adeserver.TaskStatus;
+import si.fri.algotest.entities.AlgorithmLanguage;
 import si.fri.algotest.entities.EAlgorithm;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.EResultDescription;
@@ -38,7 +39,7 @@ public class Executor {
     String projRoot = projekt.getProjectRootDir();
 
     // the classes to be compiled
-    String algTPL     = projekt.getAlgorithmClassname();
+    String algTPL     = projekt.getAbstractAlgorithmClassname();
     String testCase   = projekt.getTestCaseClassname();
     String tsIterator = projekt.getTestSetIteratorClassName();
 
@@ -80,7 +81,7 @@ public class Executor {
 
     String algSrc   = ATGlobal.getALGORITHMsrc(projRoot, algName);
     String algBin   = ATGlobal.getALGORITHMbin(projRoot, algName);
-    String algClass = eAlgorithm.getField(EAlgorithm.ID_MainClassName);
+    String algClass = eAlgorithm.getAlgorithmClassname();
 
     if (mType.equals(MeasurementType.CNT)) {
       testAndCreateCOUNTClass(algSrc, algClass);
@@ -200,54 +201,70 @@ public class Executor {
     if (!(alwaysRun || alwaysCompile) && resultsAreUptodate && resultsAreComplete) {
       return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg + " - nothing to be done.");
     }
-
-    if (projectMakeCompile(project.getProject(), alwaysCompile) != ErrorStatus.STATUS_OK) {
-      return ErrorStatus.getLastErrorStatus();
-    }
-
-    if (algorithmMakeCompile(project.getProject(), eAlgorithm, mType, alwaysCompile) != ErrorStatus.STATUS_OK) {
-      return ErrorStatus.getLastErrorStatus();
-    }
-
-    AbstractTestSetIterator tsIt = New.testsetIteratorInstance(project, algName);
-    tsIt.setTestSet(eTestSet);
-
-    notificator.setNumberOfInstances(numberOfInstances);
-
-    // prepare file for results
-    File resFile;
-    try {
-      String resFilename = ATGlobal.getRESULTfilename(projRoot, algName, testSetName, mType);
-      File resPath = new File(ATTools.extractFilePath(new File(resFilename)));
-      if (!resPath.exists()) {
-        resPath.mkdirs();
-      }
-      resFile = new File(resFilename);
-      if (resFile.exists())
-        resFile.delete();
-    } catch (Exception e) {
-      return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
-    }
-
+    
     ADETask tmpTask = new ADETask(project.getName(), algName, testSetName, mType.getExtension(), false);
     tmpTask.set(ADETask.ID_AssignedComputer, ATGlobal.getThisComputerID());
-    try {
 
-      if (mType.equals(MeasurementType.EM) || mType.equals(MeasurementType.CNT)) 
-        ExternalExecutor.iterateTestSetAndRunAlgorithm(project, algName, tsIt, resDesc, notificator, mType, resFile);
-      else
-        VMEPExecutor.iterateTestSetAndRunAlgorithm(project, algName, testSetName, resDesc, tsIt, notificator, resFile);
 
-      if (ErrorStatus.getLastErrorStatus().isOK()) {  
-        ADETools.writeTaskStatus(tmpTask,  TaskStatus.COMPLETED, null, ATGlobal.getThisComputerID());
-        return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg + " - done.");
-      } else  {// execution failed 
-        ADETools.writeTaskStatus(tmpTask,  TaskStatus.FAILED, ErrorStatus.getLastErrorStatus().toString(), ATGlobal.getThisComputerID());
+    if (eAlgorithm.getLanguage().equals(AlgorithmLanguage.C)) { // C algorithm
+      int testRepeat = eTestSet.getFieldAsInt(ETestSet.ID_TestRepeat);
+      
+      int timeLimit  = eTestSet.getFieldAsInt(ETestSet.ID_TimeLimit);
+      if (timeLimit <=0) timeLimit = 10; // default timeLimit: 10 sec per test
+        
+      int timeAllowed = testRepeat * timeLimit * numberOfInstances;
+        
+      CExecutor.runWithLimitedTime(project.getName(), algName, testSetName, mType.getExtension(), timeAllowed);
+        
+    } else {    //java
+    
+      if (projectMakeCompile(project.getProject(), alwaysCompile) != ErrorStatus.STATUS_OK) {
         return ErrorStatus.getLastErrorStatus();
-      } 
-    } catch (Exception e) {
+      }
+
+      if (algorithmMakeCompile(project.getProject(), eAlgorithm, mType, alwaysCompile) != ErrorStatus.STATUS_OK) {
+        return ErrorStatus.getLastErrorStatus();
+      }
+
+      AbstractTestSetIterator tsIt = New.testsetIteratorInstance(project, algName);
+      tsIt.setTestSet(eTestSet);
+
+      notificator.setNumberOfInstances(numberOfInstances);
+
+      // prepare file for results
+      File resFile;
+      try {
+        String resFilename = ATGlobal.getRESULTfilename(projRoot, algName, testSetName, mType);
+        File resPath = new File(ATTools.extractFilePath(new File(resFilename)));
+        if (!resPath.exists()) {
+          resPath.mkdirs();
+        }
+        resFile = new File(resFilename);
+        if (resFile.exists())
+          resFile.delete();
+      } catch (Exception e) {
+        return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
+      }
+
+
+      try {
+        if (mType.equals(MeasurementType.EM) || mType.equals(MeasurementType.CNT)) 
+          ExternalExecutor.iterateTestSetAndRunAlgorithm(project, algName, tsIt, resDesc, notificator, mType, resFile);
+        else
+          VMEPExecutor.iterateTestSetAndRunAlgorithm(project, algName, testSetName, resDesc, tsIt, notificator, resFile);
+      } catch (Exception e) {
         ADETools.writeTaskStatus(tmpTask,  TaskStatus.FAILED, ErrorStatus.ERROR_CANT_RUN.toString(), ATGlobal.getThisComputerID());
         return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
-    }
+      }
+    } // end java execution
+      
+
+    if (ErrorStatus.getLastErrorStatus().isOK()) {  
+      ADETools.writeTaskStatus(tmpTask,  TaskStatus.COMPLETED, null, ATGlobal.getThisComputerID());
+      return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg + " - done.");
+    } else  {// execution failed 
+      ADETools.writeTaskStatus(tmpTask,  TaskStatus.FAILED, ErrorStatus.getLastErrorStatus().toString(), ATGlobal.getThisComputerID());
+      return ErrorStatus.getLastErrorStatus();
+    } 
   }
 }

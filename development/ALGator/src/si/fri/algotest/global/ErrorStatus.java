@@ -156,6 +156,12 @@ public enum ErrorStatus {
     }
   },
   
+  ERROR_EXECUTING_C {
+    public String toString() {
+      return "Error: Problems occured while executing algatorc." ;
+    }
+  },
+  
   PROCESS_KILLED {
     public String toString() {
       return "Msg: Process was killed.";

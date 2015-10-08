@@ -104,7 +104,7 @@ public class New {
       // ClassLoader classLoader = getClassloader(project, algName);
       ClassLoader classLoader = getClassloader(getClassPathsForAlgorithm(project, algName));
       
-      String algClassName = project.getAlgorithms().get(algName).getField(EAlgorithm.ID_MainClassName);
+      String algClassName = project.getAlgorithms().get(algName).getAlgorithmClassname();
 
       if (mType.equals(MeasurementType.CNT)) {
         algClassName += ATGlobal.COUNTER_CLASS_EXTENSION;

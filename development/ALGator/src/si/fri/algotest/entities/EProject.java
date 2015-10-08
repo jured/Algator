@@ -28,7 +28,7 @@ public class EProject extends Entity {
   public static final String ID_JVMExecFamily         = "JVMExecFamily";        // String
 
 //  Depricated. In current version, java files MUST be named according to the following :
-//     AlgorithmClass        === <project_name>Algorithm.java
+//     AlgorithmClass        === <project_name>AbstractAlgorithm.java
 //     TestCaseClass         === <project_name>TestCase.java
 //     TestSetIteratorClass  === <project_name>TestSetIterator.java
 //
@@ -103,8 +103,8 @@ public class EProject extends Entity {
   
 
   // Names of java classes for the project
-  public String getAlgorithmClassname() {
-    return getName() + "Algorithm";
+  public String getAbstractAlgorithmClassname() {
+    return getName() + "AbsAlgorithm";
   }
   public String getTestCaseClassname() {
     return getName() + "TestCase";

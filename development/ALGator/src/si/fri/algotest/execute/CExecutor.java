@@ -3,6 +3,7 @@ package si.fri.algotest.execute;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import si.fri.algotest.global.ATGlobal;
+import si.fri.algotest.global.ATLog;
 import si.fri.algotest.global.ErrorStatus;
 
 /**
@@ -12,7 +13,7 @@ import si.fri.algotest.global.ErrorStatus;
 public class CExecutor {
 
   public static Object runWithAlgatorC(String project_name, String alg_name, String testset_name, String mType) {    
-    System.out.printf("... running algatorc -e %s %s %s %s\n", project_name, alg_name, testset_name, mType);
+    ATLog.log(String.format("Running algatorc -e %s %s %s %s", project_name, alg_name, testset_name, mType), 3);
     try {      
       String algatorCCommand = "algatorc";            
       String[] command = {algatorCCommand, "-e", project_name, alg_name, testset_name};      

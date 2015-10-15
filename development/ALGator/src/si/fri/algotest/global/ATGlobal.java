@@ -44,7 +44,7 @@ public class ATGlobal {
   private static final String ATDIR_queryOutput    = "output";
   
   private static final String ATDIR_logDir         = "log";
-  private static final String ATDIR_algatorLOGfile = "log";
+  private static final String ATDIR_algatorLOGfile = "algator.log";
   private static final String ATDIR_taskLogDir     = "tasks";
   
   private static final String ATDIR_tmpDir         = "tmp";

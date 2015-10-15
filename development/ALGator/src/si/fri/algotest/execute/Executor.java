@@ -17,6 +17,7 @@ import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.ParameterSet;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.global.ATGlobal;
+import si.fri.algotest.global.ATLog;
 import si.fri.algotest.tools.ATTools;
 import static si.fri.algotest.tools.ATTools.compile;
 import si.fri.algotest.global.ErrorStatus;
@@ -172,7 +173,8 @@ public class Executor {
     }
 
     String runningMsg = String.format("Running [%s, %s, %s]", mType.getExtension(), testSetName, algName);
-    ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg);
+    ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, "");
+    ATLog.log(runningMsg, 3);
 
     String projRoot = project.getProject().getProjectRootDir();
     String proj_name = project.getProject().getName();

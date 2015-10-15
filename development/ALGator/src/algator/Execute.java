@@ -130,8 +130,9 @@ public class Execute {
       new Notificator() {
       
       public void notify(int i, ExecutionStatus status) {
-        System.out.println(String.format("[%s, %s, %s]: test %3d / %-3d - %s", 
-          alg, testSet, mt.getExtension(), i, this.getN(),status.toString()));
+        if ((ATLog.getLogTarget() & ATLog.LOG_TARGET_STDOUT) != 0)
+          System.out.println(String.format("[%s, %s, %s]: test %3d / %-3d - %s", 
+            alg, testSet, mt.getExtension(), i, this.getN(),status.toString()));
         
         String statusMsg = String.format("%d/%d # %d%c", i, getN(), 100*i/this.getN(), '%');
         ADETask tmpTask = new ADETask(proj, alg, testSet, mt.getExtension(), true);
@@ -224,6 +225,8 @@ public class Execute {
       
       ATGlobal.logTarget = ATLog.LOG_TARGET_STDOUT;
       if (line.hasOption("log")) {
+        if (line.getOptionValue("log").equals("0"))
+          ATGlobal.logTarget = ATLog.LOG_TARGET_OFF;
         if (line.getOptionValue("log").equals("2"))
           ATGlobal.logTarget = ATLog.LOG_TARGET_FILE;
         if (line.getOptionValue("log").equals("3"))
@@ -317,19 +320,19 @@ public class Execute {
       ErrorStatus error = ErrorStatus.STATUS_OK;
       for (int i = 0; i < eAlgs.size(); i++) {
 	for (int j = 0; j < eTests.size(); j++) {
-          ATLog.setPateFilename(ATGlobal.getTaskHistoryFilename(projName, algName, testsetName, mType.getExtension()));
+          ATLog.setPateFilename(ATGlobal.getTaskHistoryFilename(projName, eAlgs.get(i).getName(), eTests.get(j).getName(), mType.getExtension()));
           Notificator notificator = getNotificator(projName, eAlgs.get(i).getName(), eTests.get(j).getName(), mType);
 	  error = Executor.algorithmRun(projekt, eAlgs.get(i).getName(), 
 		  eTests.get(j).getName(),  mType, notificator, alwaysCompile, alwaysRun); 
           
           // when execution failes, all batch is canceled
-          // Is this a good idea? 
-          if (!error.equals(ErrorStatus.STATUS_OK)) {
-            System.exit(error.ordinal());
-          }
-	}
-        System.exit(ErrorStatus.STATUS_OK.ordinal()); // 0
-      }      
+          // Is this a good idea?  Probably not!
+          // if (!error.equals(ErrorStatus.STATUS_OK)) {
+          //  System.exit(error.ordinal());
+          //}
+	}        
+      }
+      System.exit(ErrorStatus.STATUS_OK.ordinal()); // 0
     }
   }
 }

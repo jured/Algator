@@ -189,13 +189,13 @@ public enum ErrorStatus {
       return status;
     
     if (status.isOK())
-      ATLog.log(msg, 2);
+      ATLog.log(msg, 3);
     else {      
       String where = String.format(" (Class: %s, Method: %s, line: %d)", 
 	      Thread.currentThread().getStackTrace()[2].getClassName(), 
 	      Thread.currentThread().getStackTrace()[2].getMethodName(),
 	      Thread.currentThread().getStackTrace()[2].getLineNumber());   
-      ATLog.log(status + (msg.isEmpty() ? "" : " -- ") + msg + where, 2);
+      ATLog.log(status + (msg.isEmpty() ? "" : " -- ") + msg + where, 3);
     }
     
     return status;

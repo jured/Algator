@@ -33,11 +33,13 @@ public class ATLog {
   private static String pateFilename = "";
   public static void setPateFilename(String pateFN) {
     pateFilename = pateFN;
-    
-    // ob priklopu na datoteko izpišem ločilo, da so logi jasno ločeni eden od drugega
-    try (PrintWriter pw = new PrintWriter(new FileWriter(new File(pateFN), true))) {
-      pw.println("-------------------------------------------------------------");
-    } catch (Exception e) {}
+
+    if (logTarget == LOG_TARGET_FILE) {
+      // ob priklopu na datoteko izpišem ločilo, da so logi jasno ločeni eden od drugega
+      try (PrintWriter pw = new PrintWriter(new FileWriter(new File(pateFN), true))) {
+        pw.println("-------------------------------------------------------------");
+      } catch (Exception e) {}
+    }
   }
   
   
@@ -52,6 +54,10 @@ public class ATLog {
   public static void setLogTarget(int target) {
     logTarget = target;
     lastLogTarget = logTarget;    
+  }
+  
+  public static int getLogTarget() {
+    return logTarget;
   }
   
   /**

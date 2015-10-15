@@ -1,10 +1,13 @@
 package si.fri.algotest.execute;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
+import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ATLog;
 import si.fri.algotest.global.ErrorStatus;
+import si.fri.algotest.tools.ATTools;
 
 /**
  *
@@ -30,14 +33,27 @@ public class CExecutor {
   // !!! Metoda je zelo podobna metodi runWithLimitedTime v WMEPExecutor. Ali res morata biti dve metodi???
   // Poglej, če bi lahko kaj ponovno uporabil???
   /**
-   * Using external program (algatorc), method executes given task. If task does not finish in 
-   * timeAllowed seconds, algatorc is killed and ErrorStatus.PROCESS_KILLED is returned. Otherwise,
-   * if algatorC exit status != 0, ErrorStatus.ERROR_EXECUTING_C is returned.
-   * If task finishes correctly, ErrorStatus.STATUS_OK is returned.
+   * Using external program (algatorc), method executes given task. 
+   * 
+   * Every timeForOneTest seconds the content of resultFile is checked; if it does not contain 
+   * secondsPassed/timeForOneTest lines, method killes the process and returns ErrorStatus.PROCESS_KILLED.
+   * 
+   * Otherwise, if algatorC exit with status != 0, ErrorStatus.ERROR_EXECUTING_C is returned.
+   *
+   * Otherwise, task finished correctly, ErrorStatus.STATUS_OK is returned.
    */  
-  static void runWithLimitedTime(String project_name, String alg_name, String testset_name, String mType, int timeLimit) {    
+  static void runWithLimitedTime(String project_name, String alg_name, String testset_name, String mType, 
+          int numberOfTests, int timeForOneTest) {    
+
     ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, "");
     
+    
+    //!!! TODO: ko bo algatorc popravljen in bo rezultate pisal v pravi direktorij (F#.C#), popravi
+    // "" v spodnji kodi! Namesto "" piši ATGlobal.getThisComputerID()
+    String resultFileName = ATGlobal.getRESULTfilename(project_name, alg_name, testset_name, 
+            MeasurementType.valueOf(mType), "");
+    File resultFile = new File(resultFileName);
+        
     Object result =  runWithAlgatorC(project_name, alg_name, testset_name, mType);
       
     // during the process creation, an error occured
@@ -48,17 +64,20 @@ public class CExecutor {
     
     Process externProcess = (Process) result;
     
-    // loop and wait for process to finish
-    int loop_per_sec  = 10;
-    int secondsPassed = 0;
+    int timeLimit = numberOfTests * timeForOneTest;
+    int loop_per_sec  = 10, secondsPassed = 0;
     whileloop: while (timeLimit > 0) {
       // loop for one second
       for(int i=0; i<loop_per_sec; i++) {
         if (processExitCode(externProcess) >= 0)
           break whileloop;        
         try {Thread.sleep(1000/loop_per_sec);} catch (InterruptedException e) {}
-      }
+      }       
       timeLimit--; secondsPassed++;
+      
+      int linesExpected = secondsPassed / timeForOneTest;
+      if (ATTools.getNumberOfLines(resultFile) < linesExpected)
+        break whileloop;
     }
     
     int exitCode = processExitCode(externProcess);
@@ -68,7 +87,7 @@ public class CExecutor {
         ErrorStatus.setLastErrorMessage(ErrorStatus.PROCESS_KILLED, String.format("(after %d sec.)", (int)secondsPassed)); 
         externProcess.destroy();
         return;
-      } catch (Exception e) {}
+      } catch (Exception e) {}// can't do anything 
     }
     
     try {

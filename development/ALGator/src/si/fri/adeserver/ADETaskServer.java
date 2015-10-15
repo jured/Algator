@@ -252,7 +252,8 @@ public class ADETaskServer implements Runnable {
   }
   
   private String processRequest(String request) {
-    ADELog.log("REQUEST: " + request);
+    if (!request.toUpperCase().startsWith(ADEGlobal.REQ_GET_NEXT_TASK.toString().toUpperCase()))
+      ADELog.log("REQUEST: " + request);
     
     String [] parts = request.split(" ");
     if (parts.length == 0) return "";

@@ -15,6 +15,7 @@ import org.apache.commons.cli.ParseException;
 import si.fri.adeserver.ADEGlobal;
 import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.global.ATGlobal;
+import si.fri.algotest.global.ATLog;
 
 /**
  *
@@ -127,7 +128,7 @@ public class TaskClient {
         System.out.println(askTaskServer(serverName, request));
         System.exit(0);
       }
-      
+            
       si.fri.aeeclient.AEETaskClient.runClient(serverName);
       
     } catch (ParseException ex) {

@@ -1,8 +1,11 @@
 package si.fri.algotest.tools;
 
+import java.io.BufferedInputStream;
 import si.fri.algotest.global.ErrorStatus;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -463,16 +466,36 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
 
     
   public static int getNumberOfLines(String filename) {
-    int noLines = 0;
-    try (Scanner sc = new Scanner(new File(filename))) {
-      while (sc.hasNextLine()) {
-        sc.nextLine(); noLines++;
-      }
+    return getNumberOfLines(new File(filename));
+  }
+  public static int getNumberOfLines(File file) {    
+    try (InputStream is = new BufferedInputStream(new FileInputStream(file));) {
+      byte[] c = new byte[1024];
+      int count = 0;
+      int readChars = 0;
+      boolean empty = true;
+      while ((readChars = is.read(c)) != -1) {
+        empty = false;
+        for (int i = 0; i < readChars; ++i) 
+          if (c[i] == '\n') ++count;                            
+        }
+        return (count == 0 && !empty) ? 1 : count;
     } catch (Exception e) {
-      noLines = 0;
+        return 0;
     }
-    return noLines;
-  }  
+  }
+//  tole je prepočasno, zato sem nadomestil z zgornjo kodo
+//  public static int getNumberOfLines(String filename) {
+//    int noLines = 0;
+//    try (Scanner sc = new Scanner(new File(filename))) {
+//      while (sc.hasNextLine()) {
+//        sc.nextLine(); noLines++;
+//      }
+//    } catch (Exception e) {
+//      noLines = 0;
+//    }
+//    return noLines;
+//  }  
     
   /**
    * Returns null if all the sources exists or the name of the missing source

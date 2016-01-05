@@ -42,7 +42,7 @@ public class CExecutor {
    *
    * Otherwise, task finished correctly, ErrorStatus.STATUS_OK is returned.
    */  
-  static void runWithLimitedTime(String project_name, String alg_name, String testset_name, String mType, 
+  static void runWithLimitedTime(String project_name, String alg_name, String testset_name, MeasurementType mType, 
           int numberOfTests, int timeForOneTest) {    
 
     ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, "");
@@ -50,11 +50,11 @@ public class CExecutor {
     
     //!!! TODO: ko bo algatorc popravljen in bo rezultate pisal v pravi direktorij (F#.C#), popravi
     // "" v spodnji kodi! Namesto "" piši ATGlobal.getThisComputerID()
-    String resultFileName = ATGlobal.getRESULTfilename(project_name, alg_name, testset_name, 
-            MeasurementType.valueOf(mType), "");
+    String resultFileName = ATGlobal.getRESULTfilename(project_name, alg_name, 
+            testset_name,  mType, ATGlobal.getThisComputerID());
     File resultFile = new File(resultFileName);
         
-    Object result =  runWithAlgatorC(project_name, alg_name, testset_name, mType);
+    Object result =  runWithAlgatorC(project_name, alg_name, testset_name, mType.getExtension());
       
     // during the process creation, an error occured
     if (result == null || !(result instanceof Process)) {

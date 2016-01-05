@@ -214,7 +214,7 @@ public class Executor {
       int timeLimit  = eTestSet.getFieldAsInt(ETestSet.ID_TimeLimit);
       if (timeLimit <=0) timeLimit = 10; // default timeLimit: 10 sec per test
                 
-      CExecutor.runWithLimitedTime(project.getName(), algName, testSetName, mType.getExtension(), testRepeat*timeLimit, numberOfInstances);
+      CExecutor.runWithLimitedTime(project.getName(), algName, testSetName, mType, testRepeat*timeLimit, numberOfInstances);
         
     } else {    //java
     

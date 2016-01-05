@@ -334,7 +334,9 @@ public class DataAnalyser {
    * If file exists and is fresh (never than project configuration files), method returns its content, 
    * else it runs a query, writes the result to file and returns the result.
    */
-  public static String getQueryResultTableAsString(String projectname, String query, String [] params) {    
+  public static String getQueryResultTableAsString(String projectname, String query, String [] params) {
+    if (projectname==null || projectname.isEmpty() || query==null || query.isEmpty()) return "";
+    
     if (query.startsWith("{")) {
       EProject project = new EProject(new File(ATGlobal.getPROJECTfilename(ATGlobal.getALGatorDataRoot(), projectname)));  
       EQuery eQuery = new EQuery(query, params);

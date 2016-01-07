@@ -209,6 +209,10 @@ public class Executor {
 
 
     if (eAlgorithm.getLanguage().equals(AlgorithmLanguage.C)) { // C algorithm
+      if (!mType.equals(MeasurementType.EM)) {
+        return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, runningMsg + " - can't run C algorith in " + mType.toString());
+      }
+      
       int testRepeat = eTestSet.getFieldAsInt(ETestSet.ID_TestRepeat);
       
       int timeLimit  = eTestSet.getFieldAsInt(ETestSet.ID_TimeLimit);

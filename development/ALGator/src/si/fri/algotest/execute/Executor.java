@@ -210,7 +210,7 @@ public class Executor {
 
     if (eAlgorithm.getLanguage().equals(AlgorithmLanguage.C)) { // C algorithm
       if (!mType.equals(MeasurementType.EM)) {
-        return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg + " - can't run C algorith in " + mType.toString());
+        return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, runningMsg + " - can not run C algorith in " + mType.toString());
       }
       
       int testRepeat = eTestSet.getFieldAsInt(ETestSet.ID_TestRepeat);

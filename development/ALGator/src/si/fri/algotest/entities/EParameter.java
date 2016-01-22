@@ -103,11 +103,13 @@ public class EParameter extends Entity  implements Serializable {
     Object value = get(ID_Value);
     
     // getValue() method for parameters of type DOUBLE returns a value with limited number of decimals (given in subtype) 
-    if (type.equals(ParameterType.DOUBLE) && subtype != null && !subtype.isEmpty()) {
+    if (type.equals(ParameterType.DOUBLE)) {
       int decimals = 2;
       try {
         decimals = Integer.parseInt(subtype);        
+      } catch (Exception e) {}
       
+      try {
         Double d = null;
         if (value instanceof String)
           d = Double.parseDouble((String) value);
@@ -124,6 +126,7 @@ public class EParameter extends Entity  implements Serializable {
     return value;
   }
 
+    
   @Override
   public boolean equals(Object obj) {
     return (obj instanceof EParameter && ((EParameter)obj).getName().equals(this.getName()));

@@ -3,6 +3,9 @@ package si.fri.algotest.entities;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.MessageDigestSpi;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -287,6 +290,5 @@ public class Entity implements Cloneable, Serializable {
     myClone.fieldNames      = (TreeSet)   this.fieldNames.clone();
     myClone.representatives = (ArrayList) this.representatives.clone();
     return myClone;
-  }
-   
+  } 
 }

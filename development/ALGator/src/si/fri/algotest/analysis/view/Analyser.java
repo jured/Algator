@@ -31,15 +31,17 @@ public class Analyser extends javax.swing.JFrame {
   
   ArrayList<QueryAndGraphPanel> queryAndGraphPanels;
   
+  String computerID; // the ID of computer; the results are in computerID folder
+  
   /**
    * Creates new form Analyse
    */
-  public Analyser(java.awt.Frame parent, boolean modal) {
+  public Analyser(java.awt.Frame parent, boolean modal, String computerID) {
 
     initComponents();
     queryAndGraphPanels = new ArrayList<QueryAndGraphPanel>();
     
-    QueryAndGraphPanel queryAndGraphpanel = new QueryAndGraphPanel();
+    QueryAndGraphPanel queryAndGraphpanel = new QueryAndGraphPanel(computerID);
     jPanel9.add(queryAndGraphpanel);
     queryAndGraphPanels.add(queryAndGraphpanel);
     
@@ -48,11 +50,11 @@ public class Analyser extends javax.swing.JFrame {
     izPrograma = false;
   }
 
-  public Analyser(final Project project) {
+  public Analyser(final Project project, final String computerID) {
     java.awt.EventQueue.invokeLater(new Runnable() {
       public void run() {
-	Analyser dialog = new Analyser(new javax.swing.JFrame(), true);
-        dialog.setProject(project); 
+	Analyser dialog = new Analyser(new javax.swing.JFrame(), true, computerID);
+        dialog.setProject(project, computerID); 
 	dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 	  @Override
 	  public void windowClosing(java.awt.event.WindowEvent e) {
@@ -65,12 +67,13 @@ public class Analyser extends javax.swing.JFrame {
   }
   
   
-  public void setProject(Project project) {
+  public void setProject(Project project, String computerID) {
     if (project == null) return;
     
     this.project = project;
+    this.computerID = computerID;
     
-    setTitle(String.format("ALGator analyzer - [%s] ", project.getProject().getName()));
+    setTitle(String.format("ALGator analyzer - [%s] ", project.getEProject().getName()));
     
     getCurrentQAG().setProject(project);
   }
@@ -86,7 +89,7 @@ public class Analyser extends javax.swing.JFrame {
       String queryName = "Query" + (++lastQueryNumber);
       int tabCount = jTabbedPane1.getTabCount();
       
-      QueryAndGraphPanel qagp = new QueryAndGraphPanel();
+      QueryAndGraphPanel qagp = new QueryAndGraphPanel(computerID);
       queryAndGraphPanels.add(qagp);
       qagp.setProject(project);
       
@@ -104,7 +107,7 @@ public class Analyser extends javax.swing.JFrame {
     if (project==null) return;
     JFileChooser jfc = new JFileChooser();
     
-    String queryRoot = ATGlobal.getQUERIESroot(project.getProject().getProjectRootDir());
+    String queryRoot = ATGlobal.getQUERIESroot(project.getEProject().getProjectRootDir());
     
     jfc.setCurrentDirectory(new File(queryRoot));
     jfc.setFileFilter(new FileFilter() {
@@ -146,7 +149,7 @@ public class Analyser extends javax.swing.JFrame {
     if (project==null) return;
     JFileChooser jfc = new JFileChooser();
     
-    String queryRoot = ATGlobal.getQUERIESroot(project.getProject().getProjectRootDir());
+    String queryRoot = ATGlobal.getQUERIESroot(project.getEProject().getProjectRootDir());
     
     jfc.setCurrentDirectory(new File(queryRoot));
     jfc.setFileFilter(new FileFilter() {

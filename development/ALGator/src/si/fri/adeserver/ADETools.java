@@ -257,7 +257,7 @@ public class ADETools {
       // TODO: tu bi lahko preveril, če so algoritem, testset in mtype pravilni (so definirani v projektu)
             
       MeasurementType mt = task.getMType();      
-      String myFamily = project.getProject().getProjectFamily(mt);
+      String myFamily = project.getEProject().getProjectFamily(mt);
             
       // generate a list of computer that are capable to execute a given task
       ComputerCapability requiredCompCap = ComputerCapability.getComputerCapability(mt.getExtension());      

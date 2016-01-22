@@ -14,8 +14,9 @@ import si.fri.algotest.entities.MeasurementType;
  */
 public class ATGlobal {
 
-  private static String ALGatorRoot     = System.getenv("ALGATOR_ROOT");
-  private static String ALGatorDataRoot = System.getenv("ALGATOR_DATA_ROOT");
+  private static String ALGatorRoot      = System.getenv("ALGATOR_ROOT");
+  private static String ALGatorDataRoot  = System.getenv("ALGATOR_DATA_ROOT");
+  private static String ALGatorDataLocal = System.getenv("ALGATOR_DATA_LOCAL");
   
   
   public static int logTarget = 1;    // stdout
@@ -30,6 +31,7 @@ public class ATGlobal {
   public static final String AT_FILEEXT_query      = "atqd";
 
   // For the structure of the Project folder see ALGator.docx documentation
+  private static final String ATDIR_data_local     = "data_local";
   private static final String ATDIR_data_root      = "data_root";
   private static final String ATDIR_projects       = "projects";  
   private static final String ATDIR_projRootDir    = "PROJ-%s";
@@ -75,11 +77,22 @@ public class ATGlobal {
     return result;
   }
 
+  public static String getALGatorDataLocal() {
+    String result = ALGatorDataLocal;
+    if (result == null || result.isEmpty())
+      result = getALGatorRoot() + File.separator + ATDIR_data_local;
+    return result;
+  }
+  
+  
   public static void setALGatorRoot(String algatorRoot) {
     ALGatorRoot = algatorRoot;
   }
   public static void setALGatorDataRoot(String dataRoot) {
     ALGatorDataRoot = dataRoot;
+  }
+  public static void setALGatorDataLocal(String dataLocal) {
+    ALGatorDataLocal = dataLocal;
   }
 
   
@@ -113,7 +126,16 @@ public class ATGlobal {
        String.format("%s-%s-%s-%s.history", project, algorithm, testset, mtype);
   }
 
-  
+  /**
+   * Extracts and returns the data root folder from the project root folder.
+   * Example: /ALGATOR_ROOT/data_root/projects/PROJ-Sorting -> /ALGATOR_ROOT/data_root
+   */
+  public static String getDataRootFromProjectRoot(String projRoot) {
+    //     /projects/PROJ-
+    String middleStr = File.separator + ATDIR_projects + File.separator + String.format(ATDIR_projRootDir, "");
+    int pos = projRoot.lastIndexOf(middleStr);
+    return (pos != -1 ? projRoot.substring(0, pos) : projRoot);
+  }
   
   /**
    * Returns the root of the project
@@ -207,9 +229,6 @@ public class ATGlobal {
    * The name of a file containing results of the execution of the algorithm
    * {@code algName} on test set {@code testSetName}.
    */
-  public static String getRESULTfilename(String projectRoot, String algName, String testSetName, MeasurementType measurementType) {
-    return getRESULTfilename(projectRoot, algName, testSetName, measurementType, getThisComputerID());
-  }
   public static String getRESULTfilename(String projectRoot, String algName, String testSetName, MeasurementType measurementType, String computerID) {
     return getRESULTSroot(projectRoot, computerID) + File.separator + algName + "-" + testSetName + "." + measurementType.getExtension();
   }
@@ -285,7 +304,7 @@ public class ATGlobal {
   
   
   public static final String getBuildNumber() { 
-   String msg = "/unknown/"; 
+   String msg; 
    try { 
      // resource bundle that provides the build number
      ResourceBundle versionRB = ResourceBundle.getBundle("version"); 

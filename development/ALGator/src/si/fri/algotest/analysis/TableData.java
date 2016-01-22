@@ -3,6 +3,7 @@ package si.fri.algotest.analysis;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import si.fri.algotest.entities.ParameterType;
 import si.fri.algotest.entities.StatFunction;
@@ -357,17 +358,41 @@ public class TableData {
 
   @Override
   public String toString() {
+    if (data==null || data.size()==0) return "";
+      
+    // iz rezultata izloci vse stolpce, v katerih se pojavljajo same ničle (0), vprašaji (?) ali null    ArrayList<ArrayList<Object>> clearedData   = (ArrayList) data  .clone();;
+    HashSet<Integer> emptyRows = new HashSet();    
+    for (int j = 0; j < data.get(0).size(); j++) {      
+      boolean allUndefined = true;
+      for (int i = 1; i < data.size(); i++) {
+        try {
+          Object object = data.get(i).get(j);
+          if (object != null && !object.toString().isEmpty() && !"0".equals(object.toString()) && !"?".equals(object.toString())) {
+            // found defined value - column will not be deleted
+            allUndefined=false;
+            break;
+          }
+        } catch (Exception e) {};
+      }
+      if (allUndefined) {
+        emptyRows.add(j);
+      }
+    }
+    
+    
     String result = "";
     for (int i = 0; i < header.size(); i++) {
-      result = add(result, header.get(i), delim);
+      if (!emptyRows.contains(i))
+        result = add(result, header.get(i), delim);
     }
 
     for (int i = 0; i < data.size(); i++) {
       String vrstica = "";
       for (int j = 0; j < data.get(i).size(); j++) {
-        Object object = data.get(i).get(j);
-        String value  = object != null ? object.toString() : "null";
+        if (emptyRows.contains(j)) continue;
         
+        Object object = data.get(i).get(j);
+        String value  = object != null ? object.toString() : "null";        
         vrstica = add(vrstica, value, delim);
       }
       result = add(result, vrstica, "\n");
@@ -383,7 +408,7 @@ public class TableData {
     String operator = izraz.substring(f[0].length(),izraz.indexOf(f[1]));
     System.out.printf("'%s'\n", operator);
     
-    System.out.println("abc".substring(-1,5));
+    System.out.println("abc".substring(01,5));
   }
   
   

@@ -213,7 +213,7 @@ public class ATTools {
     
     try {
       Project project = new Project(ATGlobal.getALGatorDataRoot(), projectname);    
-      EQuery   query   = new EQuery(new File(ATGlobal.getQUERYfilename(project.getProject().getProjectRootDir(), queryname)), params);
+      EQuery   query   = new EQuery(new File(ATGlobal.getQUERYfilename(project.getEProject().getProjectRootDir(), queryname)), params);
 
       result.add(query.entity_file_name);
       
@@ -237,26 +237,26 @@ public class ATTools {
   
   private static HashSet<String> getFilesForProject(Project project) {
     HashSet<String> result = new HashSet<>();  
-    if (project==null ||  project.getProject()== null) return result;
+    if (project==null ||  project.getEProject()== null) return result;
     
     try {
       // Project.atp
-      result.add(ATGlobal.getPROJECTfilename(project.dataRoot, project.getName()));
+      result.add(ATGlobal.getPROJECTfilename(project.getDataRoot(), project.getName()));
       
       // project src files
-      String algTPL     = project.getProject().getAbstractAlgorithmClassname();
-      String testCase   = project.getProject().getTestCaseClassname();
-      String tsIterator = project.getProject().getTestSetIteratorClassName();
+      String algTPL     = project.getEProject().getAbstractAlgorithmClassname();
+      String testCase   = project.getEProject().getTestCaseClassname();
+      String tsIterator = project.getEProject().getTestSetIteratorClassName();
       
-      String projSrc    = ATGlobal.getPROJECTsrc(project.getProject().getProjectRootDir());
+      String projSrc    = ATGlobal.getPROJECTsrc(project.getEProject().getProjectRootDir());
       result.add(projSrc + File.separator + algTPL     + ".java");
       result.add(projSrc + File.separator + testCase   + ".java");
       result.add(projSrc + File.separator + tsIterator + ".java");
       
-      URL[] proJARs = ATTools.getURLsFromJARs(project.getProject().getStringArray(EProject.ID_ProjectJARs), ATGlobal.getPROJECTlib(project.getProject().getProjectRootDir()));
+      URL[] proJARs = ATTools.getURLsFromJARs(project.getEProject().getStringArray(EProject.ID_ProjectJARs), ATGlobal.getPROJECTlib(project.getEProject().getProjectRootDir()));
       for (URL url : proJARs) result.add(url.toString());
 
-      URL[] algJARs = ATTools.getURLsFromJARs(project.getProject().getStringArray(EProject.ID_AlgorithmJARs), ATGlobal.getPROJECTlib(project.getProject().getProjectRootDir()));
+      URL[] algJARs = ATTools.getURLsFromJARs(project.getEProject().getStringArray(EProject.ID_AlgorithmJARs), ATGlobal.getPROJECTlib(project.getEProject().getProjectRootDir()));
       for (URL url : algJARs) result.add(url.getFile());                        
     } catch (Exception e) {}
     return result;
@@ -265,11 +265,11 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
     HashSet<String> result = new HashSet<>();    
     try {
       // <algorithm>.atal
-      result.add(ATGlobal.getALGORITHMfilename(project.getProject().getProjectRootDir(), algName));  
+      result.add(ATGlobal.getALGORITHMfilename(project.getEProject().getProjectRootDir(), algName));  
             
       // MainClass.java
       String mainClass = project.getAlgorithms().get(algName).getAlgorithmClassname();
-      String srcDir    = ATGlobal.getALGORITHMsrc(project.getProject().getProjectRootDir(), algName);
+      String srcDir    = ATGlobal.getALGORITHMsrc(project.getEProject().getProjectRootDir(), algName);
       result.add(srcDir + File.separator + mainClass + ".java");
     } catch (Exception e) {}
     return result;
@@ -279,11 +279,11 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
     HashSet<String> result = new HashSet<>();    
     try {
       // TestSetX.atts
-      result.add(ATGlobal.getTESTSETfilename(project.getProject().getProjectRootDir(), testsetName));
+      result.add(ATGlobal.getTESTSETfilename(project.getEProject().getProjectRootDir(), testsetName));
 
       // testsetX.txt
       String descFile = project.getTestSets().get(testsetName).getField(ETestSet.ID_DescFile);
-      result.add(ATGlobal.getTESTSroot(project.getProject().getProjectRootDir()) + File.separator + descFile);      
+      result.add(ATGlobal.getTESTSroot(project.getEProject().getProjectRootDir()) + File.separator + descFile);      
     } catch (Exception e) {}
     return result;
   }
@@ -292,7 +292,7 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
     HashSet<String> result = new HashSet<>();    
     try {
       // Project-[mtype].atrd
-      result.add(ATGlobal.getRESULTDESCfilename(project.getProject().getProjectRootDir(), project.getName(), MeasurementType.valueOf(mType)));    
+      result.add(ATGlobal.getRESULTDESCfilename(project.getEProject().getProjectRootDir(), project.getName(), MeasurementType.valueOf(mType)));    
     } catch (Exception e) {}
     return result;
   }
@@ -365,14 +365,14 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
    * Namen: metoda vrne datoteko z rezultati za dan trojček algoritem-testset-mtype. Ker lahko obstaja več datotek, 
    * ki vsebujejo te rezultate (če so, na primer, različni računalniki izvedli isti task), moram izbrati eno izmed 
    * njih. Izbiram po naslednjem postopku: najprej določim aktualne družine računalnikov. To je project.family, če 
-   * obstaja, sicer so to vse obstoječe družine. Potem za vse računalnike obstoječih družin po vrsti pregledujem
+   * obstaja, sicer so to vse obstoječe družine. Potem za vse računalnike izbranih družin po vrsti pregledujem
    * datoteke in vrnem PRVO up-todat ali complete ali non-empty datoteko.
    */
   public static String getTaskResultFileName(Project project, String algorithmName, String testsetName, String mType) {              
     MeasurementType mt = MeasurementType.UNKNOWN;
     try {mt = MeasurementType.valueOf(mType.toUpperCase());} catch (Exception e) {}
 
-    String familyName = project.getProject().getProjectFamily(mt);
+    String familyName = project.getEProject().getProjectFamily(mt);
     EGlobalConfig config = EGlobalConfig.getConfig();
     
     // The families that are to be checked
@@ -406,19 +406,16 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
           // uptodate file was found!
           return threeFiles[2];
         }
-        if (firstNonEmptyFile.isEmpty() && !threeFiles[0].isEmpty())
-          firstNonEmptyFile = threeFiles[0];
-        if (firstCompleteFile.isEmpty() && !threeFiles[1].isEmpty())
-          firstCompleteFile = threeFiles[1];                 
+        if (firstNonEmptyFile.isEmpty() && !threeFiles[1].isEmpty())
+          firstNonEmptyFile = threeFiles[1];
+        if (firstCompleteFile.isEmpty() && !threeFiles[0].isEmpty())
+          firstCompleteFile = threeFiles[0];                 
       }
     }
     if (!firstCompleteFile.isEmpty())
       return firstCompleteFile;
     else
-      return firstNonEmptyFile;
-    
-    // default result filename
-    //return ATGlobal.getRESULTfilename(project.getProject().getProjectRootDir(), algorithmName, testsetName, mt);          
+      return firstNonEmptyFile;    
   }
 
   
@@ -438,7 +435,7 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
     // for all computer in given family ...
     for (EComputer computer : compFamily.getComputers()) {
       String computerID = thisFamilyID + "." + computer.getField(EComputer.ID_ComputerID); 
-      String resultFileName = ATGlobal.getRESULTfilename(project.getProject().getProjectRootDir(), 
+      String resultFileName = ATGlobal.getRESULTfilename(project.getEProject().getProjectRootDir(), 
               algorithmName, testsetName, mType, computerID);             
         
       // check the corresponding [algorithm]-[testset].[mtype] file 
@@ -484,18 +481,6 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
         return 0;
     }
   }
-//  tole je prepočasno, zato sem nadomestil z zgornjo kodo
-//  public static int getNumberOfLines(String filename) {
-//    int noLines = 0;
-//    try (Scanner sc = new Scanner(new File(filename))) {
-//      while (sc.hasNextLine()) {
-//        sc.nextLine(); noLines++;
-//      }
-//    } catch (Exception e) {
-//      noLines = 0;
-//    }
-//    return noLines;
-//  }  
     
   /**
    * Returns null if all the sources exists or the name of the missing source

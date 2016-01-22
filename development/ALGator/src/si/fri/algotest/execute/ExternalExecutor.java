@@ -86,7 +86,7 @@ public class ExternalExecutor {
           AbstractTestSetIterator it, EResultDescription resultDesc,
           Notificator notificator, MeasurementType mType, File resultFile) {
 
-    ParameterSet algResultParams;
+    ParameterSet algResultParams; 
 
     ETestSet testSet = it.testSet;
 
@@ -126,6 +126,16 @@ public class ExternalExecutor {
         testID++;
 
         TestCase testCase = it.getCurrent();
+        
+        // v testcase dodam vse parametre; to sem dodal, da se ohrani informacija o parametrih, kot so bili definirani
+        // v atrd datoteki; recimo, če je tam definiram parameter tipa double, se prej podatki o tem parametru (recimo 
+        // subtype - število decimalk) ni prenesel in se je zato vedno uporabila default vrednost. Po tej spremembi se 
+        // podatki prevailno prenesejo, upam pa, da se kaj drugega ne podre! Če se, briši spodnji dve vrstici in 
+        // poišči drugo rešitev za prenos podatkov o parametrih iz atrd datoteke!
+        for (int i=0; i<resultDesc.getParameters().size(); i++) 
+          testCase.addParameter(resultDesc.getParameters().getParameter(i), false);
+        
+        
         AbsAlgorithm curAlg = New.algorithmInstance(project, algName, mType);
         curAlg.setTimesToExecute(timesToExecute);
 
@@ -138,7 +148,7 @@ public class ExternalExecutor {
         // was algorithm properly initialized?
         executionOK = executionOK && curAlg.init(testCase) == ErrorStatus.STATUS_OK;
 
-        String tmpFolderName = ATGlobal.getTMPDir(project.dataRoot, project.projectName);
+        String tmpFolderName = ATGlobal.getTMPDir(project.getDataRoot(), project.getName());
 
         ErrorStatus executionStatus = ErrorStatus.ERROR_CANT_PERFORM_TEST;
 
@@ -332,7 +342,7 @@ public class ExternalExecutor {
 
             Long time = (Long) StatFunction.getFunctionValue(fs, list);
             EParameter timeP = new EParameter(
-                    (String) rdP.getField(Entity.ID_NAME), null, null, time);
+                    (String) rdP.getField(Entity.ID_NAME), null, ParameterType.TIMER, time);
             timeParameters.addParameter(timeP, true);
           } catch (Exception e) {
             ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR, "Subtype parameter invalid (" + e.toString() + ")");

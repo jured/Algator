@@ -24,7 +24,11 @@ public class TestCase implements Serializable {
   
   
   public void addParameter(EParameter parameter) {
-    parameters.addParameter(parameter, true);
+    addParameter(parameter, true);
+  }
+  
+  public void addParameter(EParameter parameter, boolean replaceExisting) {
+    parameters.addParameter(parameter, replaceExisting);
   }
   
   public ParameterSet getParameters() {

@@ -33,6 +33,7 @@ public class QueryAndGraphPanel extends javax.swing.JPanel {
 
   SeriesSelectNew seriesSelect1;
   private Project project = null;
+  private String computerID;
 
   Plot2DPanel plotPanel = null;
   
@@ -41,8 +42,10 @@ public class QueryAndGraphPanel extends javax.swing.JPanel {
   /**
    * Creates new form QueryAndGraphPanel
    */
-  public QueryAndGraphPanel() {
+  public QueryAndGraphPanel(String computerID) {
     initComponents();
+    
+    this.computerID = computerID;
     
     ActionListener onSeriesSelectButtonChange = new ActionListener() {
 
@@ -79,7 +82,7 @@ public class QueryAndGraphPanel extends javax.swing.JPanel {
     if (project == null) return;
     
     this.project = project;  
-    queryComposer1.setProject(project);
+    queryComposer1.setProject(project, computerID);
   }
 
   public EQuery getQuery() {
@@ -95,7 +98,7 @@ public class QueryAndGraphPanel extends javax.swing.JPanel {
     
     System.out.println(query.toJSONString(true));
 
-    TableData td = DataAnalyser.runQuery(project.getProject(), query);
+    TableData td = DataAnalyser.runQuery(project.getEProject(), query, computerID);
     if (td==null) return;
 
     // this action is triggered by many events; to prevent changing the contenet 
@@ -113,13 +116,15 @@ public class QueryAndGraphPanel extends javax.swing.JPanel {
       int start = td.header.size() > 0 && td.header.get(0).equals("#") ? 0 : 3;
       
       for (int i = start; i < td.header.size(); i++) {
-        String field = td.header.get(i);  // field = N or Java7.Tavg, ....
+        String field = td.header.get(i);  // field = N or Java7.Tavg, .... or *.EM, *.CNT, *.JVM
+        
+        if (field.startsWith("*")) continue;
         
         int pikaPos = field.lastIndexOf('.');
         String lastPart = pikaPos != -1 ? field.substring(pikaPos+1) : field;   // lastPart = only last part (N or Tavg, ...)
         
         String genField = "*." + lastPart;
-        if (outParams.contains(lastPart) && !fields.contains(genField))
+        if (/*outParams.contains(lastPart) &&*/ !fields.contains(genField))
           fields.add(genField);
         
         fields.add(field);

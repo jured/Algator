@@ -26,6 +26,11 @@ public class NAAPanel extends javax.swing.JPanel {
     nameCB.setText(name);
     abrevTF.setText(abrev);
     onChange = action;
+    
+    if (name.equals("*")) {
+      jLabel1.setVisible(false);
+      abrevTF.setVisible(false);
+    }
   }
 
   public boolean isSelected() {
@@ -80,7 +85,9 @@ public class NAAPanel extends javax.swing.JPanel {
     });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridwidth = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+    gridBagConstraints.weightx = 0.1;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
     add(nameCB, gridBagConstraints);
 

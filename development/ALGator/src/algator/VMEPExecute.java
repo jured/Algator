@@ -220,7 +220,7 @@ public class VMEPExecute {
         result.addParameter(testCase.getParameters().getParamater(EResultDescription.testIDParName), true);
            
         if (ATGlobal.verboseLevel == 2) {           
-          ATLog.log(String.format("Project: %s, Algorithm: %s, TestSet: %s, Test: %d\n", project.projectName, algName, testsetName, testNumber), 2);
+          ATLog.log(String.format("Project: %s, Algorithm: %s, TestSet: %s, Test: %d\n", project.getName(), algName, testsetName, testNumber), 2);
           ATLog.log(String.format("********* Before execution       *********************************************"), 2);
           ATLog.log(testCase.toString(), 2);
         }

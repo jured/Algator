@@ -211,7 +211,11 @@ public class ADETaskServer implements Runnable {
     for (int i = 2; i < params.size(); i++) {
       queryParams[i-2] = params.get(i);
     }
-    return DataAnalyser.getQueryResultTableAsString(params.get(0), params.get(1), queryParams);
+    String computerID = null; // ne določim imena računalnika; če ta ne bo podan v poizvedbi, se bo izbrala "najbolj primerna" result datoteka
+    
+    // v poizvedbi se pred pošiljanjem vsi presledki nadomestijo z znakom _!_, da med prenosom ne pride do tezav (zmešnjava s parametri poizvedbe)
+    String query = params.get(1).replaceAll("_!_", " ");
+    return DataAnalyser.getQueryResultTableAsString(params.get(0), query, queryParams, computerID);
   }
   
   

@@ -30,14 +30,22 @@ public class ParameterSet implements Serializable {
   
   
   /**
-   * A parameter is added to the set if it does not exist or if replaceExisting==true.  
-   * @param parameter 
+   * Če parametra ni v množici, ga dodam; če pa parameter že obstaja, potem zamenjam 
+   * samo njegovo vrednost (replaceValue==true) oziroma ne naredim ničesar (replaceValue==false)
    */
-  public void addParameter(EParameter parameter, boolean replaceExisting) {
+  public void addParameter(EParameter parameter, boolean replaceValue) {
     if (parameters.contains(parameter)) {
-      if (replaceExisting) {
-        parameters.remove(parameter);
-	parameters.add(parameter);
+      if (replaceValue) {
+        EParameter oldPar = null;
+        for (EParameter eParameter : parameters) {
+          if (eParameter.equals(parameter)) {
+            oldPar = eParameter;
+            break;
+          }
+        }
+        if (oldPar != null) {
+          oldPar.set(EParameter.ID_Value, parameter.get(EParameter.ID_Value));
+        }
       }
     } else {
       parameters.add(parameter);
@@ -106,12 +114,12 @@ public class ParameterSet implements Serializable {
        if (includeFieldNames)
          result += p.getField(EParameter.ID_NAME) + "=";
        
-       Object value = p.getField(EParameter.ID_Value);
-       if (value instanceof String) {
-         value = ((String)value).replaceAll(delim, " ").replaceAll("\n", " ");
-       }
        
-       result += value + delim;
+        Object value = p.getValue();
+        if (value instanceof String) {
+          value = ((String)value).replaceAll(delim, " ").replaceAll("\n", " ");
+        }       
+        result += value + delim;
       } else
         result += delim;
     }

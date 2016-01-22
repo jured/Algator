@@ -26,17 +26,18 @@ public class EQuery extends Entity {
   public static final String ID_Filter         = "Filter";           // String []
   public static final String ID_SortBy         = "SortBy";           // String []
   public static final String ID_Count          = "Count";            // String (1-true, other-false)
-  
+  public static final String ID_ComputerID     = "ComputerID";       // ID of computer that provides the results file; if null or "", the most suitable result file is selected
   
   public EQuery() {
    super(ID_Query, 
 	 new String [] {ID_Description, ID_Algorithms, ID_TestSets, ID_inParameters, ID_outParameters, 
-                        ID_GroupBy, ID_Filter, ID_SortBy, ID_Count});
+                        ID_GroupBy, ID_Filter, ID_SortBy, ID_Count, ID_ComputerID});
    setRepresentatives(ID_Algorithms, ID_TestSets);
   }
   
   public EQuery(String [] algs, String [] tsts, String [] inParams, String [] outParams,
-                String [] groupby, String [] filter, String [] sortby, String count) {
+                String [] groupby, String [] filter, String [] sortby, String count, 
+                String computerID) {
     this();
     
     set(ID_Algorithms,    new JSONArray(algs));
@@ -47,6 +48,7 @@ public class EQuery extends Entity {
     set(ID_Filter,        new JSONArray(filter));
     set(ID_SortBy,        new JSONArray(sortby));
     set(ID_Count,         count);
+    set(ID_ComputerID,    computerID);
   }
   
   
@@ -77,15 +79,17 @@ public class EQuery extends Entity {
    * @param id ID of parameter (i.e. ID_Algorithms)
    * @return 
    */
-  public NameAndAbrev [] getNATabFromJSONArray(String id) {
-    String [] entities = getStringArray(id);
-    
+  public NameAndAbrev [] getNATabFromJSONArray(String [] entities) {    
     NameAndAbrev [] result = new NameAndAbrev[entities.length];
     for (int i = 0; i < entities.length; i++) {
       result[i] = new NameAndAbrev(entities[i]);
     }
     
     return result;
+  }
+  public NameAndAbrev [] getNATabFromJSONArray(String id) {
+    String [] entities = getStringArray(id);
+    return getNATabFromJSONArray(entities);
   }
   
   /**

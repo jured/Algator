@@ -24,11 +24,11 @@ public class New {
   private static final HashMap<String, URLClassLoader> classloaders = new HashMap<>();
 
   public static URL[] getClassPathsForAlgorithm(Project project, String algName) {
-      String projBin = ATGlobal.getPROJECTbin(project.getProject().getProjectRootDir());
-      String algBin = ATGlobal.getALGORITHMbin(project.getProject().getProjectRootDir(), algName);
+      String projBin = ATGlobal.getPROJECTbin(project.getEProject().getProjectRootDir());
+      String algBin = ATGlobal.getALGORITHMbin(project.getEProject().getProjectRootDir(), algName);
 
-      URL[] proJARs = ATTools.getURLsFromJARs(project.getProject().getStringArray(EProject.ID_ProjectJARs), ATGlobal.getPROJECTlib(project.getProject().getProjectRootDir()));
-      URL[] algJARs = ATTools.getURLsFromJARs(project.getProject().getStringArray(EProject.ID_AlgorithmJARs), ATGlobal.getPROJECTlib(project.getProject().getProjectRootDir()));
+      URL[] proJARs = ATTools.getURLsFromJARs(project.getEProject().getStringArray(EProject.ID_ProjectJARs), ATGlobal.getPROJECTlib(project.getEProject().getProjectRootDir()));
+      URL[] algJARs = ATTools.getURLsFromJARs(project.getEProject().getStringArray(EProject.ID_AlgorithmJARs), ATGlobal.getPROJECTlib(project.getEProject().getProjectRootDir()));
       
       URLClassLoader parentclassLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
       URL[] parentURLs = parentclassLoader.getURLs();
@@ -128,7 +128,7 @@ public class New {
       ClassLoader classLoader = getClassloader(getClassPathsForAlgorithm(project, algName));
       
       String testSetIteratorClassName
-              = project.getProject().getTestSetIteratorClassName();
+              = project.getEProject().getTestSetIteratorClassName();
       Class tsClass = Class.forName(testSetIteratorClassName, true, classLoader);
       
       result = (AbstractTestSetIterator) tsClass.newInstance();

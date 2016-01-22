@@ -312,6 +312,7 @@ public class Execute {
             boolean uptodate = ATTools.resultsAreUpToDate(projekt, eAlg.getName(), eTestSet.getName(), mtype, resultFileName);
             boolean complete = ATTools.resultsAreComplete(resultFileName, expectedNumberOfInstances);
 	    
+            System.out.printf("File: '%s'\n", resultFileName);
 	    System.out.printf("                 %-23s%-15s%-7s%-9s%-9s\n", eAlg.getName(), eTestSet.getName(), mtype, new Boolean(uptodate), new Boolean(complete));
 	  }
         }

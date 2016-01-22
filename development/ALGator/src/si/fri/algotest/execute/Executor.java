@@ -176,8 +176,7 @@ public class Executor {
     ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, "");
     ATLog.log(runningMsg, 3);
 
-    String projRoot = project.getProject().getProjectRootDir();
-    String proj_name = project.getProject().getName();
+    String projRoot = project .getProjectRoot();
 
     EResultDescription resDesc = project.getResultDescriptions().get(mType);
     if (resDesc == null) {
@@ -210,7 +209,7 @@ public class Executor {
 
     if (eAlgorithm.getLanguage().equals(AlgorithmLanguage.C)) { // C algorithm
       if (!mType.equals(MeasurementType.EM)) {
-        return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK,  "   ... can not run C algorith in " + mType.toString());
+        return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK,  "   ... can not run C algorith in " + mType.getExtension() + " mode.");
       }
       
       int testRepeat = eTestSet.getFieldAsInt(ETestSet.ID_TestRepeat);
@@ -222,11 +221,11 @@ public class Executor {
         
     } else {    //java
     
-      if (projectMakeCompile(project.getProject(), alwaysCompile) != ErrorStatus.STATUS_OK) {
+      if (projectMakeCompile(project.getEProject(), alwaysCompile) != ErrorStatus.STATUS_OK) {
         return ErrorStatus.getLastErrorStatus();
       }
 
-      if (algorithmMakeCompile(project.getProject(), eAlgorithm, mType, alwaysCompile) != ErrorStatus.STATUS_OK) {
+      if (algorithmMakeCompile(project.getEProject(), eAlgorithm, mType, alwaysCompile) != ErrorStatus.STATUS_OK) {
         return ErrorStatus.getLastErrorStatus();
       }
 
@@ -238,7 +237,7 @@ public class Executor {
       // prepare file for results
       File resFile;
       try {
-        String resFilename = ATGlobal.getRESULTfilename(projRoot, algName, testSetName, mType);
+        String resFilename = ATGlobal.getRESULTfilename(projRoot, algName, testSetName, mType, ATGlobal.getThisComputerID());
         File resPath = new File(ATTools.extractFilePath(new File(resFilename)));
         if (!resPath.exists()) {
           resPath.mkdirs();

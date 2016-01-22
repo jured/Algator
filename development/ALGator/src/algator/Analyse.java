@@ -175,11 +175,11 @@ public class Analyse {
       
       if (line.hasOption("query") || "S".equals(origin)) {  
         // if a query is given, run a query and print result ...
-        String result = runQuery(projekt, line.getOptionValue("query"), origin);
+        String result = runQuery(projekt, line.getOptionValue("query"), origin, cid);
         System.out.println(result);
       } else {
         // ...else run a GUI analizer
-        new Analyser(projekt);
+        new Analyser(projekt, cid);
       }
       
     } catch (ParseException ex) {
@@ -187,7 +187,7 @@ public class Analyse {
     }
   }
   
-  public static String runQuery(Project project, String queryName, String origin) {
+  public static String runQuery(Project project, String queryName, String origin, String computerID) {
     EQuery query = new EQuery();
     switch (origin) {
       case "S":
@@ -205,7 +205,7 @@ public class Analyse {
         if (origin.equals("F")) {
           fileName = queryName;
         } else
-          fileName = ATGlobal.getQUERYfilename(project.getProject().getProjectRootDir(), queryName);
+          fileName = ATGlobal.getQUERYfilename(project.getEProject().getProjectRootDir(), queryName);
      
         //File queryFN = new File(fileName);
         //if (!queryFN.exists()) fileName += "." + ATGlobal.AT_FILEEXT_query;
@@ -220,7 +220,7 @@ public class Analyse {
             ErrorStatus.getLastErrorMessage();
     if (query != null & !query.toJSONString().equals("{}")) {
       // run query ...
-      TableData td = DataAnalyser.runQuery(project.getProject(), query);
+      TableData td = DataAnalyser.runQuery(project.getEProject(), query, computerID);
       // ... and print table to screen
       result = td.toString();
     }

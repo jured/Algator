@@ -23,6 +23,7 @@ import si.fri.algotest.entities.Project;
 public class QueryComposer extends javax.swing.JPanel {
 
   Project project;
+  String computerID;
   
   NAAPanel [] algNAAs, tstsNAAs, infieldNAAs, outfieldNAAs;
   
@@ -56,8 +57,12 @@ public class QueryComposer extends javax.swing.JPanel {
       countCB.setSelected(true);
   }
 
-  public void setProject(Project project) {
+  public void setProject(Project project, String computerID) {
     this.project = project;
+    this.computerID = computerID;
+    
+    computerIDTF.setText(computerID);
+    
     
     setAlgsAndFields();
   }
@@ -72,17 +77,25 @@ public class QueryComposer extends javax.swing.JPanel {
   void dataChanged() {
   }
   
-  private NAAPanel [] createNAAPanels(String [] names, JPanel panel) {
+  // asterix so dodatki kot "*" ali "*EM", ....
+  private NAAPanel [] createNAAPanels(String [] names, JPanel panel, String [] asterix) {
+    boolean addAll = asterix != null && asterix.length>0; 
+    int astNu = asterix != null ? asterix.length : 0;
+    
     JPanel p = new JPanel(new GridLayout(100, 1));
     JScrollPane jsp = new JScrollPane(p);
     panel.add(jsp);
     
-    NAAPanel [] result = new NAAPanel[names.length];
+    NAAPanel [] result = new NAAPanel[names.length + astNu];
     if (names == null) return result;
     
-    for(int i=0; i<names.length;i++) {
-      result[i] = new NAAPanel(names[i], names[i], innerChangeListner);
-      p.add(result[i]);
+    // add "All algorithms" (*)
+    for(int k = 0; k<astNu; k++)
+      p.add(result[k] = new NAAPanel(asterix[k], "", innerChangeListner));
+    
+    for(int i=0; i < names.length;i++) {
+      result[i + astNu] = new NAAPanel(names[i], names[i], innerChangeListner);
+      p.add(result[i + astNu]);
     }
     return result;
   }
@@ -122,20 +135,20 @@ public class QueryComposer extends javax.swing.JPanel {
   private void setAlgsAndFields() {
     if (project == null) return;
     
-    EProject eProject = project.getProject();
+    EProject eProject = project.getEProject();
     if (eProject == null) return;
     
     String [] algs = eProject.getStringArray(EProject.ID_Algorithms);    
     String [] tsts = eProject.getStringArray(EProject.ID_TestSets);
       
     
-    algNAAs = createNAAPanels(algs, algPanel);
-    tstsNAAs = createNAAPanels(tsts, tstsPanel);
+    algNAAs = createNAAPanels(algs, algPanel, new String[] {"*"});
+    tstsNAAs = createNAAPanels(tsts, tstsPanel, new String[] {"*"});
 
-    String [] inPars = project.getTestParameters();
-    infieldNAAs  = createNAAPanels(inPars, infieldPanel); 
+    String [] inPars = Project.getTestParameters(project.getResultDescriptions());
+    infieldNAAs  = createNAAPanels(inPars, infieldPanel, new String[] {"*"}); 
   
-    outfieldNAAs = createNAAPanels(project.getResultParameters(), outfieldPanel);
+    outfieldNAAs = createNAAPanels(Project.getResultParameters(project.getResultDescriptions()), outfieldPanel, new String[] {"*EM", "*CNT", "*JVM"});
 
   }
   
@@ -149,7 +162,7 @@ public class QueryComposer extends javax.swing.JPanel {
     
     return new EQuery(algs, tsts, inf, outf, groupbyTF.getText().split(" *\\& *"), 
                   filterTF.getText().split(" *\\& *"), sortbyTF.getText().split(" *\\& *"), 
-                  countCB.isSelected() ? "1" : "0");
+                  countCB.isSelected() ? "1" : "0", computerIDTF.getText());
   }
   
   public void setQuery(EQuery query) {
@@ -219,6 +232,9 @@ public class QueryComposer extends javax.swing.JPanel {
     infieldPanel = new javax.swing.JPanel();
     outfieldPanel = new javax.swing.JPanel();
     countCB = new javax.swing.JCheckBox();
+    jPanel3 = new javax.swing.JPanel();
+    jLabel1 = new javax.swing.JLabel();
+    computerIDTF = new javax.swing.JTextField();
 
     org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
     jPanel4.setLayout(jPanel4Layout);
@@ -238,7 +254,7 @@ public class QueryComposer extends javax.swing.JPanel {
     jLabel6.setText("GroupBy");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
     jPanel2.add(jLabel6, gridBagConstraints);
@@ -255,7 +271,7 @@ public class QueryComposer extends javax.swing.JPanel {
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
@@ -264,7 +280,7 @@ public class QueryComposer extends javax.swing.JPanel {
     jLabel7.setText("Filter");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
     jPanel2.add(jLabel7, gridBagConstraints);
@@ -281,7 +297,7 @@ public class QueryComposer extends javax.swing.JPanel {
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
@@ -290,7 +306,7 @@ public class QueryComposer extends javax.swing.JPanel {
     jLabel8.setText("SortBy");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
     jPanel2.add(jLabel8, gridBagConstraints);
@@ -307,7 +323,7 @@ public class QueryComposer extends javax.swing.JPanel {
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.weightx = 1.0;
     gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
@@ -317,7 +333,7 @@ public class QueryComposer extends javax.swing.JPanel {
     jLabel5.setToolTipText("<html>\nTo enter more than one SortBy value, use the separator  &. Example: <br><br>\n\n&nbsp; &nbsp; N & QS.TMin\n</html>\n");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
     jPanel2.add(jLabel5, gridBagConstraints);
 
@@ -325,7 +341,7 @@ public class QueryComposer extends javax.swing.JPanel {
     jLabel9.setToolTipText("<html>\nTo enter more than one GroupBy, use the separator  &. Example: <br><br>\n\n&nbsp; &nbsp; N; Tmax:MAX; MIN & Group\n</html>\n");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
     jPanel2.add(jLabel9, gridBagConstraints);
 
@@ -333,7 +349,7 @@ public class QueryComposer extends javax.swing.JPanel {
     jLabel10.setToolTipText("<html>\nTo enter more than one filter, use the separator  &. Example: <br><br>\n\n&nbsp; &nbsp; N>=100  & Group == RND\n</html>\n");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
     jPanel2.add(jLabel10, gridBagConstraints);
 
@@ -358,7 +374,7 @@ public class QueryComposer extends javax.swing.JPanel {
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
+    gridBagConstraints.gridy = 1;
     gridBagConstraints.gridwidth = 4;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.weightx = 1.0;
@@ -378,9 +394,30 @@ public class QueryComposer extends javax.swing.JPanel {
     });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 3;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
     jPanel2.add(countCB, gridBagConstraints);
+
+    jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+    jLabel1.setText("Computer ID");
+    jPanel3.add(jLabel1);
+
+    computerIDTF.setColumns(10);
+    computerIDTF.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        computerIDTFActionPerformed(evt);
+      }
+    });
+    jPanel3.add(computerIDTF);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.gridwidth = 4;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+    jPanel2.add(jPanel3, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -411,8 +448,13 @@ public class QueryComposer extends javax.swing.JPanel {
     // innerChangeListner.actionPerformed(new ActionEvent(countCB, 0, "Re-run"));    
   }//GEN-LAST:event_countCBActionPerformed
 
+  private void computerIDTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_computerIDTFActionPerformed
+    // TODO add your handling code here:
+  }//GEN-LAST:event_computerIDTFActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel algPanel;
+  private javax.swing.JTextField computerIDTF;
   private javax.swing.JCheckBox countCB;
   private javax.swing.JTextField filterTF;
   private javax.swing.JPanel groupByPanel;
@@ -420,6 +462,7 @@ public class QueryComposer extends javax.swing.JPanel {
   private javax.swing.JPanel groupByPanel2;
   private javax.swing.JTextField groupbyTF;
   private javax.swing.JPanel infieldPanel;
+  private javax.swing.JLabel jLabel1;
   private javax.swing.JLabel jLabel10;
   private javax.swing.JLabel jLabel5;
   private javax.swing.JLabel jLabel6;
@@ -428,6 +471,7 @@ public class QueryComposer extends javax.swing.JPanel {
   private javax.swing.JLabel jLabel9;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
+  private javax.swing.JPanel jPanel3;
   private javax.swing.JPanel jPanel4;
   private javax.swing.JPanel outfieldPanel;
   private javax.swing.JTextField sortbyTF;

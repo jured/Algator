@@ -63,8 +63,7 @@ public class VMEPExecutor {
     EParameter failedEx = EResultDescription.getExecutionStatusParameter(ExecutionStatus.FAILED);
       
     /* The name of the output file */
-    String projectRoot = ATGlobal.getPROJECTroot(project.dataRoot, project.getName());
-    String resFilename = ATGlobal.getRESULTfilename(projectRoot, algName, testSetName, MeasurementType.JVM);
+    String projectRoot = ATGlobal.getPROJECTroot(project.getDataRoot(), project.getName());
     
     // Maximum time allowed (in seconds) for one execution of one test; if the algorithm 
     // does not  finish in this time, the execution is killed
@@ -85,14 +84,14 @@ public class VMEPExecutor {
         result.addParameter(algPar, true);
         result.addParameter(tsPar,  true);
 
-        String tmpFolderName = ATGlobal.getTMPDir(project.dataRoot, project.projectName);          
+        String tmpFolderName = ATGlobal.getTMPDir(project.getDataRoot(), project.getName());          
         
         TestCase testCase = it.getCurrent();
         if (testCase != null) {
           EParameter testP = testCase.getParameters().getParamater(EResultDescription.testIDParName);
           result.addParameter(testP,  true);
           
-          executionStatus = runWithLimitedTime(project.getName(), algName, testSetName, testID, tmpFolderName, project.dataRoot, timeLimit);
+          executionStatus = runWithLimitedTime(project.getName(), algName, testSetName, testID, tmpFolderName, project.getDataRoot(), timeLimit);
         } else {
           executionStatus = VMEPErrorStatus.INVALID_TEST;
           ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_INVALID_TEST, " ");

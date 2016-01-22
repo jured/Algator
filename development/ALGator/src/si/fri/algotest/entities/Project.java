@@ -14,12 +14,11 @@ import si.fri.algotest.global.ErrorStatus;
  * EAlgorithms and ETestSets).
  * @author tomaz
  */
-public class Project {
-  
+public class Project {  
   // the data_root folder name ...
-  public String dataRoot;
+  private String dataRoot;
   // .. and the project name
-  public String projectName;
+  private String projectName;
   
   
   private TreeMap<String, EAlgorithm> algorithms;
@@ -35,7 +34,9 @@ public class Project {
    */
   ArrayList<ErrorStatus> errors;
  
+  
   public Project(String dataRoot, String projectName) {
+    
     this.dataRoot    = dataRoot;
     this.projectName = projectName;
     
@@ -53,6 +54,7 @@ public class Project {
       return;
     }
  
+    
     errors.add(ErrorStatus.STATUS_OK);
     
     // read the algorithms
@@ -79,31 +81,32 @@ public class Project {
     }
     
     // read the resultDescriptions
-    for(MeasurementType mType : MeasurementType.values()) {
-      String rdFilename = ATGlobal.getRESULTDESCfilename(eProject.getProjectRootDir(), projectName, mType);
-      if (!mType.equals(MeasurementType.EM)) // only for EM type an error message is shown; 
-        ATLog.disableLog();
-      EResultDescription eResrulDescription = new EResultDescription(new File(rdFilename));
-      ATLog.enableLog();
-      if (ErrorStatus.getLastErrorStatus().isOK()) {
-        resultDescriptions.put(mType, eResrulDescription);
-      } else {
-   	  errors.add(ErrorStatus.getLastErrorStatus()); 
-      }
-    }
+    readResultDescriptions(eProject.getProjectRootDir(), projectName, resultDescriptions, errors);
   }
 
-  public EProject getProject() {
+  public EProject getEProject() {
     return eProject;
   }
+  
+
+  public String getProjectRoot() {
+    return ATGlobal.getPROJECTroot(this.dataRoot, getName());
+  }
+
+  public String getDataRoot() {
+    return this.dataRoot;
+  }
+
+  public String getName() {
+    return projectName;
+    // return (eProject==null) ? "?" : eProject.getName();
+  }
+  
   
   public ArrayList<ErrorStatus> getErrors() {
     return errors;
   }
   
-  public String getName() {
-    return (eProject==null) ? "?" : eProject.getName();
-  }
   
   public TreeMap<String, EAlgorithm> getAlgorithms() {
     return algorithms;
@@ -117,22 +120,24 @@ public class Project {
   }
   
   
+  //*********************  static methods ************************
+
+  
   /**
-   * Returns an array of test parameters for this project
+   * Returns an array of test parameters present in resultDescriptions
    * @return 
    */
-  public String[] getTestParameters() {
+  static public String[] getTestParameters(HashMap<MeasurementType, EResultDescription> resultDescriptions) {
     if (resultDescriptions == null || resultDescriptions.get(MeasurementType.EM) == null) 
       return new String[0];
     else
       return resultDescriptions.get(MeasurementType.EM).getStringArray(EResultDescription.ID_TestParOrder);
   }
   
-    /**
-   * Returns an array of result parameters for this project (merged from all atrd files)
-   * @return 
+  /**
+   * Returns an array of result parameters (merged from all result descriptions)
    */
-  public String[] getResultParameters() {
+  static public String[] getResultParameters(HashMap<MeasurementType, EResultDescription> resultDescriptions) {
     ArrayList<String> params = new ArrayList();
     
     for (EResultDescription eRedDesc : resultDescriptions.values()) {
@@ -143,6 +148,36 @@ public class Project {
     }
     
     return (String []) params.toArray(new String[0]);
+  }
+  
+  /**
+   * Returns an array of result parameters for a given measurement type
+   */
+  static public String[] getResultParameters(HashMap<MeasurementType, EResultDescription> resultDescriptions, MeasurementType mType) {
+    if (resultDescriptions == null) return new String []{};
+
+    EResultDescription eRedDesc = resultDescriptions.get(mType);
+    if  (eRedDesc != null) 
+      return eRedDesc.getStringArray(EResultDescription.ID_ResultParOrder);
+    else  
+      return new String []{};
+  }
+  
+  
+  public static void readResultDescriptions(String projectRootDir, String projectName, 
+                                            HashMap resultDescriptions, ArrayList errors)     {
+    for(MeasurementType mType : MeasurementType.values()) {
+      String rdFilename = ATGlobal.getRESULTDESCfilename(projectRootDir, projectName, mType);
+      if (!mType.equals(MeasurementType.EM)) // only for EM type an error message is shown; 
+        ATLog.disableLog();
+      EResultDescription eResrulDescription = new EResultDescription(new File(rdFilename));
+      ATLog.enableLog();
+      if (ErrorStatus.getLastErrorStatus().isOK()) {
+        resultDescriptions.put(mType, eResrulDescription);
+      } else {
+        errors.add(ErrorStatus.getLastErrorStatus()); 
+      }
+    }
   }
 
 }

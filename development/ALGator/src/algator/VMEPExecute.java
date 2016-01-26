@@ -59,8 +59,14 @@ public class VMEPExecute {
 	    .withLongOpt("data_root")
 	    .hasArg(true)
 	    .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT" )
-	    .create("d");
+	    .create("dr");
 
+    Option data_local = OptionBuilder.withArgName("folder")
+            .withLongOpt("data_locale")
+            .hasArg(true)
+            .withDescription("use this folder as data_LOCALE; default value in $ALGATOR_DATA_LOCALE (if defined) or $ALGATOR_ROOT/data_local")
+            .create("dl");    
+    
     Option algator_root = OptionBuilder.withArgName("folder")
             .withLongOpt("algator_root")
             .hasArg(true)
@@ -79,6 +85,7 @@ public class VMEPExecute {
             .create("log");
 
     options.addOption(data_root);
+    options.addOption(data_local);
     options.addOption(algator_root);
     options.addOption(verbose);
     options.addOption(logTarget);
@@ -292,7 +299,7 @@ public class VMEPExecute {
    * created process is returned else the error message is returned as a String
    */
   public static Object runWithVMEP(String project_name, String alg_name, String testset_name,
-          int testID, String commFolder, String data_root) {    
+          int testID, String commFolder, String data_root, String data_local) {    
     try {
       ///* For real-time execution (classPath=..../ALGator.jar)
       String classPath = Version.getClassesLocation();
@@ -315,7 +322,8 @@ public class VMEPExecute {
             
       String[] command = {jvmCommand, "-cp", classPath, "-Xss1024k", "algator.VMEPExecute", 
         project_name, alg_name, testset_name, Integer.toString(testID), commFolder, 
-        "-d", data_root, "-v", Integer.toString(ATGlobal.verboseLevel), "-log", Integer.toString(ATGlobal.logTarget)};
+        "-dr", data_root, "-dl", data_local, "-v", Integer.toString(ATGlobal.verboseLevel), 
+        "-log", Integer.toString(ATGlobal.logTarget)};
       
       
       ProcessBuilder probuilder = new ProcessBuilder( command );
@@ -368,6 +376,12 @@ public class VMEPExecute {
 	dataRoot = line.getOptionValue("data_root");
       }
       ATGlobal.setALGatorDataRoot(dataRoot);      
+      
+      String dataLocal = ATGlobal.getALGatorDataLocal();
+      if (line.hasOption("data_local")) {
+	dataLocal = line.getOptionValue("data_local");
+      }
+      ATGlobal.setALGatorDataLocal(dataLocal);      
       
       int testNumber = 1; // the first test in testset is the default test to run
       try {

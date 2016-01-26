@@ -36,12 +36,14 @@ in jo odpakiramo v poljuben direktorij (imenujmo ga <algator_root>).
          ALGator.jar
          lib
      schema
-     test_data_root    
+     data_root   
+     data_local
  
 3. Nastavimo tri sistemske spremenljivke 
   
        ALGATOR_ROOT=<algator_root>
-       ALGATOR_DATA_ROOT=<algator_root>/test_data_root
+       ALGATOR_DATA_ROOT=<algator_root>/data_root
+       ALGATOR_DATA_LOCAL=<algator_root>/data_local
        CLASSPATH=$CLASSPATH;<algator_root>/app/ALGator/ALGator.jar
 
    (v zgornjih ukazih <algator_root> zamenjamo s pravim imenom mape)

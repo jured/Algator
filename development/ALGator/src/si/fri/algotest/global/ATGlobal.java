@@ -171,13 +171,12 @@ public class ATGlobal {
   }
 
   /**
-   * Returns the name of the folder with compiled java sources.
-   *
-   * @param projectRoot
-   * @return
+   * Returns the name of the folder with compiled project's java sources.   
+   * This folder is subfolder of DATA_LOCAL folder
    */
-  public static String getPROJECTbin(String projectRoot) {
-    return projectRoot + File.separator + ATDIR_projConfDir + File.separator + ATDIR_binDir;
+  public static String getPROJECTbin(String projectName) {
+    return getPROJECTroot(getALGatorDataLocal(), projectName) + File.separator 
+            + ATDIR_projConfDir + File.separator + ATDIR_binDir;
   }
 
   
@@ -199,24 +198,28 @@ public class ATGlobal {
     return getALGORITHMroot(projectRoot, algName) + File.separator + ATDIR_srcDir;
   }
 
-  public static String getALGORITHMbin(String projectRoot, String algName) {
-    return getALGORITHMroot(projectRoot, algName) + File.separator + ATDIR_binDir;
+  // Algorithm's bin folder is a DATA_LOCAL subfolder
+  public static String getALGORITHMbin(String projectName, String algName) {
+    return getALGORITHMroot(getPROJECTroot(getALGatorDataLocal(), projectName), algName) + File.separator + ATDIR_binDir;
   }
 
   
   /************* TESTS *+++++++++++++++++++++*/
-  public static String getTESTSroot(String projectRoot) {
+  public static String getTESTSroot(String data_root, String projectName) {
+    String projectRoot = getPROJECTroot(data_root, projectName);
     return projectRoot + File.separator + ATDIR_testsDir;
   }
   /**
    * Returns the name of a test set configuration file. This file is placed in
    * the projects tests folder
    */
-  public static String getTESTSETfilename(String projectRoot, String testSetName) {
-    return getTESTSroot(projectRoot) + File.separator + testSetName + "." + AT_FILEEXT_testset;
+  public static String getTESTSETfilename(String data_root, String projectName, String testSetName) {
+    return getTESTSroot(data_root, projectName) + File.separator + testSetName + "." + AT_FILEEXT_testset;
   }
 
-
+  
+  
+  /************* RESULTS *+++++++++++++++++++++*/
   public static String getRESULTDESCfilename(String projectRoot, String projName, MeasurementType measurementType) {
     return projectRoot + File.separator + ATDIR_projConfDir + File.separator + projName + "-" + measurementType.getExtension() + "." + AT_FILEEXT_resultdesc;
   }

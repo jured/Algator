@@ -14,13 +14,11 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
 import java.util.TreeSet;
 import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import org.apache.commons.io.FileUtils;
-import si.fri.algotest.entities.EAlgorithm;
 import si.fri.algotest.entities.EComputer;
 import si.fri.algotest.entities.EComputerFamily;
 import si.fri.algotest.entities.EGlobalConfig;
@@ -180,7 +178,7 @@ public class ATTools {
     return false;
   }
 
-  
+/*  
   public static ETestSet getFirstTestSetFromProject(String dataroot, String projName) {
     String projRoot     = ATGlobal.getPROJECTroot    (dataroot, projName);
     String projFilename = ATGlobal.getPROJECTfilename(dataroot, projName);
@@ -195,14 +193,14 @@ public class ATTools {
       return null;
     }
     
-    String testSetFilename = ATGlobal.getTESTSETfilename(projRoot, eTestSetNames[0]);
+    String testSetFilename = ATGlobal.getTESTSETfilename(dataroot, projName, eTestSetNames[0]);
     ETestSet testSet = new ETestSet(new File(testSetFilename));
     if (ErrorStatus.getLastErrorStatus() != ErrorStatus.STATUS_OK)
       return null;
     else
       return testSet;
   }
-    
+*/  
   
   /**
    * Returns all the files that this query depends on. If any of these files chenges, 
@@ -275,15 +273,16 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
     return result;
   }
   
+  // Returns all files describing testsets of a given project. The files are taken from data_root (and not data_local) folder 
   private static HashSet<String> getFilesForTestSet(Project project, String testsetName) {
     HashSet<String> result = new HashSet<>();    
     try {
       // TestSetX.atts
-      result.add(ATGlobal.getTESTSETfilename(project.getEProject().getProjectRootDir(), testsetName));
+      result.add(ATGlobal.getTESTSETfilename(project.getDataRoot(), project.getName(), testsetName));
 
       // testsetX.txt
       String descFile = project.getTestSets().get(testsetName).getField(ETestSet.ID_DescFile);
-      result.add(ATGlobal.getTESTSroot(project.getEProject().getProjectRootDir()) + File.separator + descFile);      
+      result.add(ATGlobal.getTESTSroot(project.getDataRoot(), project.getName()) + File.separator + descFile);      
     } catch (Exception e) {}
     return result;
   }

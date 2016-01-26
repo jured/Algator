@@ -15,7 +15,6 @@ import org.apache.commons.cli.ParseException;
 import si.fri.adeserver.ADEGlobal;
 import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.global.ATGlobal;
-import si.fri.algotest.global.ATLog;
 
 /**
  *
@@ -32,8 +31,14 @@ public class TaskClient {
             .withLongOpt("data_root")
             .hasArg(true)
             .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT (if defined) or $ALGATOR_ROOT/data_root")
-            .create("d");
+            .create("dr");
 
+    Option data_local = OptionBuilder.withArgName("folder")
+            .withLongOpt("data_locale")
+            .hasArg(true)
+            .withDescription("use this folder as data_LOCALE; default value in $ALGATOR_DATA_LOCALE (if defined) or $ALGATOR_ROOT/data_local")
+            .create("dl");    
+    
     Option algator_root = OptionBuilder.withArgName("folder")
             .withLongOpt("algator_root")
             .hasArg(true)
@@ -53,6 +58,7 @@ public class TaskClient {
             .create("a");
     
     options.addOption(data_root);
+    options.addOption(data_local);
     options.addOption(algator_root);
     options.addOption(server);
     options.addOption(ask);
@@ -116,6 +122,12 @@ public class TaskClient {
 	dataRoot = line.getOptionValue("data_root");
       }
       ATGlobal.setALGatorDataRoot(dataRoot);
+      
+      String dataLocal = ATGlobal.getALGatorDataLocal();
+      if (line.hasOption("data_local")) {
+	dataLocal = line.getOptionValue("data_local");
+      }
+      ATGlobal.setALGatorDataLocal(dataLocal);            
       
       String serverName = null;
       if (line.hasOption("server")) {

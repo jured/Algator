@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Scanner;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -16,10 +15,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import si.fri.adeserver.ADEGlobal;
-import si.fri.algotest.entities.ELocalConfig;
-import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.global.ATGlobal;
-import si.fri.algotest.global.ATLog;
 
 /**
  *
@@ -36,7 +32,13 @@ public class TaskServer {
             .withLongOpt("data_root")
             .hasArg(true)
             .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT (if defined) or $ALGATOR_ROOT/data_root")
-            .create("d");
+            .create("dr");
+
+        Option data_local = OptionBuilder.withArgName("folder")
+            .withLongOpt("data_locale")
+            .hasArg(true)
+            .withDescription("use this folder as data_LOCALE; default value in $ALGATOR_DATA_LOCALE (if defined) or $ALGATOR_ROOT/data_local")
+            .create("dl");
 
     Option algator_root = OptionBuilder.withArgName("algator_root_folder")
             .withLongOpt("algator_root")
@@ -45,6 +47,7 @@ public class TaskServer {
             .create("r");
 
     options.addOption(data_root);
+    options.addOption(data_local);
     options.addOption(algator_root);
 
     options.addOption("h", "help", false,
@@ -87,6 +90,12 @@ public class TaskServer {
       }
       ATGlobal.setALGatorDataRoot(dataRoot);
       
+      String dataLocal = ATGlobal.getALGatorDataLocal();
+      if (line.hasOption("data_local")) {
+	dataLocal = line.getOptionValue("data_local");
+      }
+      ATGlobal.setALGatorDataLocal(dataLocal);      
+
       boolean statusOnly = false;
       if (line.hasOption("status")) {
 	statusOnly = true;

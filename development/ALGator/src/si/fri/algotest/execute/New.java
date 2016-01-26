@@ -6,7 +6,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.HashSet;
-import si.fri.algotest.entities.EAlgorithm;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.Project;
@@ -24,8 +23,8 @@ public class New {
   private static final HashMap<String, URLClassLoader> classloaders = new HashMap<>();
 
   public static URL[] getClassPathsForAlgorithm(Project project, String algName) {
-      String projBin = ATGlobal.getPROJECTbin(project.getEProject().getProjectRootDir());
-      String algBin = ATGlobal.getALGORITHMbin(project.getEProject().getProjectRootDir(), algName);
+      String projBin = ATGlobal.getPROJECTbin(project.getName());
+      String algBin = ATGlobal.getALGORITHMbin(project.getName(), algName);
 
       URL[] proJARs = ATTools.getURLsFromJARs(project.getEProject().getStringArray(EProject.ID_ProjectJARs), ATGlobal.getPROJECTlib(project.getEProject().getProjectRootDir()));
       URL[] algJARs = ATTools.getURLsFromJARs(project.getEProject().getStringArray(EProject.ID_AlgorithmJARs), ATGlobal.getPROJECTlib(project.getEProject().getProjectRootDir()));

@@ -71,7 +71,7 @@ public class Project {
     // read the testsets
     String [] tsNames = eProject.getStringArray(EProject.ID_TestSets);
     for(String tsName : tsNames) {   
-      String tsFilename = ATGlobal.getTESTSETfilename(eProject.getProjectRootDir(), tsName);
+      String tsFilename = ATGlobal.getTESTSETfilename(ATGlobal.getALGatorDataLocal(), eProject.getName(), tsName);
       ETestSet eTestset = new ETestSet(new File(tsFilename));
       if (ErrorStatus.getLastErrorStatus().isOK()) {
 	testsets.put(tsName, eTestset);

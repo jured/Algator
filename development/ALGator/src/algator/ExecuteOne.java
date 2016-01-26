@@ -1,7 +1,6 @@
 package algator;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Scanner;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -11,23 +10,11 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import si.fri.adeserver.ADETask;
-import si.fri.adeserver.ADETools;
-import si.fri.adeserver.TaskStatus;
 import si.fri.algotest.entities.EAlgorithm;
-import si.fri.algotest.entities.ELocalConfig;
-import si.fri.algotest.entities.EResultDescription;
 import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.Project;
-import si.fri.algotest.execute.Executor;
-import si.fri.algotest.execute.Notificator;
 import si.fri.algotest.global.ATGlobal;
-import si.fri.algotest.global.ATLog;
-import si.fri.algotest.tools.ATTools;
-import si.fri.algotest.global.ErrorStatus;
-import si.fri.algotest.global.ExecutionStatus;
-import static si.fri.algotest.tools.ATTools.getTaskResultFileName;
 
 /**
  *
@@ -45,7 +32,13 @@ public class ExecuteOne {
 	    .withLongOpt("data_root")
 	    .hasArg(true)
 	    .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT (if defined) or $ALGATOR_ROOT/data_root")
-	    .create("d");
+	    .create("dr");
+    
+    Option data_local = OptionBuilder.withArgName("folder")
+            .withLongOpt("data_locale")
+            .hasArg(true)
+            .withDescription("use this folder as data_LOCALE; default value in $ALGATOR_DATA_LOCALE (if defined) or $ALGATOR_ROOT/data_local")
+            .create("dl");    
     
     Option algator_root = OptionBuilder.withArgName("folder")
             .withLongOpt("algator_root")
@@ -60,6 +53,7 @@ public class ExecuteOne {
             .create("v");
 
     options.addOption(data_root);
+    options.addOption(data_local);    
     options.addOption(algator_root);
     options.addOption(verbose);
     
@@ -127,6 +121,12 @@ public class ExecuteOne {
 	dataRoot = line.getOptionValue("data_root");
       }
       ATGlobal.setALGatorDataRoot(dataRoot);
+
+      String dataLocal = ATGlobal.getALGatorDataLocal();
+      if (line.hasOption("data_local")) {
+	dataLocal = line.getOptionValue("data_local");
+      }
+      ATGlobal.setALGatorDataLocal(dataLocal);      
            
       // Create and test the project
       Project project = new Project(dataRoot, projName);
@@ -167,12 +167,14 @@ public class ExecuteOne {
   private static void runAlgorithm(Project project, String algName, ETestSet eTestSet, 
           MeasurementType mType, int testID, int verboseLevel) {
     
-    String qTestSetFIleName = ATGlobal.getTESTSETfilename(project.getProjectRoot(), "QTestSet");
+    String qTestSetFIleName = ATGlobal.getTESTSETfilename(ATGlobal.getALGatorDataLocal(), project.getName(), "QTestSet");
     eTestSet.set(ETestSet.ID_N, 1);  // only one test
     eTestSet.set(ETestSet.ID_TimeLimit,  0);  // no time limit  
     eTestSet.set(ETestSet.ID_TestRepeat, 1);  // repeate only once
     
-    String descFileName = ATGlobal.getTESTSroot(project.getProjectRoot()) + File.separator + eTestSet.getTestSetDescriptionFile();
+    String descFileName = ATGlobal.getTESTSroot(ATGlobal.getALGatorDataLocal(), project.getName()) +
+             File.separator + eTestSet.getTestSetDescriptionFile();
+
     String test = "?";
     try (Scanner sc = new Scanner(new File(descFileName))) {
       for(int i=0; i<testID; i++) sc.nextLine();

@@ -28,6 +28,7 @@ import si.fri.algotest.tools.ATTools;
 import si.fri.algotest.global.ErrorStatus;
 import si.fri.algotest.global.ExecutionStatus;
 import static si.fri.algotest.tools.ATTools.getTaskResultFileName;
+import si.fri.algotest.tools.RSync;
 
 /**
  *
@@ -64,7 +65,13 @@ public class Execute {
 	    .withLongOpt("data_root")
 	    .hasArg(true)
 	    .withDescription("use this folder as data_root; default value in $ALGATOR_DATA_ROOT (if defined) or $ALGATOR_ROOT/data_root")
-	    .create("d");
+	    .create("dr");
+
+    Option data_local = OptionBuilder.withArgName("folder")
+            .withLongOpt("data_locale")
+            .hasArg(true)
+            .withDescription("use this folder as data_LOCALE; default value in $ALGATOR_DATA_LOCALE (if defined) or $ALGATOR_ROOT/data_local")
+            .create("dl");    
     
     Option algator_root = OptionBuilder.withArgName("folder")
             .withLongOpt("algator_root")
@@ -86,6 +93,7 @@ public class Execute {
     options.addOption(algorithm);
     options.addOption(testset);
     options.addOption(data_root);
+    options.addOption(data_local);    
     options.addOption(algator_root);
     options.addOption(measurement);
         
@@ -189,6 +197,12 @@ public class Execute {
       }
       ATGlobal.setALGatorDataRoot(dataRoot);
       
+      String dataLocal = ATGlobal.getALGatorDataLocal();
+      if (line.hasOption("data_local")) {
+	dataLocal = line.getOptionValue("data_local");
+      }
+      ATGlobal.setALGatorDataLocal(dataLocal);      
+
       if (line.hasOption("algorithm")) {
 	algorithmName = line.getOptionValue("algorithm");
       }
@@ -234,6 +248,13 @@ public class Execute {
       }     
       ATLog.setLogTarget(ATGlobal.logTarget);
             
+      // before executing algorithms we sync test folder from data_root to data_local
+      String dataRootTests  = ATGlobal.getTESTSroot(ATGlobal.getALGatorDataRoot(),  projectName);
+      String dataLocalTests = ATGlobal.getTESTSroot(ATGlobal.getALGatorDataLocal(), projectName);
+      ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, String.format("Syncing tests from %s to %s", dataRootTests, dataLocalTests));
+      RSync.mirror(dataRootTests, dataLocalTests);
+      ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, String.format("Syncing tests done"));
+      
       runAlgorithms(dataRoot, projectName, algorithmName, testsetName, mType, alwaysCompile, alwaysRunTests, listOnly);
 
     } catch (ParseException ex) {

@@ -91,7 +91,8 @@ public class VMEPExecutor {
           EParameter testP = testCase.getParameters().getParamater(EResultDescription.testIDParName);
           result.addParameter(testP,  true);
           
-          executionStatus = runWithLimitedTime(project.getName(), algName, testSetName, testID, tmpFolderName, project.getDataRoot(), timeLimit);
+          executionStatus = runWithLimitedTime(project.getName(), algName, testSetName, testID, 
+                  tmpFolderName, project.getDataRoot(), ATGlobal.getALGatorDataLocal(), timeLimit);
         } else {
           executionStatus = VMEPErrorStatus.INVALID_TEST;
           ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_INVALID_TEST, " ");
@@ -175,11 +176,11 @@ public class VMEPExecutor {
    * If algorithm finishes in time, </code>runWithLimitedTime</code> returns <code>VMEPErrorStatus.OK</code>
    */
   static VMEPErrorStatus runWithLimitedTime(String projectName, String algname, String testSetName, 
-          int testID, String comFolder, String dataRoot, int timeLimit) {
+          int testID, String comFolder, String dataRoot, String dataLocal, int timeLimit) {
     
     ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, "");
     
-    Object result =  VMEPExecute.runWithVMEP(projectName,algname, testSetName, testID, comFolder, dataRoot);
+    Object result =  VMEPExecute.runWithVMEP(projectName,algname, testSetName, testID, comFolder, dataRoot, dataLocal);
       
     // during the process creation, an error occured
     if (result == null || !(result instanceof Process)) {

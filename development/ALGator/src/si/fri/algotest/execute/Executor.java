@@ -2,7 +2,6 @@ package si.fri.algotest.execute;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Scanner;
 import org.apache.commons.io.FileUtils;
 import si.fri.adeserver.ADETask;
@@ -14,12 +13,10 @@ import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.EResultDescription;
 import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.MeasurementType;
-import si.fri.algotest.entities.ParameterSet;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ATLog;
 import si.fri.algotest.tools.ATTools;
-import static si.fri.algotest.tools.ATTools.compile;
 import si.fri.algotest.global.ErrorStatus;
 import static si.fri.algotest.tools.ATTools.getTaskResultFileName;
 
@@ -46,7 +43,7 @@ public class Executor {
 
     // java src and bin dir
     String projSrc = ATGlobal.getPROJECTsrc(projRoot);
-    String projBin = ATGlobal.getPROJECTbin(projRoot);
+    String projBin = ATGlobal.getPROJECTbin(projekt.getName());
 
     String missingSource = ATTools.sourcesExists(projSrc, new String[]{algTPL, testCase, tsIterator});
     if (missingSource != null) {
@@ -60,7 +57,7 @@ public class Executor {
     }
 
     String projJARs = ATTools.buildJARList(projekt.getStringArray(EProject.ID_ProjectJARs), ATGlobal.getPROJECTlib(projRoot));
-    ErrorStatus err = compile(projSrc, new String[]{algTPL + ".java", testCase + ".java", tsIterator + ".java"},
+    ErrorStatus err = ATTools.compile(projSrc, new String[]{algTPL + ".java", testCase + ".java", tsIterator + ".java"},
             projBin, new String[]{}, projJARs, String.format("project '%s'", projekt.getName()));
 
     return ErrorStatus.setLastErrorMessage(err, "");
@@ -76,12 +73,12 @@ public class Executor {
   public static ErrorStatus algorithmMakeCompile(EProject eProjekt, EAlgorithm eAlgorithm, MeasurementType mType, boolean alwaysCompile) {
     String projRoot = eProjekt.getProjectRootDir();
 
-    String projBin = ATGlobal.getPROJECTbin(projRoot);
+    String projBin = ATGlobal.getPROJECTbin(eProjekt.getName());
 
     String algName = eAlgorithm.getName();
 
     String algSrc   = ATGlobal.getALGORITHMsrc(projRoot, algName);
-    String algBin   = ATGlobal.getALGORITHMbin(projRoot, algName);
+    String algBin   = ATGlobal.getALGORITHMbin(eProjekt.getName(), algName);
     String algClass = eAlgorithm.getAlgorithmClassname();
 
     if (mType.equals(MeasurementType.CNT)) {
@@ -102,7 +99,7 @@ public class Executor {
     }
 
     String algJARs = ATTools.buildJARList(eProjekt.getStringArray(EProject.ID_AlgorithmJARs), ATGlobal.getPROJECTlib(projRoot));
-    ErrorStatus err = compile(algSrc, new String[]{algClass + ".java"},
+    ErrorStatus err = ATTools.compile(algSrc, new String[]{algClass + ".java"},
             algBin, new String[]{projBin}, algJARs, String.format("algorithm '%s'", algName));
 
     return err;

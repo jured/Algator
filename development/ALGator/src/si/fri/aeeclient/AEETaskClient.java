@@ -46,9 +46,11 @@ public class AEETaskClient {
 
     
     CommandLine cmdLine = new CommandLine("java");    
-//  to potrebujem samo v primeru, da TaskClient poganjam iz NetBeansa    
-  cmdLine.addArgument("-cp");
-  cmdLine.addArgument("/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar");
+
+    //  !!!! to potrebujem samo v primeru, da TaskClient poganjam iz NetBeansa    
+    cmdLine.addArgument("-cp");
+    cmdLine.addArgument("/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGator/development/ALGator/dist/ALGator.jar");
+   
     cmdLine.addArgument("algator.Execute"); 
     
     // Project
@@ -63,8 +65,11 @@ public class AEETaskClient {
     cmdLine.addArgument("-m");
     cmdLine.addArgument(parts[4]);
     // data_root
-    cmdLine.addArgument("-d");
+    cmdLine.addArgument("-dr");
     cmdLine.addArgument(ATGlobal.getALGatorDataRoot());
+    // data_local
+    cmdLine.addArgument("-dl");
+    cmdLine.addArgument(ATGlobal.getALGatorDataLocal());    
     // Always execute
     cmdLine.addArgument("-e");
     // log into file

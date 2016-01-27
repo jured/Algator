@@ -1,4 +1,3 @@
-
 import si.fri.algotest.entities.EParameter;
 import si.fri.algotest.entities.ParameterSet;
 import si.fri.algotest.entities.ParameterType;
@@ -12,14 +11,14 @@ import si.fri.algotest.tools.ATTools;
  *
  * @author tomaz
  */
-public abstract class SortAbsAlgorithm extends AbsAlgorithm {
+public abstract class BasicSortAbsAlgorithm extends AbsAlgorithm {
 
-  SortTestCase sortTestCase;
+  BasicSortTestCase sortTestCase;
 
   @Override
   public ErrorStatus init(TestCase test) {
-    if (test instanceof SortTestCase) {
-      sortTestCase = (SortTestCase) test;
+    if (test instanceof BasicSortTestCase) {
+      sortTestCase = (BasicSortTestCase) test;
       return ErrorStatus.STATUS_OK;
     } else
       return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_PERFORM_TEST, "Invalid test:" + test);

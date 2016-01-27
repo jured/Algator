@@ -2,7 +2,7 @@
  *
  * @author tomaz
  */
-public class BubblesortSortAlgorithm extends SortAbsAlgorithm {
+public class BubbleSortAlgorithm extends BasicSortAbsAlgorithm {
 
   public void execute(int[] data) {
     for (int i = 0; i < data.length; i++) {

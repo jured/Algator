@@ -148,7 +148,7 @@ public class ExternalExecutor {
         // was algorithm properly initialized?
         executionOK = executionOK && curAlg.init(testCase) == ErrorStatus.STATUS_OK;
 
-        String tmpFolderName = ATGlobal.getTMPDir(project.getDataRoot(), project.getName());
+        String tmpFolderName = ATGlobal.getTMPDir(project.getName());
 
         ErrorStatus executionStatus = ErrorStatus.ERROR_CANT_PERFORM_TEST;
 
@@ -211,11 +211,7 @@ public class ExternalExecutor {
           pw.println(algResultParams.toString(order, false, delim));
         pw.close();        
 
-        try {
-          FileUtils.deleteDirectory(new File(tmpFolderName));
-        } catch (Exception e) {
-          ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR, "Folder can not be removed " + tmpFolderName);
-        }
+        ATGlobal.deleteTMPDir(tmpFolderName, project.getName());        
       }
       it.close();
     } catch (Exception e) {

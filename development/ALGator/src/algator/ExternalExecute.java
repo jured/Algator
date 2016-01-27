@@ -10,6 +10,7 @@ import org.apache.commons.cli.Options;
 import si.fri.algotest.timer.Timer;
 
 import java.io.File;
+import org.apache.commons.io.FileUtils;
 import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.entities.MeasurementType;
 

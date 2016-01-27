@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -28,6 +29,9 @@ public class ATLog {
 
   // filename for algator specific logging
   private static String algatorLogFileName = "";
+  
+  
+  private static ArrayList<String> reportedErrors = new ArrayList<>();
   
   // filename for Project-Algorithm-Testset-EM specific logging
   private static String pateFilename = "";
@@ -66,12 +70,20 @@ public class ATLog {
    * ali oboje (kam=3).
    */
   public static void log(String msg, int kam) {
-    if (logTarget == LOG_TARGET_OFF) return;
+    if (logTarget == LOG_TARGET_OFF || ATGlobal.verboseLevel == 0) return;
     
     msg = msg.substring(0, Math.min(msg.length(), MAX_ERROR_SIZE));
 
     String date = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
     String logMsg = String.format("%15s: %s", date, msg);
+    
+    boolean alreadyReported = reportedErrors.contains(logMsg);
+    if (!alreadyReported)
+      reportedErrors.add(logMsg);
+    
+    // to prevent duplicated reporting 
+    if (alreadyReported) return;
+
     
     // loggint to stdout
     if ((logTarget & LOG_TARGET_STDOUT) != 0)

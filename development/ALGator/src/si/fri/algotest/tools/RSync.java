@@ -1,6 +1,8 @@
 package si.fri.algotest.tools;
 
+import java.io.File;
 import java.io.IOException;
+import si.fri.algotest.global.ErrorStatus;
 
 /**
  *
@@ -16,6 +18,10 @@ public class RSync {
     // (instead of copying a folder srcDir as a subfolder in destDir)
     if (!srcDir.endsWith("/")) srcDir += "/";        
     
+    // if destination folder does not exist -> algator creates an empty folder
+    File ddir = new File(destDir);
+    if (!ddir.exists()) ddir.mkdirs();
+    
     String[] cmd = new String[]{"rsync", "-a", srcDir, destDir};
     ProcessBuilder pb = new ProcessBuilder(cmd);
 
@@ -23,7 +29,9 @@ public class RSync {
     try {
       Process p = pb.start();
       val       = p.waitFor();
-    } catch (Exception e) {}
+    } catch (Exception e) {
+      ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR, e.toString());
+    }
     return val;
   }
   

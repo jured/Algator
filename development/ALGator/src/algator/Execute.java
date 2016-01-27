@@ -82,7 +82,7 @@ public class Execute {
     Option verbose = OptionBuilder.withArgName("verbose_level")
             .withLongOpt("verbose")
             .hasArg(true)
-            .withDescription("print additional information (0 = OFF, 1 = some (default), 2 = all")
+            .withDescription("print additional information (0 = OFF (default), 1 = some, 2 = all")
             .create("v");
 
     Option logTarget = OptionBuilder.withArgName("log_target")
@@ -114,9 +114,7 @@ public class Execute {
     return options;
   }
 
-  private static void printMsg(Options options) {
-    System.out.println(introMsg + "\n");
-    
+  private static void printMsg(Options options) {    
     HelpFormatter formatter = new HelpFormatter();
     formatter.printHelp("algator.Execute [options] project_name", options);
 
@@ -124,8 +122,6 @@ public class Execute {
   }
 
   private static void printUsage() {
-    System.out.println(introMsg + "\n");
-
     Scanner sc = new Scanner((new Analyse()).getClass().getResourceAsStream("/data/ExecutorUsage.txt")); 
     while (sc.hasNextLine())
       System.out.println(sc.nextLine());
@@ -155,7 +151,9 @@ public class Execute {
    *
    * @param args
    */
-  public static void main(String args[]) {    
+  public static void main(String args[]) {  
+    System.out.println(introMsg + "\n");
+    
     Options options = getOptions();
 
     CommandLineParser parser = new BasicParser();
@@ -229,10 +227,10 @@ public class Execute {
         } catch (Exception e) {}  
       }
 
-      ATGlobal.verboseLevel = 1;
+      ATGlobal.verboseLevel = 0;
       if (line.hasOption("verbose")) {
-        if (line.getOptionValue("verbose").equals("0"))
-          ATGlobal.verboseLevel = 0;
+        if (line.getOptionValue("verbose").equals("1"))
+          ATGlobal.verboseLevel = 1;
         if (line.getOptionValue("verbose").equals("2"))
           ATGlobal.verboseLevel = 2;
       }
@@ -247,14 +245,7 @@ public class Execute {
           ATGlobal.logTarget = ATLog.LOG_TARGET_FILE + ATLog.LOG_TARGET_STDOUT;
       }     
       ATLog.setLogTarget(ATGlobal.logTarget);
-            
-      // before executing algorithms we sync test folder from data_root to data_local
-      String dataRootTests  = ATGlobal.getTESTSroot(ATGlobal.getALGatorDataRoot(),  projectName);
-      String dataLocalTests = ATGlobal.getTESTSroot(ATGlobal.getALGatorDataLocal(), projectName);
-      ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, String.format("Syncing tests from %s to %s", dataRootTests, dataLocalTests));
-      RSync.mirror(dataRootTests, dataLocalTests);
-      ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, String.format("Syncing tests done"));
-      
+           
       runAlgorithms(dataRoot, projectName, algorithmName, testsetName, mType, alwaysCompile, alwaysRunTests, listOnly);
 
     } catch (ParseException ex) {
@@ -266,9 +257,31 @@ public class Execute {
 	  String testsetName, MeasurementType mType, boolean alwaysCompile, 
           boolean alwaysRun, boolean printOnly) {
     
+
+    File f = new File(ATGlobal.getPROJECTfilename(dataRoot, projName));
+    if (!f.exists()) {
+      ATGlobal.verboseLevel=1;
+      ATLog.log("Project configuration file does not exist for " + projName, 1);
+
+      System.exit(0);      
+    }
+    
+    // before executing algorithms we sync test folder from data_root to data_local
+    String dataRootTests  = ATGlobal.getTESTSroot(ATGlobal.getALGatorDataRoot(),  projName);
+    String dataLocalTests = ATGlobal.getTESTSroot(ATGlobal.getALGatorDataLocal(), projName);
+    ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, String.format("Syncing tests from %s to %s", dataRootTests, dataLocalTests));
+    int syncStatus = RSync.mirror(dataRootTests, dataLocalTests);
+    if (syncStatus != 0) {
+      ATLog.log("Syncing failed  " + ErrorStatus.getLastErrorMessage(), 1);
+
+      System.exit(0);
+    }
+    ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, String.format("Syncing tests done"));
+    
     // Test the project
     Project projekt = new Project(dataRoot, projName);
     if (!projekt.getErrors().get(0).equals(ErrorStatus.STATUS_OK)) {
+      ATGlobal.verboseLevel=1;
       ATLog.log("Invalid project: " + projekt.getErrors().get(0).toString(), 1);
 
       System.exit(0);
@@ -279,6 +292,7 @@ public class Execute {
     if (!algName.isEmpty()) {
       EAlgorithm alg = projekt.getAlgorithms().get(algName);
       if (alg == null) {
+        ATGlobal.verboseLevel=1;
 	ATLog.log("Invalid algorithm - " + algName, 1);
 	System.exit(0);
       }
@@ -293,6 +307,7 @@ public class Execute {
     if (!testsetName.isEmpty()) {
       ETestSet test = projekt.getTestSets().get(testsetName);
       if (test == null) {
+        ATGlobal.verboseLevel=1;
 	ATLog.log("Invalid testset - " + testsetName, 1);
 	System.exit(0);
       }
@@ -301,12 +316,12 @@ public class Execute {
     } else {
        eTests = new ArrayList(projekt.getTestSets().values());
     }
-    
-    
+            
     // Test mesurement type
     EResultDescription rDesc = projekt.getResultDescriptions().get(mType);  
     if (rDesc == null) {
-      System.out.printf("Result description file for '%s' does not exist.\n", mType.getExtension());
+      ATGlobal.verboseLevel=1;
+      ATLog.log(String.format("Result description file for '%s' does not exist.\n", mType.getExtension()), 1);
       System.exit(0);
     }
     if (mType.equals(MeasurementType.JVM)) {
@@ -314,12 +329,12 @@ public class Execute {
       File vmepFile = new File(vmep == null ? "":vmep);
 
       if (vmep == null || vmep.isEmpty() /*|| !vmepFile.exists()  || !vmepFile.canExecute()*/) {
-        System.out.printf("Invelid vmep executable: '%s'.\n", vmep);
+        ATGlobal.verboseLevel=1;
+        ATLog.log(String.format("Invelid vmep executable: '%s'.\n", vmep), 1);
         System.exit(0);    
       }
     }
-    
-    
+        
     if (printOnly) {    
       System.out.println("DataRoot       : " + dataRoot);
       System.out.println("Project        : " + projName);

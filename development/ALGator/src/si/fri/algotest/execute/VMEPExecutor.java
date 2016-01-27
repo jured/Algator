@@ -4,6 +4,7 @@ import algator.VMEPExecute;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -84,7 +85,7 @@ public class VMEPExecutor {
         result.addParameter(algPar, true);
         result.addParameter(tsPar,  true);
 
-        String tmpFolderName = ATGlobal.getTMPDir(project.getDataRoot(), project.getName());          
+        String tmpFolderName = ATGlobal.getTMPDir(project.getName());          
         
         TestCase testCase = it.getCurrent();
         if (testCase != null) {
@@ -136,16 +137,12 @@ public class VMEPExecutor {
         // append a line representing test results to the corresponding result file        
         PrintWriter pw = new PrintWriter(new FileWriter(resultFile, true));
           pw.println(testResultLine);
-        pw.close();
+        pw.close();        
         
-        try {
-          FileUtils.deleteDirectory(new File(tmpFolderName));
-        } catch (Exception e) {
-          ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR, "Folder can not be removed " + tmpFolderName); 
-        }
+        ATGlobal.deleteTMPDir(tmpFolderName, project.getName());
       }
       it.close();
-    } catch (Exception e) {
+    } catch (IOException e) {
       ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
     }
   }

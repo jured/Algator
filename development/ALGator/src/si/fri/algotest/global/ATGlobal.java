@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.MissingResourceException;
 import java.util.Random;
 import java.util.ResourceBundle;
+import org.apache.commons.io.FileUtils;
 import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.entities.MeasurementType;
 
@@ -50,6 +51,7 @@ public class ATGlobal {
   private static final String ATDIR_taskLogDir     = "tasks";
   
   private static final String ATDIR_tmpDir         = "tmp";
+  private static final String ATDIR_tmpFile        = "tmpF";
 
   
   private static final String ATDIR_localConfigDir    = "local_config";
@@ -270,20 +272,52 @@ public class ATGlobal {
     return folderName + File.separator + fileName;
   }
   
-    
-  public static String getTMProot(String data_root, String projName) {
-    return getPROJECTroot(data_root, projName) + File.separator + ATDIR_tmpDir;
-  }
   
-  public static String getTMPDir(String data_root, String projName) {
-    String folderName = getTMProot(data_root, projName) + File.separator + "alg" + (new Random()).nextLong();
+  /************* TMP folders   *+++++++++++++++++++++*/
+  public static String getTMProot(String data_local, String prefix) {
+    return data_local + File.separator + ATDIR_tmpDir + File.separator + prefix;
+  }
+  public static String getTMPDir(String data_local, String prefix) {
+    String folderName = getTMProot(data_local, prefix) + File.separator + ATDIR_tmpFile + (new Random()).nextLong();
     File tmpFolder = new File(folderName);
     if (!tmpFolder.exists())
       tmpFolder.mkdirs();
     
     return folderName;
+  }  
+  public static String getTMPDir(String prefix) {
+    return getTMPDir(getALGatorDataLocal(), prefix);
   }
   
+  /**
+   * Tests is tmpFolderName is an ALGator tmp dir. Method is used, for example, 
+   * to prevent deleting non tmp folder.
+   */
+  public static boolean isTMPDir(String tmpFolderName, String data_local, String prefix) {
+    return tmpFolderName != null && !tmpFolderName.isEmpty() && 
+           data_local != null && !data_local.isEmpty() &&
+           prefix   != null && !prefix.isEmpty()   &&
+           tmpFolderName.contains(data_local) && tmpFolderName.contains(prefix) &&
+           tmpFolderName.contains(File.separator + ATDIR_tmpDir + File.separator) && 
+           tmpFolderName.contains(ATDIR_tmpFile);
+  }
+  
+  public static void deleteTMPDir(String tmpFolderName, String data_local, String prefix) {
+    try {
+      // before deleting, test the "correctness" of the tmpFolderName
+      if (ATGlobal.isTMPDir(tmpFolderName, data_local, prefix))
+        FileUtils.deleteDirectory(new File(tmpFolderName));
+    } catch (Exception e) {
+      ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR, "Folder can not be removed " + tmpFolderName + " for project " + prefix);
+    }
+  }
+  public static void deleteTMPDir(String tmpFolderName, String prefix) {
+    deleteTMPDir(tmpFolderName, getALGatorDataLocal(), prefix);
+  }
+  
+  
+  
+  /************* Configurations (local and global) *+++++++++++++++++++++*/
   public static String getLocalConfigFilename() {
     return getALGatorRoot() + File.separator + ATDIR_localConfigDir + File.separator + LOCAL_CONFIG_FILENAME;
   }
@@ -297,11 +331,11 @@ public class ATGlobal {
       ELocalConfig config = ELocalConfig.getConfig();
       String id = config.getComputerID();
       if (id == null || id.isEmpty())
-        return "C0";
+        return "F0.C0";
       else
         return id;
     } catch (Exception e) {
-      return "C0";
+      return "F0.C0";
     }
   }
   

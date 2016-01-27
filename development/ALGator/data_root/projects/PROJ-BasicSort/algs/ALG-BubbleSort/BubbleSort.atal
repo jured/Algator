@@ -4,8 +4,6 @@
    "Description"    : "Classic BubbleSort",
    "HTMLDescFile"   : "bubblesort.html",
    "Author"         : "Tomaž",
-   "Date"           : "07/30/2013",
-   "Classes"        : ["BubblesortSortAlgorithm.java"],
-   "MainClassName"  : "BubblesortSortAlgorithm"
+   "Date"           : "07/30/2013"
   }
 } 

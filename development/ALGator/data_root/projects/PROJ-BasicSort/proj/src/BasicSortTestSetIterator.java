@@ -7,7 +7,6 @@ import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.ParameterType;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.execute.DefaultTestSetIterator;
-import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ErrorStatus;
 import si.fri.algotest.tools.ATTools;
 
@@ -16,7 +15,7 @@ import si.fri.algotest.tools.ATTools;
  *
  * @author tomaz
  */
-public class SortTestSetIterator extends DefaultTestSetIterator {
+public class BasicSortTestSetIterator extends DefaultTestSetIterator {
    
   String filePath;
   String testFileName;
@@ -71,7 +70,7 @@ public class SortTestSetIterator extends DefaultTestSetIterator {
     EParameter parameter2 = new EParameter("N",     "Number of elements",           ParameterType.INT,    probSize);
     EParameter parameter3 = new EParameter("Group", "A name of a group of tests",   ParameterType.STRING, group);
     
-    SortTestCase tCase = new SortTestCase();
+    BasicSortTestCase tCase = new BasicSortTestCase();
     // ID
     tCase.addParameter(testIDPar);
     // input parameters
@@ -135,21 +134,6 @@ public class SortTestSetIterator extends DefaultTestSetIterator {
     tCase.arrayToSort = array;    
 
     return tCase;
-  }
-
-
-  
-  
-  // TEST
-  public static void main(String args[]) {
-    String dataroot         = "../../data_root";
-    String projName     = "Sorting";
-    
-    ETestSet testSet = ATTools.getFirstTestSetFromProject(dataroot, projName);
-    SortTestSetIterator stsi = new SortTestSetIterator();
-    stsi.setTestSet(testSet);
-    
-    ATTools.iterateAndPrintTests(stsi);
   }
 }
  

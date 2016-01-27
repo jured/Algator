@@ -50,6 +50,10 @@ public class EGlobalConfig extends Entity  implements Serializable {
       } catch (Exception e) {
         // ignore, if an error occures while parsing the ID_Families parameter
       }
+      if (families.isEmpty()) {
+        EComputerFamily cef = new EComputerFamily("{\"FamilyID\":\"F0\",\"Computers\":[{\"ComputerID\":\"C0\",\"Capabilities\":[\"AEE_EM\",\"AEE_CNT\",\"AEE_JVM\"]}]}");
+        families.add(cef);
+      }
     }    
     return families;
   }

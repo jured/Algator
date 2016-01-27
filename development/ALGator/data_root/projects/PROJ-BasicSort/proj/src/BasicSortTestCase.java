@@ -6,7 +6,7 @@ import si.fri.algotest.tools.ATTools;
  * A sort-project specific TestCase
  * @author tomaz
  */
-public class SortTestCase extends TestCase {
+public class BasicSortTestCase extends TestCase {
 
   /**
    * An array of data to be sorted

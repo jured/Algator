@@ -5,7 +5,7 @@ import java.util.Arrays;
  *
  * @author tomaz
  */
-public class QuicksortSortAlgorithm extends SortAbsAlgorithm {
+public class QuickSortAlgorithm extends BasicSortAbsAlgorithm {
 
   void quickSort(int[] arr, int left, int right) {
 

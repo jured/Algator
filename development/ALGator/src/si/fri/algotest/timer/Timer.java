@@ -9,13 +9,12 @@ import java.io.Serializable;
 public class Timer implements Serializable {
 
   // maximu number of timers supported by ALGator
-
   public static final int MAX_TIMERS = 5;
 
   // current timer from 0, ..., MAX_TIMERS-1
   private int curTimer;
 
-  private long[] startTime, stopTime;
+  private final long[] startTime, stopTime;
 
   public Timer() {
     curTimer = 0;

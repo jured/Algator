@@ -5,6 +5,7 @@ import java.util.HashMap;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.ParameterSet;
 import si.fri.algotest.entities.TestCase;
+import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ErrorStatus;
 import si.fri.algotest.timer.Timer;
 
@@ -13,6 +14,7 @@ import si.fri.algotest.timer.Timer;
  * @author tomaz
  */
 public abstract class AbsAlgorithm implements Cloneable, Serializable {
+  private final static String TMP_FOLDER_PREFIX = "exec";
   
   // This data is needed by ExternalExecutor to determine the type of execution.
   private MeasurementType mType;
@@ -22,6 +24,8 @@ public abstract class AbsAlgorithm implements Cloneable, Serializable {
   
   // values of counters after the execution of algorithm<
   private HashMap<String, Integer> counters = new HashMap();
+  
+  private String workingFolder = null;
   
   
   public AbsAlgorithm() {
@@ -66,6 +70,20 @@ public abstract class AbsAlgorithm implements Cloneable, Serializable {
     this.mType = mType;
   }
   
+  
+  public String getWorkingFolder() {
+    if (workingFolder == null)
+      workingFolder = ATGlobal.getTMPDir(TMP_FOLDER_PREFIX);
+    return workingFolder;
+  }
+  
+  /**
+   * Closing algoritm. Currently this method delets working folder if it was created.
+   */
+  public void close() {
+    if (workingFolder != null)
+      ATGlobal.deleteTMPDir(workingFolder, TMP_FOLDER_PREFIX);
+  }
   
   
   /**

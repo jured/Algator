@@ -308,17 +308,17 @@ public class DataAnalyser {
     return getQueryEntities(query, queryEntityID, allEntities, "*");
   }
 
-  private static String[] getQueryEntities(EQuery query, String queryEntityID, String [] allEntities, String asterix) {
+  private static String[] getQueryEntities(EQuery query, String queryEntityID, String [] allEntities, String asterisk) {
       String [] etts = query.getStringArray(queryEntityID);
       
       boolean containsAll = false; // is "*" in the list of entities?
       for (int i = 0; i < etts.length; i++) {
-        if (etts[i].startsWith(asterix)) {
+        if (etts[i].startsWith(asterisk)) {
           containsAll = true; break;
         }
       }
       if (containsAll) {
-        etts = allEntities;
+        etts = allEntities;        
       }
       
       return etts;

@@ -148,7 +148,8 @@ public class Analyse {
       }
       ATGlobal.setALGatorDataRoot(dataRoot);
 
-      String dataLocal = ATGlobal.getALGatorDataLocal();
+      // for analysing the data_root folder is used as a default data source 
+      String dataLocal = ATGlobal.getALGatorDataRoot();
       if (line.hasOption("data_local")) {
 	dataLocal = line.getOptionValue("data_local");
       }

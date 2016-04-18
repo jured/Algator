@@ -7,8 +7,8 @@ import si.fri.algotest.global.ATGlobal;
  * @author tomaz
  */
 public class Version {
-  private static String version = "0.6.102";
-  private static String date    = "Maj 2015";
+  private static String version = "0.7";
+  private static String date    = "April 2016";
   
   public static String getVersion() {
     return String.format("version %s (%s)", version, date);
@@ -26,9 +26,15 @@ public class Version {
     }
   }
   
-  public static void main(String[] args) {
+  public static void printVersion() {
     System.out.printf("ALGator, %s, build %s\n", getVersion(), ATGlobal.getBuildNumber());
-    System.out.println("AlgatorRoot:     " + ATGlobal.getALGatorRoot());
-    System.out.println("AlgatorDataRoot: " + ATGlobal.getALGatorDataRoot());
+    System.out.println();
+    System.out.println("ALGATOR_ROOT:       " + ATGlobal.getALGatorRoot());
+    System.out.println("ALGATOR_DATA_ROOT:  " + ATGlobal.getALGatorDataRoot());
+    System.out.println("ALGATOR_DATA_LOCAL: " + ATGlobal.getALGatorDataLocal());
+  }
+  
+  public static void main(String[] args) {
+    printVersion();
   }
 }

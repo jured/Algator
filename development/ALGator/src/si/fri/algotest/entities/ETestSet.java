@@ -15,19 +15,15 @@ public class ETestSet extends Entity {
   //Fields
   public static final String ID_ShortName     ="ShortName";	  // String
   public static final String ID_Desc          ="Description";     // String
-  public static final String ID_HTMLDescFile  ="HTMLDescFile";    // Filename  
   public static final String ID_N             ="N";		  // Integer
   public static final String ID_TestRepeat    ="TestRepeat";	  // Integer
   public static final String ID_TimeLimit     ="TimeLimit";	  // Integer  
-  public static final String ID_QuickTest     ="QuickTest";	  // Boolean
-  public static final String ID_TestSetFiles  ="TestSetFiles";	  // String []
-  public static final String ID_DescFile      ="DescriptionFile"; // Filename  
   
    
   public ETestSet() {
    super(ID_TestSet, 
-	 new String [] {ID_ShortName, ID_Desc, ID_HTMLDescFile, ID_N,  
-                        ID_TestRepeat, ID_TimeLimit, ID_QuickTest, ID_TestSetFiles, ID_DescFile}
+	 new String [] {ID_ShortName, ID_Desc, ID_N,  
+                        ID_TestRepeat, ID_TimeLimit}
 	);
   }
   
@@ -43,7 +39,7 @@ public class ETestSet extends Entity {
    * The value of the "DescriptionFile" field
    */
   public String getTestSetDescriptionFile() {
-    return getField(ID_DescFile);
+    return getName() + ".txt";
   }
 }
 

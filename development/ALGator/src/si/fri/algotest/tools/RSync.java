@@ -22,7 +22,7 @@ public class RSync {
     File ddir = new File(destDir);
     if (!ddir.exists()) ddir.mkdirs();
     
-    String[] cmd = new String[]{"rsync", "-a", srcDir, destDir};
+    String[] cmd = new String[]{"rsync", "-az", "--delete", srcDir, destDir};
     ProcessBuilder pb = new ProcessBuilder(cmd);
 
     int val = -1;

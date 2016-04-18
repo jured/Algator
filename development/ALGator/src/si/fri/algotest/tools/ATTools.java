@@ -281,7 +281,7 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
       result.add(ATGlobal.getTESTSETfilename(project.getDataRoot(), project.getName(), testsetName));
 
       // testsetX.txt
-      String descFile = project.getTestSets().get(testsetName).getField(ETestSet.ID_DescFile);
+      String descFile = project.getTestSets().get(testsetName).getTestSetDescriptionFile();
       result.add(ATGlobal.getTESTSroot(project.getDataRoot(), project.getName()) + File.separator + descFile);      
     } catch (Exception e) {}
     return result;

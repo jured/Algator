@@ -12,18 +12,17 @@ public class EAlgorithm extends Entity {
   public static final String ID_Algorithm   ="Algorithm";  
   
   //Fields
-  public static final String ID_ShortName      ="ShortName";      // String
-  public static final String ID_Description    ="Description";    // String
-  public static final String ID_HtmlDescFile   ="HtmlDescFile";   // Filename
-  public static final String ID_Author         ="Author";	  // String
-  public static final String ID_Date           ="Date";	          // String
-  public static final String ID_Classes        ="Classes";        // String []
-  public static final String ID_Language       ="Language";       // String []
+  public static final String ID_ShortName       = "ShortName";      // String
+  public static final String ID_Description     = "Description";    // String
+  public static final String ID_Author          = "Author";	    // String
+  public static final String ID_Date            = "Date";	    // String
+  public static final String ID_Classes         = "Classes";        // String []
+  public static final String ID_Language        = "Language";       // String 
   
   
   public EAlgorithm() {
     super(ID_Algorithm, 
-	 new String [] {ID_ShortName, ID_Description, ID_HtmlDescFile, 
+	 new String [] {ID_ShortName, ID_Description, 
                         ID_Author, ID_Date, ID_Classes, ID_Language});
     setRepresentatives(ID_ShortName, ID_Author);
   }

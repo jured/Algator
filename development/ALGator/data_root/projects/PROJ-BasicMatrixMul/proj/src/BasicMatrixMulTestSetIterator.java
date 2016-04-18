@@ -1,22 +1,14 @@
 import java.io.File;
-import java.io.IOException;
 import java.util.Scanner;
-import si.fri.algotest.entities.EParameter;
-import si.fri.algotest.entities.EResultDescription;
-import si.fri.algotest.entities.ETestSet;
-import si.fri.algotest.entities.ParameterType;
+import si.fri.algotest.entities.EVariable;
+import si.fri.algotest.entities.EResult;
+import si.fri.algotest.entities.VariableType;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.execute.DefaultTestSetIterator;
-import si.fri.algotest.global.ATLog;
-import si.fri.algotest.tools.ATTools;
 import si.fri.algotest.global.ErrorStatus;
 
 
-/**
- *
- * @author ...
- */
-public class MatrixMulTestSetIterator extends DefaultTestSetIterator {
+public class BasicMatrixMulTestSetIterator extends DefaultTestSetIterator {
    
   
   @Override
@@ -34,13 +26,13 @@ public class MatrixMulTestSetIterator extends DefaultTestSetIterator {
 
     String filePath = testSet.entity_rootdir;
 
-    MatrixMulTestCase tCase = new MatrixMulTestCase();
-    EParameter testIDPar = EResultDescription.getTestIDParameter("Test-" + Integer.toString(lineNumber));
+    BasicMatrixMulTestCase tCase = new BasicMatrixMulTestCase();
+    EVariable testIDPar = EResult.getTestIDParameter("Test-" + Integer.toString(lineNumber));
     tCase.addParameter(testIDPar);
 
-    EParameter parameter1 = new EParameter("Name", "", ParameterType.STRING, params[0]);
-    EParameter parameter2 = new EParameter("Group", "", ParameterType.STRING, params[1]);
-    EParameter parameter3 = new EParameter("N", "", ParameterType.INT, params[2]);
+    EVariable parameter1 = new EVariable("Name", "", VariableType.STRING, params[0]);
+    EVariable parameter2 = new EVariable("Group", "", VariableType.STRING, params[1]);
+    EVariable parameter3 = new EVariable("N", "", VariableType.INT, params[2]);
 
     tCase.addParameter(parameter1);
     tCase.addParameter(parameter2);
@@ -76,19 +68,5 @@ public class MatrixMulTestSetIterator extends DefaultTestSetIterator {
       return null;
     }
   }
-  
-  // TEST
-    
-    public static void main(String args[]) {
-    String dataroot     = "/Users/Tomaz/Dropbox/FRI/ALGator/data_root"; // a folder with the "projects" folder
-    String projName     = "MatrixMul";
-    
-    ETestSet testSet = ATTools.getFirstTestSetFromProject(dataroot, projName);
-    MatrixMulTestSetIterator stsi = new MatrixMulTestSetIterator();
-    stsi.setTestSet(testSet);
-    
-    ATTools.iterateAndPrintTests(stsi);
-  }
-  
 }
  

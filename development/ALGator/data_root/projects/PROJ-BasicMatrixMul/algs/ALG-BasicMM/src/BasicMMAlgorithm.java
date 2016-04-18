@@ -1,6 +1,6 @@
+public class BasicMMAlgorithm extends BasicMatrixMulAbsAlgorithm {
 
-public class BasicMMAlgorithm extends MatrixMulAbsAlgorithm {
-
+  @Override
   protected void execute(int [][] A, int [][] B, int [][] C) {
     for (int i = 0; i < A.length; i++) {
       for (int j = 0; j < A.length; j++) {

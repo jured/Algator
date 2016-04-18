@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import si.fri.algotest.entities.EParameter;
-import si.fri.algotest.entities.EResultDescription;
+import si.fri.algotest.entities.EVariable;
+import si.fri.algotest.entities.EResult;
 import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.Entity;
 import si.fri.algotest.entities.MeasurementType;
-import si.fri.algotest.entities.ParameterSet;
-import si.fri.algotest.entities.ParameterType;
+import si.fri.algotest.entities.VariableSet;
+import si.fri.algotest.entities.VariableType;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.entities.StatFunction;
 import si.fri.algotest.entities.TestCase;
@@ -83,10 +83,10 @@ public class ExternalExecutor {
    * @return
    */
   public static void iterateTestSetAndRunAlgorithm(Project project, String algName,
-          AbstractTestSetIterator it, EResultDescription resultDesc,
+          AbstractTestSetIterator it, EResult resultDesc,
           Notificator notificator, MeasurementType mType, File resultFile) {
 
-    ParameterSet algResultParams; 
+    VariableSet algResultParams; 
 
     ETestSet testSet = it.testSet;
 
@@ -112,12 +112,12 @@ public class ExternalExecutor {
     }
 
     // parameters to be added to result file (in case exception occures while executing algorithm)
-    String delim = resultDesc.getField(EResultDescription.ID_Delim);
-    EParameter algP      = EResultDescription.getAlgorithmNameParameter(algName);
-    EParameter tsP       = EResultDescription.getTestsetNameParameter(it.testSet.getName());
-    EParameter failedErr = EResultDescription.getExecutionStatusParameter(ExecutionStatus.FAILED);
+    String delim        = ATGlobal.DEFAULT_CSV_DELIMITER;
+    EVariable algP      = EResult.getAlgorithmNameParameter(algName);
+    EVariable tsP       = EResult.getTestsetNameParameter(it.testSet.getName());
+    EVariable failedErr = EResult.getExecutionStatusIndicator(ExecutionStatus.FAILED);
 
-    String order[] = resultDesc.getParamsOrder();
+    String order[] = resultDesc.getVariableOrder();
     
     int testID = 0; // 
     try {
@@ -132,8 +132,8 @@ public class ExternalExecutor {
         // subtype - število decimalk) ni prenesel in se je zato vedno uporabila default vrednost. Po tej spremembi se 
         // podatki prevailno prenesejo, upam pa, da se kaj drugega ne podre! Če se, briši spodnji dve vrstici in 
         // poišči drugo rešitev za prenos podatkov o parametrih iz atrd datoteke!
-        for (int i=0; i<resultDesc.getParameters().size(); i++) 
-          testCase.addParameter(resultDesc.getParameters().getParameter(i), false);
+        for (int i=0; i<resultDesc.getVariables().size(); i++) 
+          testCase.addParameter(resultDesc.getVariables().getVariable(i), false);
         
         
         AbsAlgorithm curAlg = New.algorithmInstance(project, algName, mType);
@@ -158,22 +158,22 @@ public class ExternalExecutor {
           executionStatus = runWithLimitedTime(tmpFolderName, timesToExecute, timeLimit, mType, false);
         }
 
-        EParameter executionStatusParameter;
+        EVariable executionStatusParameter;
         switch (executionStatus) {
           case STATUS_OK:
             notificator.notify(testID, ExecutionStatus.DONE);
-            executionStatusParameter = EResultDescription.getExecutionStatusParameter(ExecutionStatus.DONE);
+            executionStatusParameter = EResult.getExecutionStatusIndicator(ExecutionStatus.DONE);
             break;
           case PROCESS_KILLED:
             notificator.notify(testID, ExecutionStatus.KILLED);
-            executionStatusParameter = EResultDescription.getExecutionStatusParameter(ExecutionStatus.KILLED);
+            executionStatusParameter = EResult.getExecutionStatusIndicator(ExecutionStatus.KILLED);
             break;
           default:
             notificator.notify(testID, ExecutionStatus.FAILED);
             executionStatusParameter = failedErr;
         }
         
-        algResultParams = new ParameterSet();
+        algResultParams = new VariableSet();
         
         if (executionStatus == ErrorStatus.STATUS_OK) { // the execution passed normaly (not killed)
           resultAlg = getAlgorithmFromFile(tmpFolderName, SER_ALG_TYPE.RESULT);
@@ -183,29 +183,29 @@ public class ExternalExecutor {
 
             switch (mType) {
               case EM:
-                algResultParams.addParameters(getTimeParameters(resultDesc, resultAlg), true);
+                algResultParams.addVariables(getTimeParameters(resultDesc, resultAlg), true);
                 break;
               case CNT:
-                algResultParams.addParameters(getCounterParameters(resultDesc, resultAlg), true);
+                algResultParams.addVariables(getCounterParameters(resultDesc, resultAlg), true);
                 break;
             }
           } else {
-            algResultParams.addParameter(EResultDescription.getErrorParameter("Invalid test: "+testCase.toString()), true);
+            algResultParams.addVariable(EResult.getErrorIndicator("Invalid test: "+testCase.toString()), true);
             executionStatusParameter = failedErr;
           }
         } else { // the execution did not perform succesfully          
           if (executionStatus == ErrorStatus.PROCESS_KILLED) {
-            algResultParams.addParameter(EResultDescription.getErrorParameter(
+            algResultParams.addVariable(EResult.getErrorIndicator(
               String.format("Process killed after %d seconds.", timeLimit)), true);
           } else {
-            algResultParams.addParameter(EResultDescription.getErrorParameter(ErrorStatus.getLastErrorMessage()), true);
+            algResultParams.addVariable(EResult.getErrorIndicator(ErrorStatus.getLastErrorMessage()), true);
           }
         }
         
-        algResultParams.addParameter(algP, true);
-        algResultParams.addParameter(tsP, true);
-        algResultParams.addParameter(EResultDescription.getTestIDParameter("Test-" + testID), true);                        
-        algResultParams.addParameter(executionStatusParameter, true);
+        algResultParams.addVariable(algP, true);
+        algResultParams.addVariable(tsP, true);
+        algResultParams.addVariable(EResult.getTestIDParameter("Test-" + testID), true);                        
+        algResultParams.addVariable(executionStatusParameter, true);
         
         PrintWriter pw = new PrintWriter(new FileWriter(resultFile, true));
           pw.println(algResultParams.toString(order, false, delim));
@@ -305,15 +305,15 @@ public class ExternalExecutor {
 
   // pregledam resultDesc parametre in za vsak parameter tipa "timer" ustvarim
   // parameter v results s pravo vrednostj
-  static ParameterSet getTimeParameters(EResultDescription resultDesc, AbsAlgorithm algorithm) {
-    ParameterSet timeParameters = new ParameterSet();
+  static VariableSet getTimeParameters(EResult resultDesc, AbsAlgorithm algorithm) {
+    VariableSet timeParameters = new VariableSet();
     long[][] times = algorithm.getExecutionTimes();
 
     if (resultDesc != null) {
-      ParameterSet pSet = resultDesc.getParameters();
-      for (int i = 0; i < resultDesc.getParameters().size(); i++) {
-        EParameter rdP = pSet.getParameter(i);
-        if (ParameterType.TIMER.equals(rdP.getType())) {
+      VariableSet pSet = resultDesc.getVariables();
+      for (int i = 0; i < resultDesc.getVariables().size(); i++) {
+        EVariable rdP = pSet.getVariable(i);
+        if (VariableType.TIMER.equals(rdP.getType())) {
           String[] subtypeFields;
           try {
             String subtype = rdP.getSubtype();
@@ -337,9 +337,9 @@ public class ExternalExecutor {
             ArrayList<Long> list = new ArrayList<>(java.util.Arrays.asList(longObjects));
 
             Long time = (Long) StatFunction.getFunctionValue(fs, list);
-            EParameter timeP = new EParameter(
-                    (String) rdP.getField(Entity.ID_NAME), null, ParameterType.TIMER, time);
-            timeParameters.addParameter(timeP, true);
+            EVariable timeP = new EVariable(
+                    (String) rdP.getName(), null, VariableType.TIMER, time);
+            timeParameters.addVariable(timeP, true);
           } catch (Exception e) {
             ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR, "Subtype parameter invalid (" + e.toString() + ")");
           }
@@ -349,19 +349,19 @@ public class ExternalExecutor {
     return timeParameters;
   }
 
-  static ParameterSet getCounterParameters(EResultDescription resultDesc, AbsAlgorithm algorithm) {
-    ParameterSet counterParameters = new ParameterSet();
+  static VariableSet getCounterParameters(EResult resultDesc, AbsAlgorithm algorithm) {
+    VariableSet counterParameters = new VariableSet();
     HashMap<String, Integer> counters = algorithm.getCounters();
     if (resultDesc != null && counters != null) {
-      ParameterSet pSet = resultDesc.getParameters();
+      VariableSet pSet = resultDesc.getVariables();
       for (int i = 0; i < pSet.size(); i++) {
-        if (ParameterType.COUNTER.equals(pSet.getParameter(i).getType())) {
-          String counterName = (String) pSet.getParameter(i).getField(Entity.ID_NAME);
+        if (VariableType.COUNTER.equals(pSet.getVariable(i).getType())) {
+          String counterName = (String) pSet.getVariable(i).getName();
           int value = 0;
           if (counters.containsKey(counterName)) {
             value = counters.get(counterName);
           }
-          counterParameters.addParameter(new EParameter(counterName, null, null, value), true);
+          counterParameters.addVariable(new EVariable(counterName, null, null, value), true);
         }
       }
     }

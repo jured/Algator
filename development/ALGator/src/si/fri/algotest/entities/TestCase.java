@@ -11,10 +11,10 @@ import java.io.Serializable;
  */
 public class TestCase implements Serializable {
 
-  protected ParameterSet parameters;
+  protected VariableSet parameters;
 
   public TestCase() {
-    parameters = new ParameterSet();
+    parameters = new VariableSet();
   }
 
   
@@ -23,15 +23,15 @@ public class TestCase implements Serializable {
   }
   
   
-  public void addParameter(EParameter parameter) {
+  public void addParameter(EVariable parameter) {
     addParameter(parameter, true);
   }
   
-  public void addParameter(EParameter parameter, boolean replaceExisting) {
-    parameters.addParameter(parameter, replaceExisting);
+  public void addParameter(EVariable parameter, boolean replaceExisting) {
+    parameters.addVariable(parameter, replaceExisting);
   }
   
-  public ParameterSet getParameters() {
+  public VariableSet getParameters() {
     return parameters;
   }
   

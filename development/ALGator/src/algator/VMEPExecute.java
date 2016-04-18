@@ -17,12 +17,12 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import si.fri.algotest.entities.EAlgorithm;
 import si.fri.algotest.entities.ELocalConfig;
-import si.fri.algotest.entities.EParameter;
-import si.fri.algotest.entities.EResultDescription;
+import si.fri.algotest.entities.EVariable;
+import si.fri.algotest.entities.EResult;
 import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.MeasurementType;
-import si.fri.algotest.entities.ParameterSet;
-import si.fri.algotest.entities.ParameterType;
+import si.fri.algotest.entities.VariableSet;
+import si.fri.algotest.entities.VariableType;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.execute.AbsAlgorithm;
@@ -168,7 +168,7 @@ public class VMEPExecute {
       System.exit(VMEPErrorStatus.INVALID_ITERATOR.getValue()); // testset iterator can not be created
     }
     
-    EResultDescription resultDescription = projekt.getResultDescriptions().get(MeasurementType.JVM);
+    EResult resultDescription = projekt.getResultDescriptions().get(MeasurementType.JVM);
     if (resultDescription == null) {
       if (ATGlobal.verboseLevel > 0)
         ATLog.log("VMEP Execute: JVM result description file does not exist - " + projName + ", " + algName, 3);
@@ -197,18 +197,18 @@ public class VMEPExecute {
    * 
    */
   public static void runAlgorithmOnATest(
-    Project project, String algName, String testsetName, int testNumber, EResultDescription resultDesc,
+    Project project, String algName, String testsetName, int testNumber, EResult resultDesc,
           AbstractTestSetIterator testsetIterator, String resFilename) {
                 
     // the order of parameters to be printed
-    String[] order = resultDesc.getParamsOrder();
-    String delim   = resultDesc.getField(EResultDescription.ID_Delim);
+    String[] order = resultDesc.getVariableOrder();
+    String delim   = ATGlobal.DEFAULT_CSV_DELIMITER;
 
-    ParameterSet result = new ParameterSet();
-    result.addParameter(EResultDescription.getAlgorithmNameParameter(algName), true);
-    result.addParameter(EResultDescription.getTestsetNameParameter(testsetName), true);
-    result.addParameter(EResultDescription.getTestIDParameter("Test"+testNumber), true); // if testCase won't initialize, a testcase ID is giver here 
-    result.addParameter(EResultDescription.getExecutionStatusParameter(ExecutionStatus.UNKNOWN), true);
+    VariableSet result = new VariableSet();
+    result.addVariable(EResult.getAlgorithmNameParameter(algName), true);
+    result.addVariable(EResult.getTestsetNameParameter(testsetName), true);
+    result.addVariable(EResult.getTestIDParameter("Test"+testNumber), true); // if testCase won't initialize, a testcase ID is giver here 
+    result.addVariable(EResult.getExecutionStatusIndicator(ExecutionStatus.UNKNOWN), true);
     
     // An error that appears as a result of JVM error is not caught by the following catch; however, the finally block
     // is always executed. If in finally block success is false, then an JVM error has occured and must be reported
@@ -224,7 +224,7 @@ public class VMEPExecute {
         curAlg.init(testCase); 
         
         // add test ID (if execution fails, result should contain correct testID parameter)
-        result.addParameter(testCase.getParameters().getParamater(EResultDescription.testIDParName), true);
+        result.addVariable(testCase.getParameters().getVariable(EResult.testIDParName), true);
            
         if (ATGlobal.verboseLevel == 2) {           
           ATLog.log(String.format("Project: %s, Algorithm: %s, TestSet: %s, Test: %d\n", project.getName(), algName, testsetName, testNumber), 2);
@@ -248,13 +248,13 @@ public class VMEPExecute {
           ATLog.log("********* Bytecode commands used *********************************************", 2);
                 
         // write results to the result set.
-        ParameterSet pSet = resultDesc.getParameters();
+        VariableSet pSet = resultDesc.getVariables();
         int[] instFreq=instrMonitor.getCounts();
         String toLog = "";
         for(int i=0;i<instFreq.length;i++){
           String pName = Opcode.getNameFor(i);
-          if (pSet.getParamater(pName) != null) {
-            result.addParameter(new EParameter(pName, "", ParameterType.INT, instFreq[i]), true);
+          if (pSet.getVariable(pName) != null) {
+            result.addVariable(new EVariable(pName, "", VariableType.INT, instFreq[i]), true);
           }
           if (ATGlobal.verboseLevel == 2 && instFreq[i]!=0)
             toLog += " " + pName;
@@ -263,18 +263,18 @@ public class VMEPExecute {
             ATLog.log(toLog, 2);
         
         
-        result.addParameter(EResultDescription.getExecutionStatusParameter(ExecutionStatus.DONE), true);
-        result.addParameter(EResultDescription.getAlgorithmNameParameter(algName), true);
-        result.addParameter(EResultDescription.getTestsetNameParameter(testsetName), true);
+        result.addVariable(EResult.getExecutionStatusIndicator(ExecutionStatus.DONE), true);
+        result.addVariable(EResult.getAlgorithmNameParameter(algName), true);
+        result.addVariable(EResult.getTestsetNameParameter(testsetName), true);
       } else {
-        result.addParameter(EResultDescription.getExecutionStatusParameter(ExecutionStatus.FAILED), true);
-        result.addParameter(EResultDescription.getErrorParameter("Invaldi testset or test."), true);
+        result.addVariable(EResult.getExecutionStatusIndicator(ExecutionStatus.FAILED), true);
+        result.addVariable(EResult.getErrorIndicator("Invaldi testset or test."), true);
       }
       success = true;
       
     } catch (IOException e) {
-      result.addParameter(EResultDescription.getExecutionStatusParameter(ExecutionStatus.FAILED), true);
-      result.addParameter(EResultDescription.getErrorParameter(e.toString()), true);
+      result.addVariable(EResult.getExecutionStatusIndicator(ExecutionStatus.FAILED), true);
+      result.addVariable(EResult.getErrorIndicator(e.toString()), true);
 
       ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_RUN, e.toString());
 
@@ -283,7 +283,7 @@ public class VMEPExecute {
       
     } finally {
       if (!success) {
-         result.addParameter(EResultDescription.getErrorParameter("Unknown JVM error"), true);
+         result.addVariable(EResult.getErrorIndicator("Unknown JVM error"), true);
       }
       try (PrintWriter pw = new PrintWriter(new FileWriter(resFilename, true))) {                  
           pw.println(result.toString(order, false, delim));

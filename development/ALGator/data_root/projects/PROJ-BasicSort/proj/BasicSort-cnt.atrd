@@ -1,12 +1,9 @@
 {
-  "ResultDescription":
+  "Result":
   { 
-    "Format"           : "CSV",
-    "Delimiter"        : ";",
-    "ResultParameters" : ["CMP", "SWAP", "CALL"],    	
+    "IndicatorOrder" : ["CMP", "SWAP", "CALL"],    	
   
-    "Parameters":   [	
-    
+    "Indicators":   [	    
       {
        "Name":        "CMP",             
        "Description": "The number of compares", 

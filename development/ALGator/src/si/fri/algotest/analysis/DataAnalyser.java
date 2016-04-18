@@ -11,14 +11,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONArray;
 import si.fri.algotest.entities.DeparamFilter;
-import si.fri.algotest.entities.EParameter;
+import si.fri.algotest.entities.EVariable;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.EQuery;
-import si.fri.algotest.entities.EResultDescription;
+import si.fri.algotest.entities.EResult;
 import si.fri.algotest.entities.Entity;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.NameAndAbrev;
-import si.fri.algotest.entities.ParameterSet;
+import si.fri.algotest.entities.VariableSet;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ATLog;
@@ -37,18 +37,18 @@ public class DataAnalyser {
    *
    * @return
    */
-  public static boolean parametersMatchFilter(ParameterSet params, ParameterSet filter) {
+  public static boolean parametersMatchFilter(VariableSet params, VariableSet filter) {
     if (filter == null) {
       return true;
     }
 
     try {
       for (int i = 0; i < filter.size(); i++) {
-	EParameter refPar = filter.getParameter(i);
-	Object refVal = refPar.get(EParameter.ID_Value);
+	EVariable refPar = filter.getVariable(i);
+	Object refVal = refPar.get(EVariable.ID_Value);
 
-	EParameter param = params.getParamater((String) refPar.getField(Entity.ID_NAME));
-	Object value = param.get(EParameter.ID_Value);
+	EVariable param = params.getVariable((String) refPar.getName());
+	Object value = param.get(EVariable.ID_Value);
 
 	if (!value.equals(refVal)) {
 	  return false;
@@ -70,14 +70,14 @@ public class DataAnalyser {
    * i.e. for all Parameters in filter method checks the corresponding parameter
    * in the result; if the values doesn't match, result will be skipped
    */
-  public static ArrayList<ParameterSet> selectData(HashMap<String, ArrayList<ParameterSet>> algResults, ParameterSet join,
-	  ParameterSet filter, ParameterSet testFields, ParameterSet resultFields) {
+  public static ArrayList<VariableSet> selectData(HashMap<String, ArrayList<VariableSet>> algResults, VariableSet join,
+	  VariableSet filter, VariableSet testFields, VariableSet resultFields) {
 
-    ArrayList<ParameterSet> result = new ArrayList();
+    ArrayList<VariableSet> result = new ArrayList();
     Set<String> algKeys = algResults.keySet();
 
     for (String alg : algKeys) {
-      for (ParameterSet ps : algResults.get(alg)) {
+      for (VariableSet ps : algResults.get(alg)) {
 	if (parametersMatchFilter(ps, filter)) {
 	  result.add(ps);
 	}
@@ -101,19 +101,16 @@ public class DataAnalyser {
     }
 
     String resDescFilename = ATGlobal.getRESULTDESCfilename(project.getProjectRoot(), project.getName(), measurement);
-    EResultDescription eResultDesc = new EResultDescription(new File(resDescFilename));
+    EResult eResultDesc = new EResult(new File(resDescFilename));
 
-    String delim = eResultDesc.getField(EResultDescription.ID_Delim);
-    if (delim == null || delim.isEmpty()) {
-      delim = ";";
-    }
+    String delim =  ATGlobal.DEFAULT_CSV_DELIMITER;
 
-    ParameterSet resultPS = eResultDesc.getParameters();
+    VariableSet resultPS = eResultDesc.getVariables();
     // test parameters are only defined in EM file
-    String[] testOrder = eResultDesc.getStringArray(EResultDescription.ID_TestParOrder);
+    String[] testOrder = eResultDesc.getStringArray(EResult.ID_ParOrder);
     if (testOrder == null) testOrder = new String[0];
     
-    String[] resultOrder = eResultDesc.getStringArray(EResultDescription.ID_ResultParOrder);
+    String[] resultOrder = eResultDesc.getStringArray(EResult.ID_IndOrder);
 
 
     String resFileName;
@@ -129,7 +126,7 @@ public class DataAnalyser {
     if (resFile.exists()) {
 
       // add the current resultdescription parameters to the resPack resultDescription parameterset
-      resPack.resultDescription.getParameters().addParameters(eResultDesc.getParameters(), false);
+      resPack.resultDescription.getVariables().addVariables(eResultDesc.getVariables(), false);
 
       try (Scanner sc = new Scanner(resFile)) {
 	while (sc.hasNextLine()) {
@@ -144,52 +141,52 @@ public class DataAnalyser {
           String pass     = lineFields[3];
 
 	  // initializes algorithms parameterset with "empty" parameters
-	  ParameterSet algPS = new ParameterSet(resultPS);
+	  VariableSet algPS = new VariableSet(resultPS);
 
 	  // sets the value of default parameters
-	  algPS.getParamater(EResultDescription.algParName).set(EParameter.ID_Value, algorithm);
-	  algPS.getParamater(EResultDescription.tstParName).set(EParameter.ID_Value, testset);
-	  algPS.getParamater(EResultDescription.testIDParName).set(EParameter.ID_Value, testName);
-          algPS.getParamater(EResultDescription.passParName).set(EParameter.ID_Value, pass);
+	  algPS.getVariable(EResult.algParName).set(EVariable.ID_Value, algorithm);
+	  algPS.getVariable(EResult.tstParName).set(EVariable.ID_Value, testset);
+	  algPS.getVariable(EResult.testIDParName).set(EVariable.ID_Value, testName);
+          algPS.getVariable(EResult.passParName).set(EVariable.ID_Value, pass);
 
-	  int lineFiledsPos = EResultDescription.FIXNUM;
+	  int lineFiledsPos = EResult.FIXNUM;
 
 	  // sets the value of test parameters
 	  for (int i = 0; i < testOrder.length; i++) {
-	    EParameter tP = algPS.getParamater(testOrder[i]);
+	    EVariable tP = algPS.getVariable(testOrder[i]);
             
 	    if (tP != null)
               if (lineFiledsPos < lineFields.length) 
-	        tP.set(EParameter.ID_Value, lineFields[lineFiledsPos]);
+	        tP.set(EVariable.ID_Value, lineFields[lineFiledsPos]);
               else
-                tP.set(EParameter.ID_Value, tP.getType().getDefaultValue()); 
+                tP.set(EVariable.ID_Value, tP.getType().getDefaultValue()); 
             
 	    lineFiledsPos++;
 	  }
 
 	  // sets the value of result parameters
 	  for (int i = 0; i < resultOrder.length; i++) {
-	    EParameter tP = algPS.getParamater(resultOrder[i]);
+	    EVariable tP = algPS.getVariable(resultOrder[i]);
             
 	    if (tP != null)
               if (lineFiledsPos < lineFields.length) 
-	        tP.set(EParameter.ID_Value, lineFields[lineFiledsPos]);
+	        tP.set(EVariable.ID_Value, lineFields[lineFiledsPos]);
               else
-                tP.set(EParameter.ID_Value, tP.getType().getDefaultValue());            
+                tP.set(EVariable.ID_Value, tP.getType().getDefaultValue());            
             
             lineFiledsPos++;
 	  }
 
 	  // add this ParameterSet to the ResultPack
 	  String key = testset + "-" + testName;
-	  ParameterSet ps = resPack.getResult(key);
+	  VariableSet ps = resPack.getResult(key);
 	  // If ParameterSet for this testset-test doesn't exist ...
 	  if (ps == null) {
 	    // ... append a new testset to the map
 	    resPack.putResult(key, algPS);
 	  } else {
 	    // ... otherwise, add new parameters to existing parameterset
-	    ps.addParameters(algPS, false);
+	    ps.addVariables(algPS, false);
 	  }
 	}
       } catch (Exception e) {
@@ -477,10 +474,10 @@ public class DataAnalyser {
 
 
     // add headers for default test parameters
-    td.header.add(EResultDescription.testNoParName);  // ID of a table row
-    td.header.add(EResultDescription.tstParName);
-    td.header.add(EResultDescription.testIDParName);
-    td.header.add(EResultDescription.passParName);
+    td.header.add(EResult.testNoParName);  // ID of a table row
+    td.header.add(EResult.tstParName);
+    td.header.add(EResult.testIDParName);
+    td.header.add(EResult.passParName);
 
     // Input (test) parameters + 4 default parameters (TestNo, TestSet, TestID, pass) 
     td.numberOfInputParameters = inPars.length + 4; 
@@ -501,13 +498,13 @@ public class DataAnalyser {
       ArrayList<Object> line = new ArrayList<>();
 
       String alg0Name = alg0.getName();
-      ParameterSet ps = results.get(alg0Name).getResult(key);
+      VariableSet ps = results.get(alg0Name).getResult(key);
         
       // add values for 3 default test parameters
       line.add(testNUM);
-      line.add(ps.getParamater(EResultDescription.tstParName).get(EParameter.ID_Value));
-      line.add(ps.getParamater(EResultDescription.testIDParName).get(EParameter.ID_Value));
-      line.add(ps.getParamater(EResultDescription.passParName).get(EParameter.ID_Value));
+      line.add(ps.getVariable(EResult.tstParName).get(EVariable.ID_Value));
+      line.add(ps.getVariable(EResult.testIDParName).get(EVariable.ID_Value));
+      line.add(ps.getVariable(EResult.passParName).get(EVariable.ID_Value));
       
       
       //line.add(testNUM);
@@ -515,7 +512,7 @@ public class DataAnalyser {
       for (NameAndAbrev inPar : inPars) {
 	Object value;
 	try {
-	  EParameter parameter = ps.getParamater(inPar.getName());
+	  EVariable parameter = ps.getVariable(inPar.getName());
 	  value =  parameter.getValue();
 	} catch (Exception e) {
 	  value = "?";
@@ -528,8 +525,8 @@ public class DataAnalyser {
 	for (NameAndAbrev alg : algs) {
 	  Object value;
 	  try {
-	    ParameterSet ps2 = results.get(alg.getName()).getResult(key);
-	    EParameter parameter = ps2.getParamater(outPar.getName());
+	    VariableSet ps2 = results.get(alg.getName()).getResult(key);
+	    EVariable parameter = ps2.getVariable(outPar.getName());
 	    value = parameter.getValue();
 	  } catch (Exception e) {
 	    value = "?";

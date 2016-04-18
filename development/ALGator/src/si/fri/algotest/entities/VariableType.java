@@ -1,11 +1,11 @@
 package si.fri.algotest.entities;
 
 /**
- * A type of a result parameter.
+ * A type of a result variable.
  *
  * @author tomaz
  */
-public enum ParameterType {
+public enum VariableType {
 
   UNKNOWN, TIMER, COUNTER, INT, DOUBLE, STRING;
 
@@ -29,8 +29,8 @@ public enum ParameterType {
     }
   }
 
-  static ParameterType getType(String typeDesc) {
-    for (ParameterType rst : ParameterType.values()) {
+  static VariableType getType(String typeDesc) {
+    for (VariableType rst : VariableType.values()) {
       if (typeDesc.equals(rst.toString())) {
         return rst;
       }

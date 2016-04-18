@@ -1,9 +1,11 @@
 {
   "Algorithm" : {	
-   "ShortName"      : "BS",             
-   "Description"    : "Classic BubbleSort",
-   "HTMLDescFile"   : "bubblesort.html",
+   "Name"           : "BubbleSort",
+
    "Author"         : "Tomaž",
-   "Date"           : "07/30/2013"
+   "Date"           : "07/30/2013",
+
+   "ShortName"      : "BS",             
+   "Description"    : "Classic BubbleSort"
   }
 } 

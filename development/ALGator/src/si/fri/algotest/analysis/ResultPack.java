@@ -2,8 +2,8 @@ package si.fri.algotest.analysis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import si.fri.algotest.entities.EResultDescription;
-import si.fri.algotest.entities.ParameterSet;
+import si.fri.algotest.entities.EResult;
+import si.fri.algotest.entities.VariableSet;
 
 /**
  * Objects of this class contain a map of results (key=something describing test 
@@ -12,23 +12,23 @@ import si.fri.algotest.entities.ParameterSet;
  * @author tomaz
  */
 public class ResultPack {
-  private HashMap<String, ParameterSet> results;
-  EResultDescription resultDescription;
+  private HashMap<String, VariableSet> results;
+  EResult resultDescription;
   
   ArrayList<String> keyOrder;
 
   public ResultPack() {
     results = new HashMap<>();
-    resultDescription = new EResultDescription();
+    resultDescription = new EResult();
     keyOrder = new ArrayList<>();
   }
   
-  public void putResult(String key, ParameterSet value) {
+  public void putResult(String key, VariableSet value) {
     results.put(key, value);
     keyOrder.add(key);
   }
 
-  public ParameterSet getResult(String key) {
+  public VariableSet getResult(String key) {
     return results.get(key);
   }
   

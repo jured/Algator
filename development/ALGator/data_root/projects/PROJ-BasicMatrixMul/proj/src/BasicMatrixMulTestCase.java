@@ -4,7 +4,7 @@ import si.fri.algotest.entities.TestCase;
  * 
  * @author ...
  */
-public class MatrixMulTestCase extends TestCase {
+public class BasicMatrixMulTestCase extends TestCase {
 
   int n;
   

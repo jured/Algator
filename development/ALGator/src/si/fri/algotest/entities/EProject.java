@@ -1,6 +1,9 @@
 package si.fri.algotest.entities;
 
 import java.io.File;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -12,21 +15,23 @@ public class EProject extends Entity {
   
   //Fields
   public static final String ID_Description           = "Description";	        // String
-  public static final String ID_HtmlDescFile          = "HtmlDescFile";         // Filename
   public static final String ID_Author                = "Author";	        // String
   public static final String ID_Date                  = "Date";		        // String
-  public static final String ID_AlgDescHTML           = "AlgDescHTML";          // Filename
-  public static final String ID_AlgTechDescHTML       = "AlgTechDescHTML";      // Filename
   public static final String ID_Algorithms            = "Algorithms";	        // String []
-  public static final String ID_TestSetDescHTML       = "TestSetDescHTML";      // Filename
-  public static final String ID_TestSetTechDescHTML   = "TestSetTechDescHTML";  // Filename  
   public static final String ID_TestSets              = "TestSets";	        // String []
+
   public static final String ID_ProjectJARs           = "ProjectJARs";          // Filename[]
   public static final String ID_AlgorithmJARs         = "AlgorithmJARs";        // Filename[]
+  
   public static final String ID_EMExecFamily          = "EMExecFamily";         // String
   public static final String ID_CNTExecFamily         = "CNTExecFamily";        // String
   public static final String ID_JVMExecFamily         = "JVMExecFamily";        // String
-
+  
+  public static final String ID_ProjPresenters        = "ProjPresenters";       // String []
+  public static final String ID_AlgPresenters         = "AlgPresenters";        // String []
+  public static final String ID_MainProjPresenters    = "MainProjPresenters";   // String []
+  public static final String ID_MainAlgPresenters     = "MainAlgPresenters";    // String []
+  
 //  Depricated. In current version, java files MUST be named according to the following :
 //     AlgorithmClass        === <project_name>AbstractAlgorithm.java
 //     TestCaseClass         === <project_name>TestCase.java
@@ -44,11 +49,11 @@ public class EProject extends Entity {
   
   public EProject() {
    super(ID_Project, 
-	 new String [] {ID_Description, ID_HtmlDescFile, ID_Author, ID_Date,  
-	                ID_Algorithms, ID_AlgDescHTML, ID_AlgTechDescHTML,
-                        ID_TestSets, ID_TestSetDescHTML, ID_TestSetTechDescHTML,
+	 new String [] {ID_Description, ID_Author, ID_Date,  
+	                ID_Algorithms, ID_TestSets, 
                         ID_ProjectJARs, ID_AlgorithmJARs, 
-                        ID_EMExecFamily, ID_CNTExecFamily, ID_JVMExecFamily}
+                        ID_EMExecFamily, ID_CNTExecFamily, ID_JVMExecFamily, 
+                        ID_ProjPresenters, ID_AlgPresenters, ID_MainProjPresenters, ID_MainAlgPresenters}
 	);
    setRepresentatives(ID_Author);
   }

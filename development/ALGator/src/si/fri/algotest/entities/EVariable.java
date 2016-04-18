@@ -7,9 +7,9 @@ import java.io.Serializable;
  *
  * @author tomaz
  */
-public class EParameter extends Entity  implements Serializable {
+public class EVariable extends Entity  implements Serializable {
   // Entity identifier
-  public static final String ID_ResultParameter   = "Parameter";
+  public static final String ID_Variable   = "Variable";
   
   // Fields
   public static final String ID_Desc     = "Description";
@@ -18,34 +18,38 @@ public class EParameter extends Entity  implements Serializable {
   public static final String ID_Value    = "Value";
   
 
-  private ParameterType type;
+  private VariableType type;
   private String subtype; 
   
-  public EParameter() {
-   super(ID_ResultParameter, 
+  public EVariable() {
+   super(ID_Variable, 
 	 new String [] {ID_Desc, ID_Type, ID_Subtype, ID_Value});
   
    setRepresentatives(ID_Value);
   }
   
-  public EParameter(File fileName) {
+  public EVariable(File fileName) {
     this();
     initFromFile(fileName);
     
     setTypeAndSubtype();
   }
   
-  public EParameter(String json) {
+  public EVariable(String json) {
     this();
     initFromJSON(json);
 
     setTypeAndSubtype();
   }
 
-  public EParameter(String name, String desc, ParameterType type, Object value) {
+  public EVariable(String name, VariableType type, Object value) {
+    this(name, "", type, value);
+  }
+    
+  public EVariable(String name, String desc, VariableType type, Object value) {
     this();
     
-    set(ID_NAME, name);
+    setName(name);
     set(ID_Desc, desc);
     set(ID_Value, value);
 
@@ -83,14 +87,14 @@ public class EParameter extends Entity  implements Serializable {
    */
   private void setTypeAndSubtype() {
     String typeDesc = getField(ID_Type);
-    this.type = ParameterType.getType(typeDesc);   
+    this.type = VariableType.getType(typeDesc);   
     
     String subty = getField(ID_Subtype);
     if (subty!= null && !subty.isEmpty())
       this.subtype = subty;
   }
 
-  public ParameterType getType() {
+  public VariableType getType() {
     return type;
   }
 
@@ -103,7 +107,7 @@ public class EParameter extends Entity  implements Serializable {
     Object value = get(ID_Value);
     
     // getValue() method for parameters of type DOUBLE returns a value with limited number of decimals (given in subtype) 
-    if (type.equals(ParameterType.DOUBLE)) {
+    if (type.equals(VariableType.DOUBLE)) {
       int decimals = 2;
       try {
         decimals = Integer.parseInt(subtype);        
@@ -129,6 +133,6 @@ public class EParameter extends Entity  implements Serializable {
     
   @Override
   public boolean equals(Object obj) {
-    return (obj instanceof EParameter && ((EParameter)obj).getName().equals(this.getName()));
+    return (obj instanceof EVariable && ((EVariable)obj).getName().equals(this.getName()));
   }  
 }

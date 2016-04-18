@@ -23,6 +23,8 @@ public class ATGlobal {
   public static int logTarget = 1;    // stdout
   public static int verboseLevel = 1; // print some information
   
+  public static final String DEFAULT_CSV_DELIMITER    = ";";
+  
     
   // File extensions for AT entities
   public static final String AT_FILEEXT_project    = "atp";
@@ -53,6 +55,7 @@ public class ATGlobal {
   private static final String ATDIR_tmpDir         = "tmp";
   private static final String ATDIR_tmpFile        = "tmpF";
 
+  private static final String ATDIR_docFolder      = "doc";
   
   private static final String ATDIR_localConfigDir    = "local_config";
   private static final String LOCAL_CONFIG_FILENAME   = "config.atlc";  
@@ -151,16 +154,23 @@ public class ATGlobal {
   }
 
   /**
+   * Return the name of the project's configuration folder 
+   */
+  public static String getPROJECTconfig(String data_root, String projName) {
+    return getPROJECTroot(data_root, projName) + File.separator + ATDIR_projConfDir;
+  }
+  
+  /**
    * Returns the name of the project configuration file
    *
    * @param data_root root for all projects
    * @param projName project name
    */
   public static String getPROJECTfilename(String data_root, String projName) {
-    return getPROJECTroot(data_root, projName) + File.separator
-            + ATDIR_projConfDir + File.separator + projName + "." + AT_FILEEXT_project;
+    return getPROJECTconfig(data_root, projName)
+            + File.separator + projName + "." + AT_FILEEXT_project;
   }
-
+ 
   /**
    * Returns the name of the folder with template file(s) and other java
    * sources.
@@ -271,7 +281,12 @@ public class ATGlobal {
     
     return folderName + File.separator + fileName;
   }
-  
+
+  /************* doc folders   *+++++++++++++++++++++*/
+  public static String getPROJECTdocFolder(String projectRoot) {
+    return projectRoot + File.separator + ATDIR_docFolder;
+  }
+
   
   /************* TMP folders   *+++++++++++++++++++++*/
   public static String getTMProot(String data_local, String prefix) {

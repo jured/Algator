@@ -3,9 +3,6 @@ package si.fri.algotest.entities;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.MessageDigestSpi;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,7 +30,7 @@ public class Entity implements Cloneable, Serializable {
   private final String unknown_value = "?";
   
   // The name of the entity (property Name)
-  public static final String ID_NAME  = "Name";
+  private static final String ID_NAME  = "Name";
   
   /**
    * The ID of an entity in an JSON file
@@ -63,8 +60,9 @@ public class Entity implements Cloneable, Serializable {
   public String entity_file_name;
 
   
-  protected TreeSet<String> fieldNames;
+  protected String [] fieldNames;
   protected HashMap<String, Object> fields;
+  
   
   /**
    * An array of parameters values. This array has to be set before initFromJSON is called. 
@@ -79,8 +77,8 @@ public class Entity implements Cloneable, Serializable {
   protected ArrayList<String> representatives;
 
   public Entity() {
-    fieldNames  = new TreeSet();
-    fields       = new HashMap();
+    fieldNames  = new String[0];
+    fields      = new HashMap();    
   }
   
   public Entity(String entityID, String [] fieldNames) {
@@ -89,9 +87,8 @@ public class Entity implements Cloneable, Serializable {
     entity_id       = entityID;
     entity_name     = unknown_value;
     entity_file_ext = unknown_value;
-    
-    this.fieldNames.addAll(Arrays.asList(fieldNames));
-    
+    this.fieldNames = fieldNames;  
+        
     representatives=new ArrayList<>();
   }
   
@@ -106,6 +103,10 @@ public class Entity implements Cloneable, Serializable {
       name = unknown_value;
     
     return name;
+  }
+  
+  public void setName(String name) {
+    set(ID_NAME, name);
   }
   
   /**
@@ -187,6 +188,8 @@ public class Entity implements Cloneable, Serializable {
   
   public String toJSONString(boolean wrapWithEntity) {
     JSONObject result = new JSONObject();
+        
+    result.put(ID_NAME, getName());
     for(String sp : fieldNames) {
       Object o = fields.get(sp);
       
@@ -232,8 +235,8 @@ public class Entity implements Cloneable, Serializable {
   }   
     
   public int getFieldAsInt(String fieldKey) {
-    int result = 0;
-    if (fieldNames.contains(fieldKey)) {
+    int result = 0;    
+    if (new TreeSet(Arrays.asList(fieldNames)).contains(fieldKey)) {
       try {
         result = (Integer) fields.get(fieldKey);
       } catch (Exception e1) {
@@ -287,7 +290,7 @@ public class Entity implements Cloneable, Serializable {
   protected Object clone() throws CloneNotSupportedException {
     Entity myClone = (Entity) super.clone(); 
     myClone.fields          = (HashMap)   this.fields.clone();
-    myClone.fieldNames      = (TreeSet)   this.fieldNames.clone();
+    myClone.fieldNames      = (String[])  this.fieldNames.clone();
     myClone.representatives = (ArrayList) this.representatives.clone();
     return myClone;
   } 

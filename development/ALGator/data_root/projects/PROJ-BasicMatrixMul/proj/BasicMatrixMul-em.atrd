@@ -1,10 +1,8 @@
 {
-  "ResultDescription":
+  "Result":
   { 
-    "Format"           : "CSV",
-    "Delimiter"        : ";",
-    "TestParameters"   : ["N", "Group"],    	
-    "ResultParameters" : ["Tmin", "Check"],    	
+    "ParameterOrder"   : ["N", "Group"],    	
+    "IndicatorOrder"   : ["Tmin", "Check"],    	
   
     "Parameters":   [	    
       {
@@ -16,8 +14,9 @@
        "Name":        "N",             
        "Description": "The size of the test (number of elements to be sorted)", 
        "Type":        "int"       
-      },
-    
+      }
+    ],
+    "Indicators":   [     
       {
        "Name"        : "Tmin",             
        "Description" : "Algorithm MIN time",             

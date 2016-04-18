@@ -1,7 +1,7 @@
 
-import si.fri.algotest.entities.EParameter;
-import si.fri.algotest.entities.ParameterSet;
-import si.fri.algotest.entities.ParameterType;
+import si.fri.algotest.entities.EVariable;
+import si.fri.algotest.entities.VariableSet;
+import si.fri.algotest.entities.VariableType;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.execute.AbsAlgorithm;
 import si.fri.algotest.global.ErrorStatus;
@@ -11,16 +11,16 @@ import si.fri.algotest.global.ErrorStatus;
  *
  * @author ...
  */
-public abstract class MatrixMulAbsAlgorithm extends AbsAlgorithm {
+public abstract class BasicMatrixMulAbsAlgorithm extends AbsAlgorithm {
 
-  MatrixMulTestCase mmTestCase;
+  BasicMatrixMulTestCase mmTestCase;
   
   int [][] resultC;
 
   @Override
   public ErrorStatus init(TestCase test) {
-    if (test instanceof MatrixMulTestCase) {
-      mmTestCase = (MatrixMulTestCase) test;
+    if (test instanceof BasicMatrixMulTestCase) {
+      mmTestCase = (BasicMatrixMulTestCase) test;
       
       // prepare space for the result
       int n = mmTestCase.A != null ? mmTestCase.A.length : 0;
@@ -37,12 +37,12 @@ public abstract class MatrixMulAbsAlgorithm extends AbsAlgorithm {
   }
   
   @Override
-  public ParameterSet done() {
-    ParameterSet result = new ParameterSet(mmTestCase.getParameters());
+  public VariableSet done() {
+    VariableSet result = new VariableSet(mmTestCase.getParameters());
 
     String ok = matrixEquals(mmTestCase.C,resultC) ? "OK" : "NOK";
-    EParameter passPar = new EParameter("Check", "", ParameterType.STRING, ok);
-    result.addParameter(passPar, true);
+    EVariable passPar = new EVariable("Check", "", VariableType.STRING, ok);
+    result.addVariable(passPar, true);
     
     return result;
   }   
@@ -64,16 +64,3 @@ public abstract class MatrixMulAbsAlgorithm extends AbsAlgorithm {
   // 
   protected abstract void execute(int [][] A, int [][] B, int [][] C);
 }
-
-
-
-/*
- * A version of this class that is given to the end-user
- 
-public abstract class MatrixMulAbsAlgorithm {
-  // TODO: copy-paste the method signiture from above
-  protected abstract void execute(int [][] A, int [][] B, int [][] C);
-}
-
-* 
-*/

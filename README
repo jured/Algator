@@ -35,11 +35,10 @@ in jo odpakiramo v poljuben direktorij (imenujmo ga <algator_root>).
        ALGator
          ALGator.jar
          lib
-     schema
      data_root   
      data_local
  
-3. Nastavimo tri sistemske spremenljivke 
+3. Nastavimo štiri sistemske spremenljivke 
   
        ALGATOR_ROOT=<algator_root>
        ALGATOR_DATA_ROOT=<algator_root>/data_root
@@ -48,23 +47,43 @@ in jo odpakiramo v poljuben direktorij (imenujmo ga <algator_root>).
 
    (v zgornjih ukazih <algator_root> zamenjamo s pravim imenom mape)
 
-       
-4. Izvajalni del ALGatorja poženemo z ukazom
 
-       java algator.Execute
+4. Z ukazom 
+
+  java algator.Version
+
+preverimo pravilnost namestitve sistema (ALGator izpiše verzijo 
+in nastavitev zgoraj opisanih sistemskih spremenljivk).
+
+       
+5. Z ukazom 
+
+  java algator.Admin -ca <ime_projekta> <ime_algoritma>
+
+ustvarimo nov projekt. Pri tem v mapi (in njenih podmapah)
+
+  $ALGATOR_DATA_ROOT/projects/PROJ-<ime_projekta> 
+
+nastanejo konfiguracijske datoteke. Datoteke uredimo skladno
+z navodili (glej doc/ALGator.docx, poglavje Izdelava projekta 
+in algoritma).
+
+
+6. Izvajalni del ALGatorja poženemo z ukazom
+
+       java algator.Execute <ime_projekta>
 	
     analizo rezultatov pa z 
 
-       java algator.Analyse
+       java algator.Analyse <ime_projekta>
 
 
 
 *****************************************************************************
 4) Navodila za avtorje projektov
 *****************************************************************************
-Navodila za avtorje projektov so v datoteki doc/NovProjekt.txt. Pred 
-implementacijo novega projekta je priporočljivo, da avtor prebere tudi opis 
-delovanja celotnega sistema, ki se nahaja v doc/ALGator.docx
+Pred implementacijo novega projekta je priporočljivo, da avtor prebere 
+opis delovanja celotnega sistema, ki se nahaja v doc/ALGator.docx
 
 
 *****************************************************************************

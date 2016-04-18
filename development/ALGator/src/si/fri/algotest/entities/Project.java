@@ -23,7 +23,7 @@ public class Project {
   
   private TreeMap<String, EAlgorithm> algorithms;
   private TreeMap<String, ETestSet>   testsets;
-  private HashMap<MeasurementType, EResultDescription>   resultDescriptions;
+  private HashMap<MeasurementType, EResult>   resultDescriptions;
 	  
   private EProject eProject;
   
@@ -115,7 +115,7 @@ public class Project {
     return testsets;
   }
 
-  public HashMap<MeasurementType, EResultDescription> getResultDescriptions() {
+  public HashMap<MeasurementType, EResult> getResultDescriptions() {
     return resultDescriptions;
   }
   
@@ -127,21 +127,21 @@ public class Project {
    * Returns an array of test parameters present in resultDescriptions
    * @return 
    */
-  static public String[] getTestParameters(HashMap<MeasurementType, EResultDescription> resultDescriptions) {
+  static public String[] getTestParameters(HashMap<MeasurementType, EResult> resultDescriptions) {
     if (resultDescriptions == null || resultDescriptions.get(MeasurementType.EM) == null) 
       return new String[0];
     else
-      return resultDescriptions.get(MeasurementType.EM).getStringArray(EResultDescription.ID_TestParOrder);
+      return resultDescriptions.get(MeasurementType.EM).getStringArray(EResult.ID_ParOrder);
   }
   
   /**
    * Returns an array of result parameters (merged from all result descriptions)
    */
-  static public String[] getResultParameters(HashMap<MeasurementType, EResultDescription> resultDescriptions) {
+  static public String[] getResultParameters(HashMap<MeasurementType, EResult> resultDescriptions) {
     ArrayList<String> params = new ArrayList();
     
-    for (EResultDescription eRedDesc : resultDescriptions.values()) {
-      String [] tParams = eRedDesc.getStringArray(EResultDescription.ID_ResultParOrder);
+    for (EResult eRedDesc : resultDescriptions.values()) {
+      String [] tParams = eRedDesc.getStringArray(EResult.ID_IndOrder);
       for (String param : tParams) 
         if (!params.contains(param))
           params.add(param);
@@ -153,12 +153,12 @@ public class Project {
   /**
    * Returns an array of result parameters for a given measurement type
    */
-  static public String[] getResultParameters(HashMap<MeasurementType, EResultDescription> resultDescriptions, MeasurementType mType) {
+  static public String[] getResultParameters(HashMap<MeasurementType, EResult> resultDescriptions, MeasurementType mType) {
     if (resultDescriptions == null) return new String []{};
 
-    EResultDescription eRedDesc = resultDescriptions.get(mType);
+    EResult eRedDesc = resultDescriptions.get(mType);
     if  (eRedDesc != null) 
-      return eRedDesc.getStringArray(EResultDescription.ID_ResultParOrder);
+      return eRedDesc.getStringArray(EResult.ID_IndOrder);
     else  
       return new String []{};
   }
@@ -170,7 +170,7 @@ public class Project {
       String rdFilename = ATGlobal.getRESULTDESCfilename(projectRootDir, projectName, mType);
       if (!mType.equals(MeasurementType.EM)) // only for EM type an error message is shown; 
         ATLog.disableLog();
-      EResultDescription eResrulDescription = new EResultDescription(new File(rdFilename));
+      EResult eResrulDescription = new EResult(new File(rdFilename));
       ATLog.enableLog();
       if (ErrorStatus.getLastErrorStatus().isOK()) {
         resultDescriptions.put(mType, eResrulDescription);

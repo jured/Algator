@@ -1,8 +1,4 @@
-
-import java.util.Random;
-
-
-public class StrassenAlgorithm extends MatrixMulAbsAlgorithm {
+public class StrassenAlgorithm extends BasicMatrixMulAbsAlgorithm {
   
   private final static int LEAF_SIZE = 256;
 
@@ -51,6 +47,8 @@ public class StrassenAlgorithm extends MatrixMulAbsAlgorithm {
 
   
   private  int[][] strassenR(int[][] A, int[][] B) {
+    int[][] aResult, bResult;
+    
     int n = A.length;
 
     if (n <= LEAF_SIZE) {
@@ -67,9 +65,6 @@ public class StrassenAlgorithm extends MatrixMulAbsAlgorithm {
       int[][] b12 = new int[newSize][newSize];
       int[][] b21 = new int[newSize][newSize];
       int[][] b22 = new int[newSize][newSize];
-
-      int[][] aResult = new int[newSize][newSize];
-      int[][] bResult = new int[newSize][newSize];
 
       // dividing the matrices in 4 sub-matrices:
       for (int i = 0; i < newSize; i++) {

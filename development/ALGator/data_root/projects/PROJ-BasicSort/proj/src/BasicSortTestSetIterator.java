@@ -1,14 +1,12 @@
 import java.io.File;
 import java.util.Random;
 import java.util.Scanner;
-import si.fri.algotest.entities.EParameter;
-import si.fri.algotest.entities.EResultDescription;
-import si.fri.algotest.entities.ETestSet;
-import si.fri.algotest.entities.ParameterType;
+import si.fri.algotest.entities.EVariable;
+import si.fri.algotest.entities.EResult;
+import si.fri.algotest.entities.VariableType;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.execute.DefaultTestSetIterator;
 import si.fri.algotest.global.ErrorStatus;
-import si.fri.algotest.tools.ATTools;
 
 
 /**
@@ -16,33 +14,11 @@ import si.fri.algotest.tools.ATTools;
  * @author tomaz
  */
 public class BasicSortTestSetIterator extends DefaultTestSetIterator {
-   
-  String filePath;
-  String testFileName;
-  
-  private void reportInvalidDataFormat(String note) {
-    String msg = String.format("Invalid input data in file %s in line %d.", testFileName, lineNumber);
-    if (!note.isEmpty())
-      msg += " ("+note+")";
-    
-    ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR,msg);
-  }
-
-  @Override
-  public void initIterator() {
-    super.initIterator();
-    
-    String fileName = testSet.getTestSetDescriptionFile();
-    filePath = testSet.entity_rootdir;
-    testFileName = filePath + File.separator + fileName;
-  }
-
-  
-  
+     
   @Override
   public TestCase getCurrent() {
     if (currentInputLine == null) {
-      ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR, "No valid input!");
+      ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR, "Not a valid input!");
       return null;
     }
     
@@ -64,11 +40,11 @@ public class BasicSortTestSetIterator extends DefaultTestSetIterator {
     String group = fields[2];
     
     // unique identificator of a test
-    EParameter testIDPar = EResultDescription.getTestIDParameter("Test-" + Integer.toString(lineNumber));
+    EVariable testIDPar = EResult.getTestIDParameter("Test-" + Integer.toString(lineNumber));
     
-    EParameter parameter1 = new EParameter("Test",  "Test name",                    ParameterType.STRING, testName);
-    EParameter parameter2 = new EParameter("N",     "Number of elements",           ParameterType.INT,    probSize);
-    EParameter parameter3 = new EParameter("Group", "A name of a group of tests",   ParameterType.STRING, group);
+    EVariable parameter1 = new EVariable("Test",  "Test name",                    VariableType.STRING, testName);
+    EVariable parameter2 = new EVariable("N",     "Number of elements",           VariableType.INT,    probSize);
+    EVariable parameter3 = new EVariable("Group", "A name of a group of tests",   VariableType.STRING, group);
     
     BasicSortTestCase tCase = new BasicSortTestCase();
     // ID

@@ -10,7 +10,7 @@ import si.fri.adeserver.TaskStatus;
 import si.fri.algotest.entities.AlgorithmLanguage;
 import si.fri.algotest.entities.EAlgorithm;
 import si.fri.algotest.entities.EProject;
-import si.fri.algotest.entities.EResultDescription;
+import si.fri.algotest.entities.EResult;
 import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.Project;
@@ -175,7 +175,7 @@ public class Executor {
 
     String projRoot = project .getProjectRoot();
 
-    EResultDescription resDesc = project.getResultDescriptions().get(mType);
+    EResult resDesc = project.getResultDescriptions().get(mType);
     if (resDesc == null) {
       return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_INVALID_RESULTDESCRIPTION, "");
     }

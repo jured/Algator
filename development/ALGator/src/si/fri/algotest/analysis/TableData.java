@@ -5,16 +5,15 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
-import si.fri.algotest.entities.ParameterType;
+import si.fri.algotest.entities.VariableType;
 import si.fri.algotest.entities.StatFunction;
+import si.fri.algotest.global.ATGlobal;
 
 /**
  *
  * @author tomaz
  */
 public class TableData {
-
-  private static String delim = ";";
 
   public ArrayList<String> header;
   public ArrayList<ArrayList<Object>> data;
@@ -203,18 +202,18 @@ public class TableData {
     ArrayList<Integer> fieldPositions = getFieldsPos(filedName);
     if (fieldPositions.isEmpty()) return;
     
-    ParameterType pTypes [] = new ParameterType[fieldPositions.size()];
+    VariableType pTypes [] = new VariableType[fieldPositions.size()];
     for (int i = 0; i < fieldPositions.size(); i++) {
       // detect the type of data in corresponding column
-      ParameterType  type = ParameterType.UNKNOWN;
+      VariableType  type = VariableType.UNKNOWN;
       if (data.get(0).get(fieldPositions.get(i)) instanceof String)
-        type = ParameterType.STRING;
+        type = VariableType.STRING;
       if (data.get(0).get(fieldPositions.get(i)) instanceof Integer)
-        type = ParameterType.INT;
+        type = VariableType.INT;
       if (data.get(0).get(fieldPositions.get(i)) instanceof Double)
-        type = ParameterType.DOUBLE;
+        type = VariableType.DOUBLE;
     
-      if (type.equals(ParameterType.UNKNOWN))
+      if (type.equals(VariableType.UNKNOWN))
         return;
       
       pTypes[i] = type;
@@ -364,7 +363,7 @@ public class TableData {
     HashSet<Integer> emptyRows = new HashSet();    
     for (int j = 0; j < data.get(0).size(); j++) {      
       boolean allUndefined = true;
-      for (int i = 1; i < data.size(); i++) {
+      for (int i = 0; i < data.size(); i++) {
         try {
           Object object = data.get(i).get(j);
           if (object != null && !object.toString().isEmpty() && !"0".equals(object.toString()) && !"?".equals(object.toString())) {
@@ -383,7 +382,7 @@ public class TableData {
     String result = "";
     for (int i = 0; i < header.size(); i++) {
       if (!emptyRows.contains(i))
-        result = add(result, header.get(i), delim);
+        result = add(result, header.get(i), ATGlobal.DEFAULT_CSV_DELIMITER);
     }
 
     for (int i = 0; i < data.size(); i++) {
@@ -393,7 +392,7 @@ public class TableData {
         
         Object object = data.get(i).get(j);
         String value  = object != null ? object.toString() : "null";        
-        vrstica = add(vrstica, value, delim);
+        vrstica = add(vrstica, value, ATGlobal.DEFAULT_CSV_DELIMITER);
       }
       result = add(result, vrstica, "\n");
     }

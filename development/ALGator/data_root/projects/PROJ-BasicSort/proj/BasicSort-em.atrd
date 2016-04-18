@@ -1,13 +1,10 @@
 {
-  "ResultDescription":
+  "Result":
   { 
-    "Format"           : "CSV",
-    "Delimiter"        : ";",
-    "TestParameters"   : ["Test", "Group", "N"],    	
-    "ResultParameters" : ["Tmax", "Tmin", "Tavg", "Tsum", "Check"],    	
+    "ParameterOrder"   : ["Test", "Group", "N"],    	
+    "IndicatorOrder"   : ["Tmax", "Tmin", "Tavg", "Tsum", "Check"],    	
   
     "Parameters":   [	
-    
       {
        "Name":        "Test",             
        "Description": "The name of the test", 
@@ -22,8 +19,9 @@
        "Name":        "N",             
        "Description": "The size of the test (number of elements to be sorted)", 
        "Type":        "int"       
-      },
-    
+      }
+    ], 
+    "Indicators":   [    
       {
        "Name"         : "Tmax",             
        "Description"  : "Sorting MAX time",             

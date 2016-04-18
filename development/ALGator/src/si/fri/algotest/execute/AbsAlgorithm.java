@@ -3,7 +3,7 @@ package si.fri.algotest.execute;
 import java.io.Serializable;
 import java.util.HashMap;
 import si.fri.algotest.entities.MeasurementType;
-import si.fri.algotest.entities.ParameterSet;
+import si.fri.algotest.entities.VariableSet;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ErrorStatus;
@@ -104,7 +104,7 @@ public abstract class AbsAlgorithm implements Cloneable, Serializable {
    * This metod is called after the method run() to collect the result data and to 
    * verify the correctness of the solution. 
    */
-  public abstract ParameterSet done();
+  public abstract VariableSet done();
   
   
   @Override

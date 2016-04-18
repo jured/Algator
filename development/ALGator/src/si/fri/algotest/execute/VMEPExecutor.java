@@ -10,11 +10,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import org.apache.commons.io.FileUtils;
-import si.fri.algotest.entities.EParameter;
-import si.fri.algotest.entities.EResultDescription;
+import si.fri.algotest.entities.EVariable;
+import si.fri.algotest.entities.EResult;
 import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.MeasurementType;
-import si.fri.algotest.entities.ParameterSet;
+import si.fri.algotest.entities.VariableSet;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.global.ATGlobal;
@@ -48,20 +48,20 @@ public class VMEPExecutor {
    * @param verbose 
    */
   public static void iterateTestSetAndRunAlgorithm(Project project, String algName, 
-          String testSetName, EResultDescription resultDesc, AbstractTestSetIterator it, 
+          String testSetName, EResult resultDesc, AbstractTestSetIterator it, 
           Notificator notificator, File resultFile) {
 
-    ArrayList<ParameterSet> allAlgsRestuls = new ArrayList();
+    ArrayList<VariableSet> allAlgsRestuls = new ArrayList();
     VMEPErrorStatus executionStatus;
     
-    String delim      = resultDesc.getField(EResultDescription.ID_Delim);
-    EParameter algPar = EResultDescription.getAlgorithmNameParameter(algName);
-    String algP       = algPar.getField(EParameter.ID_Value);
-    EParameter tsPar  = EResultDescription.getTestsetNameParameter(testSetName);
-    String tsP        = tsPar.getField(EParameter.ID_Value);
+    String delim      = ATGlobal.DEFAULT_CSV_DELIMITER;
+    EVariable algPar  = EResult.getAlgorithmNameParameter(algName);
+    String algP       = algPar.getField(EVariable.ID_Value);
+    EVariable tsPar   = EResult.getTestsetNameParameter(testSetName);
+    String tsP        = tsPar.getField(EVariable.ID_Value);
     
-    EParameter killedEx = EResultDescription.getExecutionStatusParameter(ExecutionStatus.KILLED);
-    EParameter failedEx = EResultDescription.getExecutionStatusParameter(ExecutionStatus.FAILED);
+    EVariable killedEx = EResult.getExecutionStatusIndicator(ExecutionStatus.KILLED);
+    EVariable failedEx = EResult.getExecutionStatusIndicator(ExecutionStatus.FAILED);
       
     /* The name of the output file */
     String projectRoot = ATGlobal.getPROJECTroot(project.getDataRoot(), project.getName());
@@ -81,16 +81,16 @@ public class VMEPExecutor {
       while (it.hasNext()) {
         it.readNext();++testID;
 
-        ParameterSet result = new ParameterSet();
-        result.addParameter(algPar, true);
-        result.addParameter(tsPar,  true);
+        VariableSet result = new VariableSet();
+        result.addVariable(algPar, true);
+        result.addVariable(tsPar,  true);
 
         String tmpFolderName = ATGlobal.getTMPDir(project.getName());          
         
         TestCase testCase = it.getCurrent();
         if (testCase != null) {
-          EParameter testP = testCase.getParameters().getParamater(EResultDescription.testIDParName);
-          result.addParameter(testP,  true);
+          EVariable testP = testCase.getParameters().getVariable(EResult.testIDParName);
+          result.addVariable(testP,  true);
           
           executionStatus = runWithLimitedTime(project.getName(), algName, testSetName, testID, 
                   tmpFolderName, project.getDataRoot(), ATGlobal.getALGatorDataLocal(), timeLimit);
@@ -104,16 +104,16 @@ public class VMEPExecutor {
         if (!executionStatus.equals(VMEPErrorStatus.OK)) {
           if (executionStatus.equals(VMEPErrorStatus.KILLED)) {
             notificator.notify(testID,ExecutionStatus.KILLED);
-            result.addParameter(killedEx, true);
-            result.addParameter(EResultDescription.getErrorParameter(
+            result.addVariable(killedEx, true);
+            result.addVariable(EResult.getErrorIndicator(
               String.format("Killed after %d second(s)", timeLimit)), true);
           } else {
             notificator.notify(testID,ExecutionStatus.FAILED);
-            result.addParameter(failedEx, true);
-            result.addParameter(EResultDescription.getErrorParameter(
+            result.addVariable(failedEx, true);
+            result.addVariable(EResult.getErrorIndicator(
               ErrorStatus.getLastErrorMessage() + executionStatus.toString()), true);
           }
-          testResultLine=result.toString(resultDesc.getParamsOrder(), false, delim);
+          testResultLine=result.toString(resultDesc.getVariableOrder(), false, delim);
         } else {
           String oneResultFilename = ATGlobal.getJVMRESULTfilename(tmpFolderName, algName, testSetName, testID);
           try (Scanner sc = new Scanner(new File(oneResultFilename))) {
@@ -122,16 +122,16 @@ public class VMEPExecutor {
               notificator.notify(testID,ExecutionStatus.DONE);
             } else {
               notificator.notify(testID,ExecutionStatus.FAILED);
-              result.addParameter(failedEx, true);
-              result.addParameter(EResultDescription.getErrorParameter(
+              result.addVariable(failedEx, true);
+              result.addVariable(EResult.getErrorIndicator(
                 VMEPErrorStatus.UNKNOWN.toString()), true);
-              testResultLine=result.toString(resultDesc.getParamsOrder(), false, delim);
+              testResultLine=result.toString(resultDesc.getVariableOrder(), false, delim);
             }
           } catch (Exception e) {
             notificator.notify(testID,ExecutionStatus.FAILED);
-            result.addParameter(failedEx, true);
-            result.addParameter(EResultDescription.getErrorParameter(e.toString()), true);
-            testResultLine=result.toString(resultDesc.getParamsOrder(), false, delim);
+            result.addVariable(failedEx, true);
+            result.addVariable(EResult.getErrorIndicator(e.toString()), true);
+            testResultLine=result.toString(resultDesc.getVariableOrder(), false, delim);
           }
         }  
         // append a line representing test results to the corresponding result file        

@@ -1,6 +1,6 @@
-import si.fri.algotest.entities.EParameter;
-import si.fri.algotest.entities.ParameterSet;
-import si.fri.algotest.entities.ParameterType;
+import si.fri.algotest.entities.EVariable;
+import si.fri.algotest.entities.VariableSet;
+import si.fri.algotest.entities.VariableType;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.execute.AbsAlgorithm;
 import si.fri.algotest.global.ErrorStatus;
@@ -31,12 +31,12 @@ public abstract class BasicSortAbsAlgorithm extends AbsAlgorithm {
 
   
   @Override
-  public ParameterSet done() {
-    ParameterSet result = new ParameterSet(sortTestCase.getParameters());
+  public VariableSet done() {
+    VariableSet result = new VariableSet(sortTestCase.getParameters());
     
-    EParameter passPar = new EParameter("Check", "", ParameterType.STRING, 
+    EVariable passPar = new EVariable("Check", "", VariableType.STRING, 
 	 ATTools.isArraySorted(sortTestCase.arrayToSort, 1) ? "OK" : "NOK");
-    result.addParameter(passPar, true);
+    result.addVariable(passPar, true);
         
     return result;
   }   

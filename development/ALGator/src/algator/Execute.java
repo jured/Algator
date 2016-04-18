@@ -16,7 +16,7 @@ import si.fri.adeserver.ADETools;
 import si.fri.adeserver.TaskStatus;
 import si.fri.algotest.entities.EAlgorithm;
 import si.fri.algotest.entities.ELocalConfig;
-import si.fri.algotest.entities.EResultDescription;
+import si.fri.algotest.entities.EResult;
 import si.fri.algotest.entities.ETestSet;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.Project;
@@ -318,7 +318,7 @@ public class Execute {
     }
             
     // Test mesurement type
-    EResultDescription rDesc = projekt.getResultDescriptions().get(mType);  
+    EResult rDesc = projekt.getResultDescriptions().get(mType);  
     if (rDesc == null) {
       ATGlobal.verboseLevel=1;
       ATLog.log(String.format("Result description file for '%s' does not exist.\n", mType.getExtension()), 1);
@@ -348,7 +348,7 @@ public class Execute {
             boolean uptodate = ATTools.resultsAreUpToDate(projekt, eAlg.getName(), eTestSet.getName(), mtype, resultFileName);
             boolean complete = ATTools.resultsAreComplete(resultFileName, expectedNumberOfInstances);
 	    
-            System.out.printf("File: '%s'\n", resultFileName);
+            //System.out.printf("File: '%s'\n", resultFileName);
 	    System.out.printf("                 %-23s%-15s%-7s%-9s%-9s\n", eAlg.getName(), eTestSet.getName(), mtype, new Boolean(uptodate), new Boolean(complete));
 	  }
         }

@@ -427,21 +427,21 @@ public class DataAnalyser {
     Project.readResultDescriptions(eProject.getProjectRootDir(), eProject.getName(), resultDescriptions, errors);
     
     String [] allINParamaters = Project.getTestParameters(resultDescriptions);
-    String inParameters []    = getQueryEntities(query, EQuery.ID_inParameters, allINParamaters);        
+    String inParameters []    = getQueryEntities(query, EQuery.ID_Parameters, allINParamaters);        
     NameAndAbrev[] inPars     = query.getNATabFromJSONArray(inParameters);
 
 
     // calculate EM parameters ...
     String [] allEMParamaters = Project.getResultParameters(resultDescriptions, MeasurementType.EM);
-    String emParameters []    = getQueryEntities(query, EQuery.ID_outParameters, allEMParamaters, "*EM");        
+    String emParameters []    = getQueryEntities(query, EQuery.ID_Indicators, allEMParamaters, "*EM");        
     NameAndAbrev[] emPars     = query.getNATabFromJSONArray(emParameters);
     // ... CNT parameters ...
     String [] allCNTParamaters = Project.getResultParameters(resultDescriptions, MeasurementType.CNT);
-    String cntParameters []    = getQueryEntities(query, EQuery.ID_outParameters, allCNTParamaters, "*CNT");        
+    String cntParameters []    = getQueryEntities(query, EQuery.ID_Indicators, allCNTParamaters, "*CNT");        
     NameAndAbrev[] cntPars     = query.getNATabFromJSONArray(cntParameters);
     // ... JVM parameters ...
     String [] allJVMParamaters = Project.getResultParameters(resultDescriptions, MeasurementType.JVM);
-    String jvmParameters []    = getQueryEntities(query, EQuery.ID_outParameters, allJVMParamaters, "*JVM");        
+    String jvmParameters []    = getQueryEntities(query, EQuery.ID_Indicators, allJVMParamaters, "*JVM");        
     NameAndAbrev[] jvmPars     = query.getNATabFromJSONArray(jvmParameters);
     // ... and join all together
     int n = 0;

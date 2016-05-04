@@ -108,7 +108,7 @@ public class QueryAndGraphPanel extends javax.swing.JPanel {
       ArrayList<String> fields = new ArrayList<>();
       
       ArrayList<String> outParams = new ArrayList<>();
-      for (String op : query.getStringArray(EQuery.ID_outParameters)) 
+      for (String op : query.getStringArray(EQuery.ID_Indicators)) 
         outParams.add(new NameAndAbrev(op).getAbrev());
       outParams.add("COUNT");
       

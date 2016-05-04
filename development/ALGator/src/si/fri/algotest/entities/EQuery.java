@@ -20,8 +20,8 @@ public class EQuery extends Entity {
   public static final String ID_Description    = "Description";	     // String
   public static final String ID_Algorithms     = "Algorithms";       // NameAndAbrev []
   public static final String ID_TestSets       = "TestSets";         // NameAndAbrev []
-  public static final String ID_inParameters   = "TestParameters";   // String []
-  public static final String ID_outParameters  = "ResultParameters"; // String []
+  public static final String ID_Parameters   = "Parameters";         // String []
+  public static final String ID_Indicators  = "Indicators";          // String []
   public static final String ID_GroupBy        = "GroupBy";          // String []
   public static final String ID_Filter         = "Filter";           // String []
   public static final String ID_SortBy         = "SortBy";           // String []
@@ -30,7 +30,7 @@ public class EQuery extends Entity {
   
   public EQuery() {
    super(ID_Query, 
-	 new String [] {ID_Description, ID_Algorithms, ID_TestSets, ID_inParameters, ID_outParameters, 
+	 new String [] {ID_Description, ID_Algorithms, ID_TestSets, ID_Parameters, ID_Indicators, 
                         ID_GroupBy, ID_Filter, ID_SortBy, ID_Count, ID_ComputerID});
    setRepresentatives(ID_Algorithms, ID_TestSets);
   }
@@ -42,8 +42,8 @@ public class EQuery extends Entity {
     
     set(ID_Algorithms,    new JSONArray(algs));
     set(ID_TestSets,      new JSONArray(tsts));
-    set(ID_inParameters,  new JSONArray(inParams));
-    set(ID_outParameters, new JSONArray(outParams));
+    set(ID_Parameters,  new JSONArray(inParams));
+    set(ID_Indicators, new JSONArray(outParams));
     set(ID_GroupBy,       new JSONArray(groupby));
     set(ID_Filter,        new JSONArray(filter));
     set(ID_SortBy,        new JSONArray(sortby));

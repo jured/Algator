@@ -169,8 +169,8 @@ public class QueryComposer extends javax.swing.JPanel {
     try {
       setNAAPanelValues(query.getNATabFromJSONArray(EQuery.ID_Algorithms), algNAAs);
       setNAAPanelValues(query.getNATabFromJSONArray(EQuery.ID_TestSets), tstsNAAs);
-      setNAAPanelValues(query.getNATabFromJSONArray(EQuery.ID_inParameters), infieldNAAs);
-      setNAAPanelValues(query.getNATabFromJSONArray(EQuery.ID_outParameters), outfieldNAAs);
+      setNAAPanelValues(query.getNATabFromJSONArray(EQuery.ID_Parameters), infieldNAAs);
+      setNAAPanelValues(query.getNATabFromJSONArray(EQuery.ID_Indicators), outfieldNAAs);
     
     // currently only one GropuBy, one Filter and one SortBy is supported
       String[] gb = query.getStringArray(EQuery.ID_GroupBy);

@@ -3,7 +3,7 @@ ChangeLog for project ALGator since November 2014
 C12 (April 2016)
   - major changes in system configuration + documentation update
   - algator.Admin class added
-
+  
 C11 (July 2015, td)
   - TaskServer and TaskClient programs were added
 

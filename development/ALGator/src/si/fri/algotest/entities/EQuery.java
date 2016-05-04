@@ -20,8 +20,8 @@ public class EQuery extends Entity {
   public static final String ID_Description    = "Description";	     // String
   public static final String ID_Algorithms     = "Algorithms";       // NameAndAbrev []
   public static final String ID_TestSets       = "TestSets";         // NameAndAbrev []
-  public static final String ID_Parameters   = "Parameters";         // String []
-  public static final String ID_Indicators  = "Indicators";          // String []
+  public static final String ID_Parameters     = "Parameters";       // String []
+  public static final String ID_Indicators     = "Indicators";       // String []
   public static final String ID_GroupBy        = "GroupBy";          // String []
   public static final String ID_Filter         = "Filter";           // String []
   public static final String ID_SortBy         = "SortBy";           // String []

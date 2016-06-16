@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +14,6 @@ import si.fri.algotest.analysis.DataAnalyser;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ErrorStatus;
-import si.fri.algotest.tools.ATTools;
 
 /**
  *
@@ -64,6 +64,32 @@ public class ADETaskServer implements Runnable {
       return ADEGlobal.getErrorString(ADEGlobal.ERROR_ERROR_CREATE_TASK);
   }
 
+  /**
+   * Remove task from a queue. 
+   * Call: removeTask task_id
+   * Return: task_id  that was removed or -1 if it does not exist
+   */
+  public String removeTask(ArrayList<String> params) {
+    if (params.size() != 1)
+      return ADEGlobal.getErrorString(ADEGlobal.ERROR_INVALID_NPARS);
+    
+    Integer taskID;
+    try {
+      taskID = Integer.parseInt(params.get(0));
+    } catch (Exception e) {taskID=-1;}
+    
+    Iterator<ADETask> it = taskQueue.iterator();
+    while(it.hasNext()) {
+      ADETask task = it.next();
+      if (task.getField(ADETask.ID_TaskID).equals(taskID)) {
+        it.remove();
+        ADETools.writeADETasks(taskQueue);
+        
+        return "Task with id=" + taskID.toString() + " removed!";
+      }                
+    }
+    return "Task does not exist.";
+  }
   
   public String taskStatus(ArrayList<String> params) {
     if (params.size() != 1)
@@ -239,7 +265,7 @@ public class ADETaskServer implements Runnable {
   
   private String listTasks() {
     StringBuffer sb = new StringBuffer();
-    for (ADETask tsk : taskQueue) {
+            for (ADETask tsk : taskQueue) {
       sb.append((sb.length() > 0 ? "\n" : "")).append(tsk.toStringPlus());
     }
     return sb.toString();
@@ -255,10 +281,23 @@ public class ADETaskServer implements Runnable {
     return String.format("Server on for %s, Queued tasks: %d, Running tasks: %s\n", getServerRunningTime(), q,e);
   }
   
-  private String processRequest(String request) {
-    if (!request.toUpperCase().startsWith(ADEGlobal.REQ_GET_NEXT_TASK.toString().toUpperCase()))
-      ADELog.log("REQUEST: " + request);
-    
+  private String getServerPaths() {
+    return String.format("ALGATOR_ROOT=%s, DATA_ROOT=%s", ATGlobal.getALGatorRoot(), ATGlobal.getALGatorDataRoot());
+  }
+  
+  private String getServerLog(ArrayList<String> params) {
+    String nS;
+    if (params.size() != 1)
+      nS = "10";
+    else 
+      nS = params.get(0);
+    int n=10; try {n=Integer.parseInt(nS);} catch (Exception e) {}
+
+    return ADELog.getLog(n);
+  }
+  
+  
+  private String processRequest(String request) {    
     String [] parts = request.split(" ");
     if (parts.length == 0) return "";
     
@@ -290,6 +329,11 @@ public class ADETaskServer implements Runnable {
       // appends task to the queue; parameters required: project algorithm testset mtype
       case ADEGlobal.REQ_ADD_TASK:
         return addTask(params);
+
+      // appends task to the queue; parameters required: project algorithm testset mtype
+      case ADEGlobal.REQ_REMOVE_TASK:
+        return removeTask(params);
+        
         
       // prints the status of given task; parameters required: taskID
       case ADEGlobal.REQ_TASK_STATUS:
@@ -310,8 +354,14 @@ public class ADETaskServer implements Runnable {
         return projectStatus(params);
         
       case ADEGlobal.REQ_QUERY_RES:
-        return queryResult(params);                      
+        return queryResult(params);   
         
+      case ADEGlobal.REQ_ADMIN_PRINTPATHS:
+        return getServerPaths();
+
+      case ADEGlobal.REQ_ADMIN_PRINTLOG:
+        return getServerLog(params);
+                
       default:
         return ADEGlobal.getErrorString("Unknown request");
     }
@@ -323,15 +373,23 @@ public class ADETaskServer implements Runnable {
          PrintWriter pw = new PrintWriter(connection.getOutputStream());) {
         while (sc.hasNextLine()) {
           String request = sc.nextLine();
+
+          if (!ADEGlobal.nonlogableRequests.contains(request))
+            ADELog.log("[REQUEST]:  " + request);
+          
           if (request.equals("Bye")) {
             pw.println("Byebye.");
             break;
           }
-          
-          String answer  =  processRequest(request).replaceAll("\n", "<br>");
-          pw.println(answer);
+                              
+          String response  =  processRequest(request).replaceAll("\n", "<br>");          
+  
+          if (!ADEGlobal.nonlogableRequests.contains(request))
+            ADELog.log("[RESPONSE]: " + response);
+
+          pw.println(response);
           pw.flush();
-          
+                              
           // some requests finish the communication imediately
           if (request.startsWith(ADEGlobal.REQ_STATUS) ||
               request.startsWith(ADEGlobal.REQ_CHECK_Q)) {

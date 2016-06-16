@@ -78,7 +78,6 @@ public class ADETools {
       computer = task.getField(ADETask.ID_AssignedComputer);
     
     
-    
     writeTaskStatus(task, status, msg, computer);
     
     ADETools.writeADETasks(taskQueue);

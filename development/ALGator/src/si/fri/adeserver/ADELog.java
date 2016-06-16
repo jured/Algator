@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Scanner;
 import static si.fri.algotest.global.ATLog.LOG_TARGET_FILE;
 import static si.fri.algotest.global.ATLog.LOG_TARGET_OFF;
 import static si.fri.algotest.global.ATLog.LOG_TARGET_STDOUT;
@@ -37,6 +38,26 @@ public class ADELog {
       pw.println(logMsg);
     } catch (Exception e) {
       // error in logging can not be loged
+    }
+  }
+  
+  /**
+   * Returns the last n log messages
+   */
+  public static String getLog(int n) {
+    try (Scanner sc = new Scanner(new File(logFileName))){      
+      sc.useDelimiter("\\Z");
+      String vrstice[] =  sc.next().split("\n");
+      if (vrstice.length > 0) {
+        n = Math.min(n, vrstice.length);
+        String result=vrstice[vrstice.length-n];
+        for (int i = vrstice.length - n + 1; i < vrstice.length; i++) {
+          result += "\n" + vrstice[i];
+        }
+        return result;
+      } else return "";
+    } catch (Exception e) {
+            return "Error reading log file: " + e.toString();
     }
   }
 }

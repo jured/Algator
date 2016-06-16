@@ -3,6 +3,7 @@ package si.fri.adeserver;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import java.util.TreeSet;
 import si.fri.algotest.global.ATGlobal;
 
 /**
@@ -16,23 +17,39 @@ public class ADEGlobal {
   /*
    * REQUESTS
    */
-  public static final String REQ_WHO            = "WHO";            // no parameters
-  public static final String REQ_LIST           = "LIST";           // no parameters
-  public static final String REQ_ADD_TASK       = "ADDTASK";        // parameters: project_name algorithm_name testset_name measurement_type
-  public static final String REQ_GET_NEXT_TASK  = "GETNEXTTASK";    // parameters: computerID
-  public static final String REQ_COMPLETE_TASK  = "COMPLETETASK";   // parameters: taskID
-  public static final String REQ_STATUS         = "STATUS";         // no parameters
-  public static final String REQ_TASK_STATUS    = "TASKSTATUS";     // parameters: taskID
-  public static final String REQ_PROJ_STATUS    = "PROJECTSTATUS";  // parameters: projectName
-  public static final String REQ_QUERY_RES      = "GETQUERYRESULT"; // parameters: projectName
+  public static final String REQ_WHO              = "WHO";            // no parameters
+  public static final String REQ_LIST             = "LIST";           // no parameters
+  public static final String REQ_ADD_TASK         = "ADDTASK";        // parameters: project_name algorithm_name testset_name measurement_type
+  public static final String REQ_REMOVE_TASK      = "REMOVETASK";     // parameters: taskID
+  public static final String REQ_GET_NEXT_TASK    = "GETNEXTTASK";    // parameters: computerID
+  public static final String REQ_COMPLETE_TASK    = "COMPLETETASK";   // parameters: taskID
+  public static final String REQ_STATUS           = "STATUS";         // no parameters
+  public static final String REQ_TASK_STATUS      = "TASKSTATUS";     // parameters: taskID
+  public static final String REQ_PROJ_STATUS      = "PROJECTSTATUS";  // parameters: projectName
+  public static final String REQ_QUERY_RES        = "GETQUERYRESULT"; // parameters: projectName
+  public static final String REQ_ADMIN_PRINTPATHS = "PRINTPATHS";     // no parameters
+  public static final String REQ_ADMIN_PRINTLOG   = "PRINTLOG";       // parameters: numberOfLogs (default: 10)
   
   
+  // a set of requests that do not log into log file
+  public static final TreeSet<String> nonlogableRequests;
+  static {
+    nonlogableRequests = new TreeSet(String.CASE_INSENSITIVE_ORDER);
+    nonlogableRequests.add(REQ_WHO);
+    nonlogableRequests.add(REQ_LIST);
+    nonlogableRequests.add(REQ_GET_NEXT_TASK);
+    nonlogableRequests.add(REQ_STATUS);
+    nonlogableRequests.add(REQ_TASK_STATUS);
+    nonlogableRequests.add(REQ_PROJ_STATUS);
+    nonlogableRequests.add(REQ_ADMIN_PRINTLOG);
+    nonlogableRequests.add(REQ_ADMIN_PRINTPATHS);
+  }
   
 
   /**
    * TaskServer healthy checking question and answer
    */
-  public static final String REQ_CHECK_Q        = "hello?";
+  public static final String REQ_CHECK_Q        = "HELLO";
   public static final String REQ_CHECK_A        = "TaskServer status: OK";
   
   /*

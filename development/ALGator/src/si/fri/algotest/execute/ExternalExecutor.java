@@ -15,12 +15,10 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import si.fri.algotest.entities.EVariable;
 import si.fri.algotest.entities.EResult;
 import si.fri.algotest.entities.ETestSet;
-import si.fri.algotest.entities.Entity;
 import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.VariableSet;
 import si.fri.algotest.entities.VariableType;
@@ -132,9 +130,9 @@ public class ExternalExecutor {
         // subtype - število decimalk) ni prenesel in se je zato vedno uporabila default vrednost. Po tej spremembi se 
         // podatki prevailno prenesejo, upam pa, da se kaj drugega ne podre! Če se, briši spodnji dve vrstici in 
         // poišči drugo rešitev za prenos podatkov o parametrih iz atrd datoteke!
-        for (int i=0; i<resultDesc.getVariables().size(); i++) 
-          testCase.addParameter(resultDesc.getVariables().getVariable(i), false);
-        
+        for (EVariable evar : resultDesc.getVariables()) {
+          testCase.addParameter(evar, false);
+        }
         
         AbsAlgorithm curAlg = New.algorithmInstance(project, algName, mType);
         curAlg.setTimesToExecute(timesToExecute);
@@ -310,9 +308,7 @@ public class ExternalExecutor {
     long[][] times = algorithm.getExecutionTimes();
 
     if (resultDesc != null) {
-      VariableSet pSet = resultDesc.getVariables();
-      for (int i = 0; i < resultDesc.getVariables().size(); i++) {
-        EVariable rdP = pSet.getVariable(i);
+      for (EVariable rdP : resultDesc.getVariables()) {
         if (VariableType.TIMER.equals(rdP.getType())) {
           String[] subtypeFields;
           try {
@@ -353,10 +349,9 @@ public class ExternalExecutor {
     VariableSet counterParameters = new VariableSet();
     HashMap<String, Integer> counters = algorithm.getCounters();
     if (resultDesc != null && counters != null) {
-      VariableSet pSet = resultDesc.getVariables();
-      for (int i = 0; i < pSet.size(); i++) {
-        if (VariableType.COUNTER.equals(pSet.getVariable(i).getType())) {
-          String counterName = (String) pSet.getVariable(i).getName();
+      for (EVariable evar : resultDesc.getVariables()) {
+        if (VariableType.COUNTER.equals(evar.getType())) {
+          String counterName = (String) evar.getName();
           int value = 0;
           if (counters.containsKey(counterName)) {
             value = counters.get(counterName);

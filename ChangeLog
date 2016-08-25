@@ -1,5 +1,25 @@
 ChangeLog for project ALGator since November 2014
 
+C13 (Avgust 2016, Ernest Stukelj)
+Dodan nov poizvedovalni jezik (A-SQL):
+
+  Dodane datoteke:ASqlObject.java, AlgInterpreter.java, Cache.java, CacheEntry.java, LengthComparator.java, ReadResultsInitData.java, ASQLComposer.java, ASQLComposer.form, IQueryComposer.java
+
+  Spremenjene datoteke:
+  - Analyse.java: spremembe zaradi novega formata.
+  - DataAnalyser.java: veliko sprememb.
+  - TableData.java: malo spremenjen getComparator.
+  - QueryAndGraphPanel: dodan GUI za ASQL.
+  - QueryComposer: spremembe zaradi dodanih izracunljivih polj, 
+    interface IQueryComposer. Moral sem odstraniti nastavljanje ikon.
+  - Entity.java: dodana metoda public ErrorStatus initFromFile(File entityFile, 
+    String format, Project project) in overload. ID_NAME public.
+  - EQuery.java: dodana metoda public String getCacheKey()
+  - VariableSet.java: vec sprememb, dodan iterface Iterable<EVariable>, variables v 
+    HashMap<String, EVariable>
+  - ExternalExecuter: zaradi spremembe tipa variables v VariableSet spremenjene 3 for zanke.
+
+
 C12 (April 2016)
   - major changes in system configuration + documentation update
   - algator.Admin class added

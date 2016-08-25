@@ -14,8 +14,9 @@ import si.fri.algotest.global.ErrorStatus;
  */
 public class EQuery extends Entity {
   // Entity identifier
-  public static final String ID_Query   ="Query";  
   
+  public static final String ID_Query = "Query";
+
   //Fields
   public static final String ID_Description    = "Description";	     // String
   public static final String ID_Algorithms     = "Algorithms";       // NameAndAbrev []
@@ -87,8 +88,9 @@ public class EQuery extends Entity {
     
     return result;
   }
-  public NameAndAbrev [] getNATabFromJSONArray(String id) {
-    String [] entities = getStringArray(id);
+
+    public NameAndAbrev[] getNATabFromJSONArray(String id) {
+        String[] entities = getStringArray(id);
     return getNATabFromJSONArray(entities);
   }
   
@@ -112,6 +114,20 @@ public class EQuery extends Entity {
   
   public void applyParameters(String [] parameters) {
     
+  }
+  
+  public String getCacheKey() {
+    Object algs = get(ID_Algorithms);
+    Object ts = get(ID_TestSets);
+    Object params = get(ID_Parameters);
+    Object indicators = get(ID_Indicators);
+    Object compId = get(ID_ComputerID);
+    return ((algs == null ? "" : algs.toString())
+            + (ts == null ? "" : ts.toString())
+            + (params == null ? "" : params.toString())
+            + (indicators == null ? "" : indicators.toString())
+            + ((get(ID_Count) == null) ? "" : get(ID_Count).toString())
+            + (compId == null ? "" : compId.toString()));
   }
   
 }

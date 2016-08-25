@@ -597,6 +597,14 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
     }
   }
   
+  public static String stringJoin(String delim, Iterable<String> parts) {
+    String result = "";
+    for (String part : parts) {
+      result += (result.isEmpty() ? "" : delim) + part;
+    }
+    return result;
+  }
+  
   public static void main(String[] args) {
     Project project = new Project("/Users/Tomaz/Dropbox/FRI/ALGOSystem/ALGATOR_ROOT/data_root", "Sorting");
     

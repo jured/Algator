@@ -10,6 +10,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.asql.ASqlObject;
 import org.json.JSONObject;
 import si.fri.algotest.analysis.DataAnalyser;
 import si.fri.algotest.analysis.view.Analyser;
@@ -42,14 +43,12 @@ public class Analyse {
             .withDescription("use this folder as data_LOCALE; default value in $ALGATOR_DATA_LOCALE (if defined) or $ALGATOR_ROOT/data_local")
             .create("dl");
     
-    
     Option algator_root = OptionBuilder.withArgName("folder")
             .withLongOpt("algator_root")
             .hasArg(true)
             .withDescription("use this folder as algator_root; default value in $ALGATOR_ROOT")
             .create("r");
 
-    
     Option query = OptionBuilder.withArgName("query_name")
             .withLongOpt("query")
             .hasArg(true)
@@ -62,6 +61,12 @@ public class Analyse {
             .withDescription("the origin of the query (R=data root folder, F=custom folder, S=standard input); default: R")
             .create("o");
     
+        Option queryFormat = OptionBuilder.withArgName("JSON|ASQL")
+                .withLongOpt("query_format")
+                .hasArg(true)
+                .withDescription("query format")
+                .create("qf");
+
     Option computerID = OptionBuilder.withArgName("computer_id")
             .withLongOpt("cid")
             .hasArg(true)
@@ -74,7 +79,6 @@ public class Analyse {
             .withDescription("print additional information (0 = OFF, 1 = some (default), 2 = all")
             .create("v");
 
-
     options.addOption(data_root);
     options.addOption(data_local);
     options.addOption(algator_root);
@@ -82,6 +86,7 @@ public class Analyse {
     options.addOption(queryOrigin);
     options.addOption(computerID);
     options.addOption(verbose);
+        options.addOption(queryFormat);
 
     options.addOption("h", "help", false,
             "print this message");
@@ -102,8 +107,9 @@ public class Analyse {
 
   private static void printUsage() {
     Scanner sc = new Scanner((new Analyse()).getClass().getResourceAsStream("/data/AnalyserUsage.txt")); 
-    while (sc.hasNextLine())
+        while (sc.hasNextLine()) {
       System.out.println(sc.nextLine());
+        }
     
     System.exit(0);
   }
@@ -127,7 +133,6 @@ public class Analyse {
       if (line.hasOption("u")) {
         printUsage();
       }
-      
       
       String[] curArgs = line.getArgs();
       if (curArgs.length != 1) {
@@ -157,10 +162,12 @@ public class Analyse {
 
       ATGlobal.verboseLevel = 1;
       if (line.hasOption("verbose")) {
-        if (line.getOptionValue("verbose").equals("0"))
+        if (line.getOptionValue("verbose").equals("0")) {
           ATGlobal.verboseLevel = 0;
-        if (line.getOptionValue("verbose").equals("2"))
+        }
+        if (line.getOptionValue("verbose").equals("2")) {
           ATGlobal.verboseLevel = 2;
+        }
       }
 
       String projectName = curArgs[0];
@@ -178,17 +185,18 @@ public class Analyse {
       System.out.println(cid);
       
       String origin = line.getOptionValue("query_origin");
-      if (origin == null) origin = "R";
+            if (origin == null) {
+                origin = "R";
+            }
    
       if (!line.hasOption("query")) {
         System.out.println(introMsg + "\n");
         System.out.println("Data root = " + dataRoot);
       }
 
-      
       if (line.hasOption("query") || "S".equals(origin)) {  
         // if a query is given, run a query and print result ...
-        String result = runQuery(projekt, line.getOptionValue("query"), origin, cid);
+                String result = runQuery(projekt, line.getOptionValue("query"), origin, line.getOptionValue("query_format"), cid);
         System.out.println(result);
       } else {
         // ...else run a GUI analizer
@@ -201,44 +209,55 @@ public class Analyse {
   }
   
   public static String runQuery(Project project, String queryName, String origin, String computerID) {
+        return runQuery(project, queryName, origin, null, computerID);
+  }
+
+  public static String runQuery(Project project, String queryName, String origin, String format, String computerID) {
     EQuery query = new EQuery();
+    String vsebina = "";
     switch (origin) {
       case "S":
         Scanner sc = new Scanner(System.in);
-        String vsebina = "";
-        while (sc.hasNextLine()) 
+        while (sc.hasNextLine()) {
           vsebina += sc.nextLine() + "\n";
-        
-        JSONObject queryObject = new JSONObject(vsebina);        
-        query.initFromJSON(queryObject.get("Query").toString());
+        }
+        if(!"ASQL".equals(format)){
+          JSONObject queryObject = new JSONObject(vsebina);        
+          query.initFromJSON(queryObject.get("Query").toString());
+        }
         break;
       case "F":
       case "R":
         String fileName;
         if (origin.equals("F")) {
           fileName = queryName;
-        } else
+        } else {
           fileName = ATGlobal.getQUERYfilename(project.getEProject().getProjectRootDir(), queryName);
+        }
      
         //File queryFN = new File(fileName);
         //if (!queryFN.exists()) fileName += "." + ATGlobal.AT_FILEEXT_query;
-        
-        query.initFromFile(new File(fileName));
+        if(!"ASQL".equals(format))
+          query.initFromFile(new File(fileName));
+        else
+          vsebina = query.getFileText(new File(fileName));
         break;
     }
     
     // debug: System.out.println("---> " + query.toJSONString());
-    
-    String result = ErrorStatus.getLastErrorMessage().equals(ErrorStatus.STATUS_OK) ? "Invalid query." :
-            ErrorStatus.getLastErrorMessage();
-    if (query != null & !query.toJSONString().equals("{}")) {
-      // run query ...
-      TableData td = DataAnalyser.runQuery(project.getEProject(), query, computerID);
-      // ... and print table to screen
-      result = td.toString();
+    String result = ErrorStatus.getLastErrorMessage().equals(ErrorStatus.STATUS_OK) 
+            ? "Invalid query." : ErrorStatus.getLastErrorMessage();
+    if("ASQL".equals(format)){
+       TableData td = new ASqlObject(vsebina).runQuery(project);
+       result = td.toString();
+    } else {
+      if (query != null & !query.toJSONString().equals("{}")) {
+        // run query ...
+        TableData td = DataAnalyser.runQuery(project.getEProject(), query, computerID);
+        // ... and print table to screen
+        result = td.toString();
+      }
     }
-
     return result;
   }
-  
 }

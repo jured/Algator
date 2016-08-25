@@ -1,6 +1,7 @@
 package si.fri.algotest.entities;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -122,18 +123,17 @@ public class Entity implements Cloneable, Serializable {
     entity_file_ext  = ATTools.getFilenameExtension(entityFile.getAbsolutePath());
     entity_file_name = entityFile.getPath();
     
-    try (Scanner sc = new Scanner(entityFile, "UTF-8")) {
-      String vsebina = "";
-      while (sc.hasNextLine()) 
-	vsebina += sc.nextLine();
+        try {
+            String vsebina = getFileText(entityFile);
+            JSONObject queryObject = new JSONObject(vsebina);
+            if (entity_id == null || entity_id.isEmpty()) {
+                return initFromJSON(queryObject.get("Query").toString());
+            }
       
-      if (entity_id == null || entity_id.isEmpty())
-	return initFromJSON(vsebina);
-      
-      JSONObject object = new JSONObject(vsebina);
-      String entity = object.optString(entity_id);
-      if (entity.isEmpty())
-	throw new Exception("Token '"+entity_id+"' does not exist.");
+            String entity = queryObject.optString(entity_id);
+            if (entity.isEmpty()) {
+                throw new Exception("Token '" + entity_id + "' does not exist.");
+            }
       
       return initFromJSON(entity);
     } catch (Exception e) {
@@ -142,6 +142,20 @@ public class Entity implements Cloneable, Serializable {
     }
   }
   
+    public String getFileText(File entityFile) {
+        Scanner sc;
+        String vsebina = "";
+        try {
+            sc = new Scanner(entityFile, "UTF-8");
+            while (sc.hasNextLine()) 
+                vsebina += sc.nextLine();
+        } catch (FileNotFoundException ex) {
+            ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_READFILE,
+                String.format("File: %s, Msg: %s", entityFile.getAbsolutePath(), ex.toString()));
+        }
+        return vsebina;
+    }
+
   /**
    * Method reads a JSON object and fills the map with correspnding values.
    * @param json

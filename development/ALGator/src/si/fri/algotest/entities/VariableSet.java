@@ -2,36 +2,36 @@ package si.fri.algotest.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import si.fri.algotest.global.ATLog;
 
 /**
  * A set of variables.
  * @author tomaz
  */
-public class VariableSet implements Serializable {
-  private ArrayList<EVariable> variables;
+public class VariableSet implements Serializable, Iterable<EVariable> {
+
+  private HashMap<String, EVariable> variables;
 
   public VariableSet() {
-    variables = new ArrayList<>();
+        variables = new HashMap<>();
   }
-  
   
   public VariableSet(VariableSet variables) {
     this();
-    
-    for (int i = 0; i < variables.size(); i++) {
+    for (EVariable var : variables.variables.values()) {
       try {
-	addVariable((EVariable) variables.getVariable(i).clone(), true);
+                addVariable((EVariable) var.clone(), true);
       } catch (CloneNotSupportedException ex) {
 	ATLog.log("Can't clone (EVariable)", 2);
       }
     } 
   }
   
-  
-  
   public void addVariable(EVariable variable) {
-    addVariable(variable,true);
+    addVariable(variable, true);
   }
   
   /**
@@ -39,21 +39,11 @@ public class VariableSet implements Serializable {
    * njeno vrednost (replaceValue==true) oziroma ne naredim ničesar (replaceValue==false)
    */
   public void addVariable(EVariable variable, boolean replaceValue) {
-    if (variables.contains(variable)) {
-      if (replaceValue) {
-        EVariable oldVar = null;
-        for (EVariable eVariable : variables) {
-          if (eVariable.equals(variable)) {
-            oldVar = eVariable;
-            break;
-          }
-        }
-        if (oldVar != null) {
-          oldVar.set(EVariable.ID_Value, variable.get(EVariable.ID_Value));
-        }
-      }
-    } else {
-      variables.add(variable);
+    EVariable oldVar = variables.get(variable.getName());
+    if (oldVar == null) {
+      variables.put(variable.getName(), variable);
+    } else if (replaceValue) {
+      oldVar.set(EVariable.ID_Value, variable.get(EVariable.ID_Value));
     }
   }
   
@@ -62,28 +52,37 @@ public class VariableSet implements Serializable {
   }
   
   public void addVariables(VariableSet vSet, boolean replaceExisting) {
-    for(EVariable variable : vSet.variables)
+    for (EVariable variable : vSet) {
       addVariable(variable, replaceExisting);
+    }
   }
   
-  
   public EVariable getVariable(int i) {
-    if (i<variables.size())
-      return variables.get(i);
-    else
+    if (i < variables.size()) {
+      return variables.values().toArray(new EVariable[0])[i];
+    } else {
       return null;
+    }
   }
   
   public int size() {
     return variables.size();
   }
   
-  public EVariable getVariable(String name) {
-    for (int i = 0; i < variables.size(); i++) {
-      if (variables.get(i).getName().equals(name))
-	return variables.get(i);
+  public VariableSet copy() {
+    VariableSet copy = new VariableSet();
+    for (Map.Entry<String, EVariable> entry : variables.entrySet()) {
+      try {
+        copy.variables.put(entry.getKey(), (EVariable) entry.getValue().clone());
+      } catch (CloneNotSupportedException ex) {
+        ATLog.log("Can't clone (EVariable)", 3);
+      }
     }
-    return null;
+    return copy;
+  }
+
+  public EVariable getVariable(String name) {
+    return variables.get(name);
   }
 
   @Override
@@ -103,9 +102,9 @@ public class VariableSet implements Serializable {
     String localOrder [] = order.clone();
     
     int numVar = localOrder.length;
-    if (numVar > EResult.FIXNUM && variables.contains(EResult.getErrorIndicator(""))) {
-        numVar = EResult.FIXNUM;
-        localOrder[numVar++] = EResult.errorParName;
+    if (numVar > EResult.FIXNUM && variables.values().contains(EResult.getErrorIndicator(""))) {
+      numVar = EResult.FIXNUM;
+      localOrder[numVar++] = EResult.errorParName;
     }
     
     for (int i = 0; i < numVar; i++) {
@@ -137,4 +136,9 @@ public class VariableSet implements Serializable {
     return result.substring(0,result.length()-delim.length());
   }
   
+  @Override
+  public Iterator<EVariable> iterator() {
+      return variables.values().iterator();
+  }
+
 }

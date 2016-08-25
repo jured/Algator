@@ -1,0 +1,27 @@
+{
+    "Project": {
+        "Idminmax": "", 
+        "Author": "", 
+        "Idmax": "", 
+        "Version": "", 
+        "AlgorithmJARs": [], 
+        "Double2": "", 
+        "Double3": "", 
+        "Double4": "", 
+        "Description": "", 
+        "TestSetTechDescHTML": "", 
+        "TestSetDescHTML": "", 
+        "Date": "", 
+        "AlgTechDescHTML": "", 
+        "HTMLDescFile": "", 
+        "TestSetIteratorClass": "", 
+        "Algorithms": [], 
+        "TestSets": [], 
+        "AlgDescHTML": "", 
+        "Idmin": "", 
+        "AlgorithmClass": "", 
+        "Id": "", 
+        "ProjectJARs": [], 
+        "TestCaseClass": ""
+    }
+}

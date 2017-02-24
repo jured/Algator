@@ -1,5 +1,10 @@
 ChangeLog for project ALGator since November 2014
 
+C14 (Februar 2017, Ziga Zorman)
+Popravki za izvajanje algatorja v sistemu Windows ter dodana nova statistična funkcija (MED). 
+
+  Spremenjene datoteke:Analyser.java, ATTools.java, Execute.java, ExternalExecutor.java, RSync.java, StatFunction-java
+
 C13 (Avgust 2016, Ernest Stukelj)
 Dodan nov poizvedovalni jezik (A-SQL):
 

@@ -103,12 +103,16 @@ public class ExternalExecutor {
     // Maximum time allowed (in seconds) for one execution of one test; if the algorithm 
     // does not  finish in this time, the execution is killed
     int timeLimit = 10;
-    try {
+    try {      
       timeLimit = testSet.getField(ETestSet.ID_TimeLimit);
     } catch (Exception e) {
-      // if ETestSet.ID_TimeLimit parameter is missing, timelimit is set to 10 (sec) and exception is ignored
+      try {
+        timeLimit = Integer.parseInt(testSet.getField(ETestSet.ID_TimeLimit).toString());
+      } catch (Exception ex) {
+        // if ETestSet.ID_TimeLimit parameter is missing or invalid, timelimit is set to 10 (sec) and exception is ignored
+      }
     }
-
+  
     // parameters to be added to result file (in case exception occures while executing algorithm)
     String delim        = ATGlobal.DEFAULT_CSV_DELIMITER;
     EVariable algP      = EResult.getAlgorithmNameParameter(algName);

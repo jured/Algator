@@ -270,10 +270,9 @@ public class Execute {
     String dataRootTests  = ATGlobal.getTESTSroot(ATGlobal.getALGatorDataRoot(),  projName);
     String dataLocalTests = ATGlobal.getTESTSroot(ATGlobal.getALGatorDataLocal(), projName);
     ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, String.format("Syncing tests from %s to %s", dataRootTests, dataLocalTests));
-    int syncStatus = RSync.mirror(dataRootTests, dataLocalTests);
-    if (syncStatus != 0) {
-      ATLog.log("Syncing failed  " + ErrorStatus.getLastErrorMessage(), 1);
-
+    int syncStatus = RSync.mirror(dataRootTests, dataLocalTests);    
+    if (syncStatus != 0) {      
+      ATLog.log("Syncing failed  (sync status: " + syncStatus +") " + ErrorStatus.getLastErrorMessage(), 1);      
       System.exit(0);
     }
     ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, String.format("Syncing tests done"));

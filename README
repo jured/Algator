@@ -98,3 +98,10 @@ Vsa izvorna koda programa ALGator se nahaja v mapi development/ALGator/src.
 6) Pot do ALGator githuba:
   https://github.com/ALGatorDevel/Algator
 *****************************************************************************
+
+
+*****************************************************************************
+7) Zahtevana programska oprema za uporabo ALGatorja:
+    - java >= 7.0
+    - v okolju Windows: cygwin rsync (https://cygwin.com/install.html)
+*****************************************************************************

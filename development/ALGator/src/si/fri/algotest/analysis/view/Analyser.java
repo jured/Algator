@@ -1,6 +1,9 @@
 package si.fri.algotest.analysis.view;
 
 import java.awt.BorderLayout;
+import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -24,15 +27,15 @@ import si.fri.algotest.global.ErrorStatus;
 public class Analyser extends javax.swing.JFrame {
 
   private Project project = null;
-    
+
   int lastQueryNumber = 1;
-  
+
   boolean izPrograma = true;
-  
+
   ArrayList<QueryAndGraphPanel> queryAndGraphPanels;
-  
+
   String computerID; // the ID of computer; the results are in computerID folder
-  
+
   /**
    * Creates new form Analyse
    */
@@ -40,75 +43,105 @@ public class Analyser extends javax.swing.JFrame {
 
     initComponents();
     queryAndGraphPanels = new ArrayList<QueryAndGraphPanel>();
-    
+
     QueryAndGraphPanel queryAndGraphpanel = new QueryAndGraphPanel(computerID);
     jPanel9.add(queryAndGraphpanel);
     queryAndGraphPanels.add(queryAndGraphpanel);
-    
-    setSize(Toolkit.getDefaultToolkit().getScreenSize());
-    
+
+    //Ziga Zorman: maximizes and shows this frame on the largest screen
+    //setSize(Toolkit.getDefaultToolkit().getScreenSize());
+    GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    GraphicsDevice[] monitors = environment.getScreenDevices();
+    if (monitors.length > 0) {
+      GraphicsDevice largestScreen = getLargestScreen(monitors);
+      this.setLocation(largestScreen.getDefaultConfiguration().getBounds().x, largestScreen.getDefaultConfiguration().getBounds().y);
+      this.setExtendedState(MAXIMIZED_BOTH);
+    } else {
+      throw new RuntimeException("No Screens Found");
+    }
+
     izPrograma = false;
+  }
+
+  /**
+   * @author: Ziga Zorman
+   */
+  private static GraphicsDevice getLargestScreen(GraphicsDevice[] screens) {
+    GraphicsDevice largestScreen = screens[0];
+    int largestWidth = screens[0].getDisplayMode().getWidth();
+    int largestHeight = screens[0].getDisplayMode().getHeight();
+    for (GraphicsDevice screen : screens) {
+      DisplayMode displayMode = screen.getDisplayMode();
+      int width = displayMode.getWidth();
+      int height = displayMode.getHeight();
+      if (width * height >= largestWidth * largestHeight) {
+        largestHeight = height;
+        largestWidth = width;
+        largestScreen = screen;
+      }
+    }
+    return largestScreen;
   }
 
   public Analyser(final Project project, final String computerID) {
     java.awt.EventQueue.invokeLater(new Runnable() {
       public void run() {
-	Analyser dialog = new Analyser(new javax.swing.JFrame(), true, computerID);
-        dialog.setProject(project, computerID); 
-	dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-	  @Override
-	  public void windowClosing(java.awt.event.WindowEvent e) {
-	    System.exit(0);
-	  }
-	});
-	dialog.setVisible(true);
+        Analyser dialog = new Analyser(new javax.swing.JFrame(), true, computerID);
+        dialog.setProject(project, computerID);
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+          @Override
+          public void windowClosing(java.awt.event.WindowEvent e) {
+            System.exit(0);
+          }
+        });
+        dialog.setVisible(true);
       }
     });
   }
-  
-  
+
   public void setProject(Project project, String computerID) {
-    if (project == null) return;
-    
+    if (project == null) {
+      return;
+    }
+
     this.project = project;
     this.computerID = computerID;
-    
+
     setTitle(String.format("ALGator analyzer - [%s] ", project.getEProject().getName()));
-    
+
     getCurrentQAG().setProject(project);
   }
-  
+
   private QueryAndGraphPanel getCurrentQAG() {
     int index = jTabbedPane1.getSelectedIndex();
     return queryAndGraphPanels.get(index);
   }
-  
-  
+
   private void addNewQueryTab() {
-    if (jTabbedPane1.getSelectedIndex() == jTabbedPane1.getTabCount()-1) {
+    if (jTabbedPane1.getSelectedIndex() == jTabbedPane1.getTabCount() - 1) {
       String queryName = "Query" + (++lastQueryNumber);
       int tabCount = jTabbedPane1.getTabCount();
-      
+
       QueryAndGraphPanel qagp = new QueryAndGraphPanel(computerID);
       queryAndGraphPanels.add(qagp);
       qagp.setProject(project);
-      
+
       JPanel nov = new JPanel(new BorderLayout());
       nov.add(qagp);
-      
-      jTabbedPane1.insertTab(queryName, null, nov, queryName, tabCount-1);
-      jTabbedPane1.setSelectedIndex(tabCount-1);
+
+      jTabbedPane1.insertTab(queryName, null, nov, queryName, tabCount - 1);
+      jTabbedPane1.setSelectedIndex(tabCount - 1);
     }
   }
-  
-  
-  
+
   void saveQuery() {
-    if (project==null) return;
+    if (project == null) {
+      return;
+    }
     JFileChooser jfc = new JFileChooser();
-    
+
     String queryRoot = ATGlobal.getQUERIESroot(project.getEProject().getProjectRootDir());
-    
+
     jfc.setCurrentDirectory(new File(queryRoot));
     jfc.setFileFilter(new FileFilter() {
       @Override
@@ -118,22 +151,23 @@ public class Analyser extends javax.swing.JFrame {
 
       @Override
       public String getDescription() {
-        return "ALGator query (*."+ATGlobal.AT_FILEEXT_query+")";
+        return "ALGator query (*." + ATGlobal.AT_FILEEXT_query + ")";
       }
     });
-    
+
     int ans = jfc.showSaveDialog(this);
     if (ans == JFileChooser.APPROVE_OPTION) {
       File fileToSave = jfc.getSelectedFile();
-      if (!fileToSave.getPath().endsWith("." + ATGlobal.AT_FILEEXT_query))
+      if (!fileToSave.getPath().endsWith("." + ATGlobal.AT_FILEEXT_query)) {
         fileToSave = new File(fileToSave.getPath() + "." + ATGlobal.AT_FILEEXT_query);
-      
+      }
+
       String fileMsg = String.format("File %s exists. Overwrite?", fileToSave.getPath());
-      boolean save = !fileToSave.exists() || 
-        (JOptionPane.showConfirmDialog(this, fileMsg, "Save query warning", JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION);
-      
+      boolean save = !fileToSave.exists()
+              || (JOptionPane.showConfirmDialog(this, fileMsg, "Save query warning", JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION);
+
       if (save) {
-        
+
         try {
           PrintWriter pw = new PrintWriter(fileToSave);
           pw.println(getCurrentQAG().getQuery().toJSONString(true));
@@ -144,13 +178,15 @@ public class Analyser extends javax.swing.JFrame {
       }
     }
   }
-  
+
   void openQuery() {
-    if (project==null) return;
+    if (project == null) {
+      return;
+    }
     JFileChooser jfc = new JFileChooser();
-    
+
     String queryRoot = ATGlobal.getQUERIESroot(project.getEProject().getProjectRootDir());
-    
+
     jfc.setCurrentDirectory(new File(queryRoot));
     jfc.setFileFilter(new FileFilter() {
       @Override
@@ -160,10 +196,10 @@ public class Analyser extends javax.swing.JFrame {
 
       @Override
       public String getDescription() {
-        return "ALGator query (*."+ATGlobal.AT_FILEEXT_query+")";
+        return "ALGator query (*." + ATGlobal.AT_FILEEXT_query + ")";
       }
     });
-    
+
     int ans = jfc.showOpenDialog(this);
     if (ans == JFileChooser.APPROVE_OPTION) {
       File fileToOpen = jfc.getSelectedFile();
@@ -175,9 +211,7 @@ public class Analyser extends javax.swing.JFrame {
       }
     }
   }
-  
- 
-  
+
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -273,7 +307,7 @@ public class Analyser extends javax.swing.JFrame {
     }
   }//GEN-LAST:event_jTabbedPane1StateChanged
 
-  
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenuBar jMenuBar1;

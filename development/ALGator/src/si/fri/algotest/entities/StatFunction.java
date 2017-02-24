@@ -1,6 +1,7 @@
 package si.fri.algotest.entities;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  *
@@ -8,7 +9,7 @@ import java.util.ArrayList;
  */
 public enum StatFunction {
 
-  UNKNOWN, MIN, MAX, AVG, SUM, FIRST, LAST;
+  UNKNOWN, MIN, MAX, AVG, SUM, FIRST, LAST, MED;
 
   @Override
   public String toString() {
@@ -27,6 +28,8 @@ public enum StatFunction {
         return "FIRST";
       case LAST:
         return "LAST";
+      case MED:
+        return "MED";
       default:
         return "/unknown/";
     }
@@ -116,6 +119,34 @@ public enum StatFunction {
             return new Double(valN).longValue();
           } else {
             return valN;
+          }
+        } catch (Exception e) {
+          // this exception will probably occur only if values are not Numbers
+          return -1;
+        }
+      // added by Ziga Zorman
+      case MED:
+        try {
+          double median = ((Number) values.get(0)).doubleValue();
+          if (values.size() == 2) {
+            median += ((Number) values.get(1)).doubleValue();
+            median /= 2;
+          } else if (values.size() > 2) {
+            ArrayList<? extends Comparable> sortedValues = new ArrayList<>(values);
+            Collections.sort(sortedValues);
+            int halfSize = sortedValues.size() / 2;
+            if (sortedValues.size() % 2 == 0) {
+              median = (((Number) sortedValues.get(halfSize - 1)).doubleValue() + ((Number) sortedValues.get(halfSize)).doubleValue()) / 2;
+            } else {
+              median = ((Number) sortedValues.get(halfSize)).doubleValue();
+            }
+          }
+          if (values.get(0) instanceof Integer) {
+            return new Double(median).intValue();
+          } else if (values.get(0) instanceof Long) {
+            return new Double(median).longValue();
+          } else {
+            return median;
           }
         } catch (Exception e) {
           // this exception will probably occur only if values are not Numbers

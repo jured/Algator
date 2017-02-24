@@ -157,8 +157,11 @@ public class ATTools {
      
     if (!compileOK) {
       String error = os.toString();
-      error = error.replaceAll(srcPath + File.separator, "");
-      
+      //Ziga Zorman:  fixed BUG - on windows escape the File.separator chars in regex otherwise an exception for invalid pattern will be thrown
+      // error = error.replaceAll(srcPath + File.separator, "");
+      String escapedSrcPath = (srcPath + File.separator).replaceAll("\\\\", "\\\\\\\\");
+      error = error.replaceAll(escapedSrcPath, "");
+            
       return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_COMPILE, error);
     }
     return ErrorStatus.setLastErrorMessage(ErrorStatus.STATUS_OK, String.format("Compiling %s  - done.", msg));

@@ -3,8 +3,7 @@ import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.tools.ATTools;
 
 /**
- * A sort-project specific TestCase
- * @author tomaz
+ * A TestCase subclass for the sorting problem
  */
 public class BasicSortTestCase extends TestCase {
 

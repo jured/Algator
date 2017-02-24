@@ -111,9 +111,10 @@ public class VariableSet implements Serializable, Iterable<EVariable> {
       EVariable v = null;
     
       // find a variable with name==localOrder[i]
-      for (int j = 0; j < variables.size(); j++) {
-        if (variables.get(j).getName().equals(localOrder[i])) {
-          v = variables.get(j);
+      for (String varName : variables.keySet()) {        
+        EVariable curV = variables.get(varName);
+        if (curV != null && curV.getName() != null && curV.getName().equals(localOrder[i])) {
+          v = curV;
 	  break;
         }
       }

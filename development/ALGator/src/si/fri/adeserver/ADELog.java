@@ -3,20 +3,17 @@ package si.fri.adeserver;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.io.RandomAccessFile;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
-import static si.fri.algotest.global.ATLog.LOG_TARGET_FILE;
-import static si.fri.algotest.global.ATLog.LOG_TARGET_OFF;
-import static si.fri.algotest.global.ATLog.LOG_TARGET_STDOUT;
 
 /**
  *
  * @author tomaz
  */
 public class ADELog {
+  public static boolean doVerbose = false;
   private static String logFileName = null;
   
   // maximal error size in bytes (to truncate very long error messages)
@@ -36,6 +33,8 @@ public class ADELog {
     
     try (PrintWriter pw = new PrintWriter(new FileWriter(logFileName, true))) {
       pw.println(logMsg);
+      if (doVerbose)
+        System.out.println(logMsg);
     } catch (Exception e) {
       // error in logging can not be loged
     }

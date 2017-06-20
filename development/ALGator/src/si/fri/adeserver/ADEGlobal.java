@@ -29,6 +29,7 @@ public class ADEGlobal {
   public static final String REQ_QUERY_RES        = "GETQUERYRESULT"; // parameters: projectName
   public static final String REQ_ADMIN_PRINTPATHS = "PRINTPATHS";     // no parameters
   public static final String REQ_ADMIN_PRINTLOG   = "PRINTLOG";       // parameters: numberOfLogs (default: 10)
+  public static final String REQ_USERS            = "USERS";          // users
   
   
   // a set of requests that do not log into log file

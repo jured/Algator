@@ -15,6 +15,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import si.fri.adeserver.ADEGlobal;
+import si.fri.adeserver.ADELog;
 import si.fri.algotest.global.ATGlobal;
 
 /**
@@ -92,6 +93,8 @@ public class TaskServer {
       }
       
       boolean serverIsAlive = askServer(ADEGlobal.REQ_CHECK_Q).equals(ADEGlobal.REQ_CHECK_A);
+      
+      ADELog.doVerbose = true;
       
       if (statusOnly) {
         if (serverIsAlive) {

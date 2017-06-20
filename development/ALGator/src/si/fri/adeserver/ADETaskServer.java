@@ -362,9 +362,17 @@ public class ADETaskServer implements Runnable {
       case ADEGlobal.REQ_ADMIN_PRINTLOG:
         return getServerLog(params);
                 
+      case ADEGlobal.REQ_USERS:
+        return users(params);
+        
+        
       default:
         return ADEGlobal.getErrorString("Unknown request");
     }
+  }
+  
+  private String users(ArrayList<String> params) {
+    return "Odgovor";
   }
 
   @Override

@@ -149,7 +149,7 @@ public class ATTools {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     Writer wos = new OutputStreamWriter(os);
     
-    JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
+      JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
     StandardJavaFileManager fileManager = javac.getStandardFileManager(null /* diagnosticlistener */, null, null);
     JavaCompiler.CompilationTask task = javac.getTask(wos, fileManager, null /* diagnosticlistener */, options, null, fileManager.getJavaFileObjectsFromFiles(srcFiles));
     

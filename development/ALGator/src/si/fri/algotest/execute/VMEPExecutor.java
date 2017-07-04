@@ -9,11 +9,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
-import org.apache.commons.io.FileUtils;
 import si.fri.algotest.entities.EVariable;
 import si.fri.algotest.entities.EResult;
 import si.fri.algotest.entities.ETestSet;
-import si.fri.algotest.entities.MeasurementType;
 import si.fri.algotest.entities.VariableSet;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.entities.TestCase;
@@ -219,7 +217,7 @@ public class VMEPExecutor {
       while ((s = stdError.readLine()) != null) sb.append(s);
       
       if (exitCode != 0) {
-        ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_EXECUTING_VMPEJVM, sb.toString());
+        ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_EXECUTING_VMPEJVM, sb.toString() + "(ercode: "+exitCode+")");
         return VMEPErrorStatus.getErrorStatusByID(exitCode);
       } else {
         if (ATGlobal.verboseLevel > 0)

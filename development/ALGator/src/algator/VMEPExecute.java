@@ -17,6 +17,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import si.fri.algotest.entities.EAlgorithm;
 import si.fri.algotest.entities.ELocalConfig;
+import si.fri.algotest.entities.EProject;
 import si.fri.algotest.entities.EVariable;
 import si.fri.algotest.entities.EResult;
 import si.fri.algotest.entities.ETestSet;
@@ -34,6 +35,7 @@ import si.fri.algotest.global.ATLog;
 import si.fri.algotest.global.ErrorStatus;
 import si.fri.algotest.global.ExecutionStatus;
 import si.fri.algotest.global.VMEPErrorStatus;
+import si.fri.algotest.tools.ATTools;
 
 /**
  * VMEPExecute class is used to execute algorithm with vmep virtual machine. It 
@@ -160,9 +162,10 @@ public class VMEPExecute {
     }    
             
     AbstractTestSetIterator testsetIterator = New.testsetIteratorInstance(projekt, algName);
+    System.out.println("iterator: " + testsetIterator);
     if (testsetIterator != null) 
       testsetIterator.setTestSet(testSet);    
-    if (testsetIterator == null || !ErrorStatus.getLastErrorStatus().equals(ErrorStatus.STATUS_OK)) {
+    if (testsetIterator == null) { // || !ErrorStatus.getLastErrorStatus().equals(ErrorStatus.STATUS_OK)) { // tole je cudno - zakaj je to bilo tu; če je, v določenih  primerih ne dela (recimo pri projektu FourierTransform)
       if (ATGlobal.verboseLevel > 0)
         ATLog.log("VMEP Execute: Can not create testset iterator - " + projName + ", " + algName, 3);
       System.exit(VMEPErrorStatus.INVALID_ITERATOR.getValue()); // testset iterator can not be created
@@ -174,8 +177,6 @@ public class VMEPExecute {
         ATLog.log("VMEP Execute: JVM result description file does not exist - " + projName + ", " + algName, 3);
       System.exit(VMEPErrorStatus.INVALID_RESULTDESCRIPTION.getValue()); // JVM result descritpion does not exist
     }
-
-    
     
     // Test testNumber
     int allTests = testsetIterator.getNumberOfTestInstances();
@@ -315,17 +316,25 @@ public class VMEPExecute {
       String jvmCommand = "java";
       String vmepCmd = ELocalConfig.getConfig().getField(ELocalConfig.ID_VMEP);
       String vmepCP  = ELocalConfig.getConfig().getField(ELocalConfig.ID_VMEPClasspath);
+
+      // dodane 20. 6. 2017
+      EProject eProjekt = new EProject(new File(ATGlobal.getPROJECTfilename(data_root, project_name)));
+      String projRoot = ATGlobal.getPROJECTroot(data_root, project_name);
+      String algJARs = ATTools.buildJARList(eProjekt.getStringArray(EProject.ID_AlgorithmJARs), ATGlobal.getPROJECTlib(projRoot));      
+      
       if (!vmepCmd.isEmpty()) 
         jvmCommand = vmepCmd;
       if (!vmepCP.isEmpty())
           classPath += File.pathSeparator + vmepCP;
-            
+      
+      if (!algJARs.isEmpty())
+        classPath += File.pathSeparator + algJARs;
+
       String[] command = {jvmCommand, "-cp", classPath, "-Xss1024k", "algator.VMEPExecute", 
         project_name, alg_name, testset_name, Integer.toString(testID), commFolder, 
         "-dr", data_root, "-dl", data_local, "-v", Integer.toString(ATGlobal.verboseLevel), 
         "-log", Integer.toString(ATGlobal.logTarget)};
-      
-      
+            
       ProcessBuilder probuilder = new ProcessBuilder( command );
     
       return probuilder.start();      

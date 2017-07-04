@@ -38,14 +38,14 @@ in jo odpakiramo v poljuben direktorij (imenujmo ga <algator_root>).
      data_root   
      data_local
  
-3. Nastavimo štiri sistemske spremenljivke 
+3. Nastavimo štiri sistemske spremenljivke: 
   
        ALGATOR_ROOT=<algator_root>
-       ALGATOR_DATA_ROOT=<algator_root>/data_root
-       ALGATOR_DATA_LOCAL=<algator_root>/data_local
-       CLASSPATH=$CLASSPATH;<algator_root>/app/ALGator/ALGator.jar
+       ALGATOR_DATA_ROOT=$ALGATOR_ROOT/data_root
+       ALGATOR_DATA_LOCAL=$ALGATOR_ROOT/data_local
+       CLASSPATH=$CLASSPATH:$ALGATOR_ROOT/app/ALGator/ALGator.jar
 
-   (v zgornjih ukazih <algator_root> zamenjamo s pravim imenom mape)
+   (v prvem ukazu <algator_root> zamenjamo s pravim imenom mape)
 
 
 4. Z ukazom 

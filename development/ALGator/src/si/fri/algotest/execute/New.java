@@ -129,7 +129,6 @@ public class New {
       String testSetIteratorClassName
               = project.getEProject().getTestSetIteratorClassName();
       Class tsClass = Class.forName(testSetIteratorClassName, true, classLoader);
-      
       result = (AbstractTestSetIterator) tsClass.newInstance();
     } catch (Exception e) {
       ATLog.log("Can't make an instance of testset iterator for project " + project.getName() + ": " + e, 2);

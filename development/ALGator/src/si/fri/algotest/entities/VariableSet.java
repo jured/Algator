@@ -90,7 +90,8 @@ public class VariableSet implements Serializable, Iterable<EVariable> {
     for (int i = 0; i < variables.size(); i++) {
       if (!result.isEmpty()) result+="; ";
       EVariable p = variables.get(i);
-      result += p.getName() + "=" + p.getField(EVariable.ID_Value);
+      if (p!=null)
+        result += p.getName() + "=" + p.getField(EVariable.ID_Value);
     }
     return result;
   }

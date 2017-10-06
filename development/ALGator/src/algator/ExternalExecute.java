@@ -10,7 +10,6 @@ import org.apache.commons.cli.Options;
 import si.fri.algotest.timer.Timer;
 
 import java.io.File;
-import org.apache.commons.io.FileUtils;
 import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.entities.MeasurementType;
 
@@ -19,8 +18,8 @@ import si.fri.algotest.entities.MeasurementType;
  * reads the algorithm (and input parameters that are included in the algortihm's testcase) and runs this 
  * algorithm n times (where n is one of the parameters in the testcase).
  * This class is used to execute algorithm in a separate JVM. The typical usage of the run method is as follows:
- * 1) write algorithm to a file in a tmpFolder
- * 2) execute "java algator.ExternExecute tmpFolder"
+ * 1) write algorithm to a file in a cFolder
+ * 2) execute "java algator.ExternExecute cFolder"
  * 3) during the execution of this JVM check for time limits; if this limits are exceeded, kill the JVM and finish,
  *    otherwise collect the results and finish
  * 
@@ -55,19 +54,19 @@ public class ExternalExecute {
    * The final version of algorithm instance (which includes the result parameters
    * in the testCase and timer parameters in the timer array) is written to file.
    */
-  public static void run(String tmpFolderName) {
-    AbsAlgorithm curAlg = ExternalExecutor.getAlgorithmFromFile(tmpFolderName, ExternalExecutor.SER_ALG_TYPE.TEST);
+  public static void run(String cFolderName) {
+    AbsAlgorithm curAlg = ExternalExecutor.getAlgorithmFromFile(cFolderName, ExternalExecutor.SER_ALG_TYPE.TEST);
     if (curAlg == null) return;
     
     // urls that are used to load an algorithm
-    URL [] urls = ExternalExecutor.getURLsFromFile(tmpFolderName, ExternalExecutor.SER_ALG_TYPE.TEST);
+    URL [] urls = ExternalExecutor.getURLsFromFile(cFolderName, ExternalExecutor.SER_ALG_TYPE.TEST);
     
     // run the test timesToExecute-times and save time to the times[] array
     long[][] times     = curAlg.getExecutionTimes();
     int timesToExecute = curAlg.getTimesToExecute();
     
     // clear the contents of the communication file
-    ExternalExecutor.initCommunicationFile(tmpFolderName);
+    ExternalExecutor.initCommunicationFile(cFolderName);
     
     for (int i = 0; curAlg!=null && i < timesToExecute; i++) {
       
@@ -79,7 +78,7 @@ public class ExternalExecute {
       curAlg.timer.stop();
       
       // adds one byte to the communication file to signal a succesfull execution
-      ExternalExecutor.addToCommunicationFile(tmpFolderName);
+      ExternalExecutor.addToCommunicationFile(cFolderName);
 
       for (int tID = 0; tID < Timer.MAX_TIMERS; tID++) {
         times[tID][i] = curAlg.timer.time(tID);
@@ -87,7 +86,7 @@ public class ExternalExecute {
   
       // read the clean version of the algorithm from the file for the next execution
       if (i < timesToExecute - 1)
-        curAlg = ExternalExecutor.getAlgorithmFromFile(tmpFolderName, ExternalExecutor.SER_ALG_TYPE.TEST);
+        curAlg = ExternalExecutor.getAlgorithmFromFile(cFolderName, ExternalExecutor.SER_ALG_TYPE.TEST);
     }
         
     if (curAlg != null) {
@@ -101,7 +100,7 @@ public class ExternalExecute {
       // ... and counters
       curAlg.setCounters(Counters.getCounters());
       
-      ExternalExecutor.saveAlgToFile(urls, curAlg, tmpFolderName, ExternalExecutor.SER_ALG_TYPE.RESULT);
+      ExternalExecutor.saveAlgToFile(urls, curAlg, cFolderName, ExternalExecutor.SER_ALG_TYPE.RESULT);
     }
   }
   

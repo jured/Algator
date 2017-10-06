@@ -67,7 +67,7 @@ public class ExternalExecutor {
    * regulary checks the content of this file and stops the execution is there
    * is no progress.
    */
-  private final static String COMMUNICATION_FILENAME = "alg.com";
+  private final static String COMMUNICATION_FILENAME = "comm.data";
 
   /**
    * Iterates through testset and for each test runs an algorithm.
@@ -150,14 +150,14 @@ public class ExternalExecutor {
         // was algorithm properly initialized?
         executionOK = executionOK && curAlg.init(testCase) == ErrorStatus.STATUS_OK;
 
-        String tmpFolderName = ATGlobal.getTMPDir(project.getName());
+        String cFolderName = ATGlobal.getTMPDir(project.getName());
 
         ErrorStatus executionStatus = ErrorStatus.ERROR_CANT_PERFORM_TEST;
 
         if (executionOK) {
-          saveAlgToFile(New.getClassPathsForAlgorithm(project, algName), curAlg, tmpFolderName, SER_ALG_TYPE.TEST);
+          saveAlgToFile(New.getClassPathsForAlgorithm(project, algName), curAlg, cFolderName, SER_ALG_TYPE.TEST);
 
-          executionStatus = runWithLimitedTime(tmpFolderName, timesToExecute, timeLimit, mType, false);
+          executionStatus = runWithLimitedTime(cFolderName, timesToExecute, timeLimit, mType, false);
         }
 
         EVariable executionStatusParameter;
@@ -178,7 +178,7 @@ public class ExternalExecutor {
         algResultParams = new VariableSet();
         
         if (executionStatus == ErrorStatus.STATUS_OK) { // the execution passed normaly (not killed)
-          resultAlg = getAlgorithmFromFile(tmpFolderName, SER_ALG_TYPE.RESULT);
+          resultAlg = getAlgorithmFromFile(cFolderName, SER_ALG_TYPE.RESULT);
 
           if (resultAlg != null) {
             algResultParams = resultAlg.done();
@@ -213,7 +213,7 @@ public class ExternalExecutor {
           pw.println(algResultParams.toString(order, false, delim));
         pw.close();        
 
-        ATGlobal.deleteTMPDir(tmpFolderName, project.getName());        
+        ATGlobal.deleteTMPDir(cFolderName, project.getName());        
       }
       it.close();
     } catch (Exception e) {

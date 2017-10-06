@@ -35,9 +35,9 @@ public class ExecuteOne {
 	    .create("dr");
     
     Option data_local = OptionBuilder.withArgName("folder")
-            .withLongOpt("data_locale")
+            .withLongOpt("data_local")
             .hasArg(true)
-            .withDescription("use this folder as data_LOCALE; default value in $ALGATOR_DATA_LOCALE (if defined) or $ALGATOR_ROOT/data_local")
+            .withDescription("use this folder as data_LOCAL; default value in $ALGATOR_DATA_LOCAL (if defined) or $ALGATOR_ROOT/data_local")
             .create("dl");    
     
     Option algator_root = OptionBuilder.withArgName("folder")

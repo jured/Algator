@@ -39,7 +39,7 @@ public class AEETaskClient {
     
     // max time to wait for task to finish; in the future this time should be read
     // from configuration files (should be testset-dependant)
-    int secondsToWait = 10 * 60; // 10 minute
+    int secondsToWait = 10 * 60; // 10 minutes
     
     ExecuteWatchdog watchdog = new ExecuteWatchdog(secondsToWait*1000);
     executor.setWatchdog(watchdog);

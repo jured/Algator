@@ -7,8 +7,8 @@ import si.fri.algotest.global.ATGlobal;
  * @author tomaz
  */
 public class Version {
-  private static String version = "0.8";
-  private static String date    = "Avgust 2016";
+  private static String version = "0.85";
+  private static String date    = "Oktober 2017";
   
   public static String getVersion() {
     return String.format("version %s (%s)", version, date);

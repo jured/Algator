@@ -23,15 +23,15 @@ comparisons of defined algorithms.
 
 Instalation of the single-user version of the ALGator system on Linux system:
 
-* Create ALGator folder
+* **Create ALGator folder**
 
     We will refere to this folder as `<algator_root>` folder
 
-* Download ALGator.zip file from
+* **Download ALGator.zip** file from
 
     https://raw.githubusercontent.com/ALGatorDevel/Algator/ALGator.zip
 
-* Unpack ALGator.zip file to `<algator_root>`
+* **Unpack ALGator.zip** file to `<algator_root>`
 
 	```algator_root $ unzip ALGator.zip```
 

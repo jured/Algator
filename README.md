@@ -15,10 +15,10 @@ the problem to be solved, sets of test cases, parameters
 of the input and indicators of the output data  and the criteria for the 
 algorithm quality evaluation. When a project is defined, any number of 
 algorithm implementations can be added. When requested, system 
-executes all the implemented algorithms, checks the correctness and compares  
-the quality of their results.  Using the ALGator user can add additional 
-quality criteria, draw graphs and perform evaluations and comparisons of 
-defined algorithms. 
+executes all the implemented algorithms, checks for the correctness 
+and compares the quality of their results.  
+Using the ALGator user can add additional quality criteria, draw graphs 
+and perform evaluations and comparisons of defined algorithms. 
 
 ## System instalation
 

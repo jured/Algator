@@ -38,10 +38,14 @@ Instalation of the single-user version of the ALGator system on Linux system:
  
 * **Set environment variables:** 
   
+  Add to `~/.bash_profile`the following lines:
+  
+  ```
   export ALGATOR_ROOT=<algator_root>
   export ALGATOR_DATA_ROOT=$ALGATOR_ROOT/data_root
   export ALGATOR_DATA_LOCAL=$ALGATOR_ROOT/data_local
   export CLASSPATH=$CLASSPATH:$ALGATOR_ROOT/app/ALGator/ALGator.jar
+  ```
 
 
 * **To test correctness** of the instalation, type

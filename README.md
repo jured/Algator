@@ -36,7 +36,7 @@ Instalation of the single-user version of the ALGator system on Linux system:
 	```algator_root$ unzip ALGator.zip```
 
  
-* **Set environment variables:** 
+* **Set environment variables** 
   
   Add to `~/.bash_profile`the following lines:
   
@@ -47,6 +47,8 @@ Instalation of the single-user version of the ALGator system on Linux system:
   export CLASSPATH=$CLASSPATH:$ALGATOR_ROOT/app/ALGator/ALGator.jar
   ```
 
+  Note: in the first line change the `<algator_root>` with the name of 
+  your ALGator folder.
 
 * **To test correctness** of the instalation, type
 

@@ -31,7 +31,9 @@ Instalation of the single-user version of the ALGator system on Linux system:
 
     https://raw.githubusercontent.com/ALGatorDevel/Algator/ALGator.zip
 
-* Unpack ALGator.zip file to `<algator_root>
+* Unpack ALGator.zip file to `<algator_root>`
+
+	```algator_root $ unzip ALGator.zip```
 
   
 

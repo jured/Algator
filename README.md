@@ -33,44 +33,20 @@ Instalation of the single-user version of the ALGator system on Linux system:
 
 * **Unpack ALGator.zip** file to `<algator_root>`
 
-	```algator_root $ unzip ALGator.zip```
+	```algator_root$ unzip ALGator.zip```
 
-  
-
-*****************************************************************************
-3) Kratka navodila za namestitev programa ALGator kot samostojne aplikacije
-*****************************************************************************
-1. Preveden program ALGator z vsemi potrebnimi dodatki se nahaja v datoteki
-ALGator.zip. Za uporabo programa prenesemo datoteko 
-
-https://github.com/ALGatorDevel/Algator/blob/master/ALGator.zip?raw=true
-
-in jo odpakiramo v poljuben direktorij (imenujmo ga <algator_root>).
-
-2. Ustvarimo mapi <algator_root>/app in <algator_root>/app/ALGator in v slednjo
-   prenesemo datoteko ALGator.jar in mapo lib. Končen cilj je taka struktura:
-
-   <algator_root>
-     app
-       ALGator
-         ALGator.jar
-         lib
-     data_root   
-     data_local
  
-3. Nastavimo štiri sistemske spremenljivke: 
+* **Set environment variables:** 
   
-       ALGATOR_ROOT=<algator_root>
-       ALGATOR_DATA_ROOT=$ALGATOR_ROOT/data_root
-       ALGATOR_DATA_LOCAL=$ALGATOR_ROOT/data_local
-       CLASSPATH=$CLASSPATH:$ALGATOR_ROOT/app/ALGator/ALGator.jar
-
-   (v prvem ukazu <algator_root> zamenjamo s pravim imenom mape)
+  export ALGATOR_ROOT=<algator_root>
+  export ALGATOR_DATA_ROOT=$ALGATOR_ROOT/data_root
+  export ALGATOR_DATA_LOCAL=$ALGATOR_ROOT/data_local
+  export CLASSPATH=$CLASSPATH:$ALGATOR_ROOT/app/ALGator/ALGator.jar
 
 
-4. Z ukazom 
+* **To test correctness** of the instalation, type
 
-  java algator.Version
+  ```java algator.Version```
 
 preverimo pravilnost namestitve sistema (ALGator izpiše verzijo 
 in nastavitev zgoraj opisanih sistemskih spremenljivk).

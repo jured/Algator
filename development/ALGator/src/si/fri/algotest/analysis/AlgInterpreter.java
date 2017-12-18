@@ -2,6 +2,8 @@ package si.fri.algotest.analysis;
 
 import bsh.EvalError;
 import bsh.Interpreter;
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 import si.fri.algotest.global.ATLog;
 
 /**
@@ -36,13 +38,17 @@ public class AlgInterpreter {
     }
 
     public static Object evalExpression(String expression) {
-        Interpreter ip = GetInterpreter();
+/*        Interpreter ip = GetInterpreter();
         try {
             ip.eval("result=" + expression);
             return ip.get("result");
         } catch (EvalError ex) {
             return "?";
         }
+*/
+       Expression e = new ExpressionBuilder(expression).build();
+       double result = e.evaluate();
+       return result;
     }
 
 }

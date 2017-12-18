@@ -17,7 +17,6 @@ public class EVariable extends Entity  implements Serializable {
   public static final String ID_Subtype  = "Subtype";
   public static final String ID_Value    = "Value";
   
-
   private VariableType type;
   private String subtype; 
   

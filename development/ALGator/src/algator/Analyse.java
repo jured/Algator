@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import si.fri.algotest.analysis.DataAnalyser;
 import si.fri.algotest.analysis.view.Analyser;
 import si.fri.algotest.analysis.TableData;
+import si.fri.algotest.entities.EPresenter;
 import si.fri.algotest.entities.EQuery;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.global.ATGlobal;
@@ -42,7 +43,7 @@ public class Analyse {
             .hasArg(true)
             .withDescription("use this folder as data_LOCAL; default value in $ALGATOR_DATA_LOCAL (if defined) or $ALGATOR_ROOT/data_local")
             .create("dl");
-    
+
     Option algator_root = OptionBuilder.withArgName("folder")
             .withLongOpt("algator_root")
             .hasArg(true)
@@ -54,46 +55,53 @@ public class Analyse {
             .hasArg(true)
             .withDescription("the name of the query to run")
             .create("q");
-    
+
     Option queryOrigin = OptionBuilder.withArgName("[R|F|S]")
             .withLongOpt("query_origin")
             .hasArg(true)
             .withDescription("the origin of the query (R=data root folder, F=custom folder, S=standard input); default: R")
             .create("o");
-    
-        Option queryFormat = OptionBuilder.withArgName("JSON|ASQL")
-                .withLongOpt("query_format")
-                .hasArg(true)
-                .withDescription("query format")
-                .create("qf");
+
+    Option queryFormat = OptionBuilder.withArgName("JSON|ASQL")
+            .withLongOpt("query_format")
+            .hasArg(true)
+            .withDescription("query format")
+            .create("qf");
 
     Option computerID = OptionBuilder.withArgName("computer_id")
             .withLongOpt("cid")
             .hasArg(true)
             .withDescription("the ID of computer that produced results; default: this computer ID")
             .create("c");
-    
+
     Option verbose = OptionBuilder.withArgName("verbose_level")
             .withLongOpt("verbose")
             .hasArg(true)
             .withDescription("print additional information (0 = OFF, 1 = some (default), 2 = all")
             .create("v");
 
+    Option presenter = OptionBuilder.withArgName("presenter_name")
+            .withLongOpt("presenter")
+            .hasArg(true)
+            .withDescription("the name of the presenter to open")
+            .create("p");
+
     options.addOption(data_root);
     options.addOption(data_local);
     options.addOption(algator_root);
     options.addOption(query);
+    options.addOption(presenter);
     options.addOption(queryOrigin);
     options.addOption(computerID);
     options.addOption(verbose);
-        options.addOption(queryFormat);
+    options.addOption(queryFormat);
 
     options.addOption("h", "help", false,
             "print this message");
 
     options.addOption("u", "usage", false,
             "print usage guide");
-    
+
     return options;
   }
 
@@ -106,14 +114,14 @@ public class Analyse {
   }
 
   private static void printUsage() {
-    Scanner sc = new Scanner((new Analyse()).getClass().getResourceAsStream("/data/AnalyserUsage.txt")); 
-        while (sc.hasNextLine()) {
+    Scanner sc = new Scanner((new Analyse()).getClass().getResourceAsStream("/data/AnalyserUsage.txt"));
+    while (sc.hasNextLine()) {
       System.out.println(sc.nextLine());
-        }
-    
+    }
+
     System.exit(0);
   }
-  
+
   /**
    * Used to run the system. Parameters are given trought the arguments
    *
@@ -133,7 +141,7 @@ public class Analyse {
       if (line.hasOption("u")) {
         printUsage();
       }
-      
+
       String[] curArgs = line.getArgs();
       if (curArgs.length != 1) {
         printMsg(options);
@@ -143,22 +151,22 @@ public class Analyse {
 
       String algatorRoot = ATGlobal.getALGatorRoot();
       if (line.hasOption("algator_root")) {
-        algatorRoot = line.getOptionValue("algator_root");        
+        algatorRoot = line.getOptionValue("algator_root");
       }
       ATGlobal.setALGatorRoot(algatorRoot);
-      
+
       String dataRoot = ATGlobal.getALGatorDataRoot();
       if (line.hasOption("data_root")) {
-        dataRoot = line.getOptionValue("data_root");        
+        dataRoot = line.getOptionValue("data_root");
       }
       ATGlobal.setALGatorDataRoot(dataRoot);
 
       // for analysing the data_root folder is used as a default data source 
       String dataLocal = ATGlobal.getALGatorDataRoot();
       if (line.hasOption("data_local")) {
-	dataLocal = line.getOptionValue("data_local");
+        dataLocal = line.getOptionValue("data_local");
       }
-      ATGlobal.setALGatorDataLocal(dataLocal);            
+      ATGlobal.setALGatorDataLocal(dataLocal);
 
       ATGlobal.verboseLevel = 1;
       if (line.hasOption("verbose")) {
@@ -179,37 +187,53 @@ public class Analyse {
 
       String cid = ATGlobal.getThisComputerID();
       if (line.hasOption("cid")) {
-        cid = line.getOptionValue("cid");        
+        cid = line.getOptionValue("cid");
       }
-      
+
       System.out.println(cid);
-      
+
+      EPresenter presenter = null;
+      if (line.hasOption("presenter")) {
+        presenter = getPresenter(line.getOptionValue("presenter"), dataRoot, projectName);
+      }
+
       String origin = line.getOptionValue("query_origin");
-            if (origin == null) {
-                origin = "R";
-            }
-   
+      if (origin == null) {
+        origin = "R";
+      }
+
       if (!line.hasOption("query")) {
         System.out.println(introMsg + "\n");
         System.out.println("Data root = " + dataRoot);
       }
 
-      if (line.hasOption("query") || "S".equals(origin)) {  
+      if (line.hasOption("query") || "S".equals(origin)) {
         // if a query is given, run a query and print result ...
-                String result = runQuery(projekt, line.getOptionValue("query"), origin, line.getOptionValue("query_format"), cid);
+        String result = runQuery(projekt, line.getOptionValue("query"), origin, line.getOptionValue("query_format"), cid);
         System.out.println(result);
       } else {
         // ...else run a GUI analizer
-        new Analyser(projekt, cid);
+        new Analyser(projekt, cid, presenter);
       }
-      
+
     } catch (ParseException ex) {
       printMsg(options);
     }
   }
-  
+
+  private static EPresenter getPresenter(String presenter, String dataRoot, String projectName) {
+    String presenterFileName = presenter;
+    if (!presenterFileName.endsWith("."+ATGlobal.AT_FILEEXT_presenter))
+      presenterFileName += "."+ATGlobal.AT_FILEEXT_presenter;
+    
+    String presenterRoot = ATGlobal.getPRESENTERSroot(ATGlobal.getPROJECTroot(dataRoot, projectName));
+    EPresenter result =  new EPresenter();
+    result.initFromFile(new File(presenterRoot + File.separator + presenterFileName));
+    return result;
+  }
+
   public static String runQuery(Project project, String queryName, String origin, String computerID) {
-        return runQuery(project, queryName, origin, null, computerID);
+    return runQuery(project, queryName, origin, null, computerID);
   }
 
   public static String runQuery(Project project, String queryName, String origin, String format, String computerID) {
@@ -221,8 +245,8 @@ public class Analyse {
         while (sc.hasNextLine()) {
           vsebina += sc.nextLine() + "\n";
         }
-        if(!"ASQL".equals(format)){
-          JSONObject queryObject = new JSONObject(vsebina);        
+        if (!"ASQL".equals(format)) {
+          JSONObject queryObject = new JSONObject(vsebina);
           query.initFromJSON(queryObject.get("Query").toString());
         }
         break;
@@ -234,22 +258,23 @@ public class Analyse {
         } else {
           fileName = ATGlobal.getQUERYfilename(project.getEProject().getProjectRootDir(), queryName);
         }
-     
+
         //File queryFN = new File(fileName);
         //if (!queryFN.exists()) fileName += "." + ATGlobal.AT_FILEEXT_query;
-        if(!"ASQL".equals(format))
+        if (!"ASQL".equals(format)) {
           query.initFromFile(new File(fileName));
-        else
+        } else {
           vsebina = query.getFileText(new File(fileName));
+        }
         break;
     }
-    
+
     // debug: System.out.println("---> " + query.toJSONString());
-    String result = ErrorStatus.getLastErrorMessage().equals(ErrorStatus.STATUS_OK) 
+    String result = ErrorStatus.getLastErrorMessage().equals(ErrorStatus.STATUS_OK)
             ? "Invalid query." : ErrorStatus.getLastErrorMessage();
-    if("ASQL".equals(format)){
-       TableData td = new ASqlObject(vsebina).runQuery(project);
-       result = td.toString();
+    if ("ASQL".equals(format)) {
+      TableData td = new ASqlObject(vsebina).runQuery(project);
+      result = td.toString();
     } else {
       if (query != null & !query.toJSONString().equals("{}")) {
         // run query ...

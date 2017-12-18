@@ -6,10 +6,10 @@ import si.fri.aeeclient.Requester;
  *
  * @author tomaz
  */
-public class TaskClient  {
+public class Request  {
   
   public static void main(String args[]) {
-    Requester.programName = "TaskClient";
-    Requester.do_main(args, 0);
+    Requester.programName = "Request";
+    Requester.do_main(args, 1);
   }
 }

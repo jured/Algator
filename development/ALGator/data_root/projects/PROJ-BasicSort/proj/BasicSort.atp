@@ -1,1 +1,17 @@
-{  "Project" : {    "Description"          : "Testing several sorting methods",    "HTMLDescFile"         : "sorting.html",    "Author"               : "Tomaz",    "Date"                 : "30/07/2013",        "Algorithms"           : ["QuickSort", "BubbleSort"],         "TestSets"             : ["TestSet1", "TestSet2"],    "AlgorithmJARs"        : [],    "ProjectJARs"          : []  }}
+{"Project": {
+  "Name": "BasicSort",
+  "Description": "Testing several sorting methods",
+  "Author": "Tomaz",
+  "Date": "30/07/2013",
+  "Algorithms": [
+    "QuickSort",
+    "BubbleSort",
+    "InsertionSort"
+  ],
+  "TestSets": [
+    "TestSet1",
+    "TestSet2"
+  ],
+  "ProjectJARs": [],
+  "AlgorithmJARs": []
+}}

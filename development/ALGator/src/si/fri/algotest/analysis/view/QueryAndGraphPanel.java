@@ -15,6 +15,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.TreeSet;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -22,10 +23,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import org.json.JSONArray;
 import org.math.plot.Plot2DPanel;
 import si.fri.algotest.analysis.DataAnalyser;
 import si.fri.algotest.analysis.TableData;
+import si.fri.algotest.entities.EPresenter;
 import si.fri.algotest.entities.EQuery;
+import si.fri.algotest.entities.GraphType;
 import si.fri.algotest.entities.NameAndAbrev;
 import si.fri.algotest.entities.Project;
 
@@ -98,6 +102,30 @@ public class QueryAndGraphPanel extends javax.swing.JPanel {
     public void setQuery(EQuery query) {
         getCurrentComposer().setQuery(query);
     }
+    
+    
+    public EPresenter getPresenter() {
+      EPresenter presenter = new EPresenter();
+      presenter.setQuery(getQuery());
+      presenter.set(EPresenter.ID_HasGraph, "1");
+      presenter.set(EPresenter.ID_Xaxis,seriesSelect1.getXField());
+      presenter.set(EPresenter.ID_Yaxes,new JSONArray(seriesSelect1.getYFieldsID()));
+      presenter.setGraphTypes(seriesSelect1.getGraphType());      
+      return presenter;
+    }
+
+    public void setPresenter(EPresenter presenter) {
+      EQuery query = presenter.getQuery();
+      getCurrentComposer().setQuery(query);
+      run(new ActionEvent(new JCheckBox(), 0, "Re-run graph")); // to run the query (and thus create fields in XCOmbo)
+      seriesSelect1.setXField(presenter.getField(EPresenter.ID_Xaxis));
+      
+      String [] yFIelds = presenter.getStringArray(EPresenter.ID_Yaxes);
+      seriesSelect1.setYFieldsID(yFIelds);
+            
+      seriesSelect1.setGraphType(presenter.getGraphTypes());
+    }
+    
 
     public void run(ActionEvent evt) {
         
@@ -161,7 +189,7 @@ public class QueryAndGraphPanel extends javax.swing.JPanel {
                 int xFieldID = getFieldID(td, seriesSelect1.getXField());
                 int yFieldIDs[] = getFieldsID(td, seriesSelect1.getYFieldsID());
 
-                int graphType = seriesSelect1.getGraphType();
+                TreeSet<GraphType> graphType = seriesSelect1.getGraphType();
 
                 if (xFieldID >= 0 && yFieldIDs.length > 0) {
                     drawGraph(td, graphPanel, xFieldID, yFieldIDs, graphType);
@@ -175,7 +203,7 @@ public class QueryAndGraphPanel extends javax.swing.JPanel {
      * Draw y.length graphs with X-axis be the x-th column and y-axis the y[i]
      * column of td.
      */
-    private void drawGraph(TableData td, JPanel outPanel, int xAxis, int[] yAxes, int graphType) {
+    private void drawGraph(TableData td, JPanel outPanel, int xAxis, int[] yAxes, TreeSet<GraphType> graphType) {
         if (td.data.size() == 0 || td.data.get(0).size() < 2) {
             return;
         }
@@ -184,12 +212,12 @@ public class QueryAndGraphPanel extends javax.swing.JPanel {
             outPanel.remove(plotPanel);
         }
 
-        boolean drawLine = (graphType & 1) != 0;
-        boolean drawStair = (graphType & 2) != 0;
-        boolean drawBar = (graphType & 4) != 0;
-        boolean drawBox = (graphType & 8) != 0;
-        boolean drawCloud = (graphType & 16) != 0;
-        boolean drawHist = (graphType & 32) != 0;
+        boolean drawLine  = graphType.contains(GraphType.LINE);
+        boolean drawStair = graphType.contains(GraphType.STAIR);;
+        boolean drawBar   = graphType.contains(GraphType.BAR);;
+        boolean drawBox   = graphType.contains(GraphType.BOX);;
+//        boolean drawCloud = (graphType & 16) != 0;
+//        boolean drawHist = (graphType & 32) != 0;
 
         plotPanel = new Plot2DPanel();
         double[] x = getDoubleArray(td.data, xAxis);

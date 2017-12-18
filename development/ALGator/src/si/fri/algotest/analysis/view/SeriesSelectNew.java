@@ -4,9 +4,11 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.TreeSet;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JRadioButton;
+import si.fri.algotest.entities.GraphType;
 
 /**
  *
@@ -72,6 +74,10 @@ public class SeriesSelectNew extends javax.swing.JPanel {
     return XCOmbo.getSelectedItem().toString();
   }
   
+  public void setXField(String xField) {
+    XCOmbo.setSelectedItem(xField);
+  }
+  
   public String [] getYFieldsID() {
     Object [] tagedItems = tTagEditor1.getTagedItems();
     String [] result = new String[tagedItems.length];
@@ -83,18 +89,26 @@ public class SeriesSelectNew extends javax.swing.JPanel {
     return result;
   } 
   
-  
-  public int getGraphType() {
-    return
-       (lineCB. isSelected() ? 1 : 0) * 1 + 
-       (stairCB.isSelected() ? 1 : 0) * 2 + 
-       (barCB.  isSelected() ? 1 : 0) * 4 + 
-       (boxCB.  isSelected() ? 1 : 0) * 8 + 
-       (cloudCB.isSelected() ? 1 : 0) * 16 + 
-       (histCB. isSelected() ? 1 : 0) * 32; 
+  public void setYFieldsID(String [] yFields) {
+    tTagEditor1.setTags(yFields);
   }
   
   
+  public TreeSet<GraphType> getGraphType() {
+    TreeSet<GraphType> result = new TreeSet<GraphType>();
+    if (lineCB. isSelected()) result.add(GraphType.LINE);
+    if (stairCB.isSelected()) result.add(GraphType.STAIR);
+    if (barCB.  isSelected()) result.add(GraphType.BAR);
+    if (boxCB.  isSelected()) result.add(GraphType.BOX);
+    return result;
+  }
+  
+  public void setGraphType(TreeSet<GraphType> gType) {
+    lineCB. setSelected(gType.contains(GraphType.LINE));
+    stairCB.setSelected(gType.contains(GraphType.STAIR));
+    barCB.  setSelected(gType.contains(GraphType.BAR));
+    boxCB.  setSelected(gType.contains(GraphType.BOX));
+  }
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always

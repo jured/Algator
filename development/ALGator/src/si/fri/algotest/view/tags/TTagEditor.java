@@ -130,6 +130,17 @@ public class TTagEditor extends javax.swing.JPanel {
     revalidate();
   }
   
+  // tole dodam, ker želim od zunaj (po branju datoteke) nastaviti več tagov;
+  // morda ni povsem v skladu z logiko orodja! Dela kljub temu...
+  public void setTags(Object [] newTags) {
+    fromProgram = true;
+      for (Object newTag : newTags) {
+        itemsCB.setSelectedItem(newTag);
+        addSelectedItemToTags();
+      }
+    fromProgram=false;
+  }
+  
   public Object[] getTags() {
     return selectedItems.toArray();
   }

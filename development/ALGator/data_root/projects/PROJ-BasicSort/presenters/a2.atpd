@@ -1,0 +1,25 @@
+{"Presenter": {
+  "Name": "a2",
+  "Query": {
+    "Name": "?",
+    "Algorithms": [
+      "BubbleSort AS BS",
+      "InsertionSort AS IS"
+    ],
+    "TestSets": ["TestSet2 AS TestSet2"],
+    "Parameters": ["N AS N"],
+    "Indicators": [
+      "(N*N)/CMP AS Y",
+      " N*N/SWAP AS X"
+    ],
+    "GroupBy": ["N"],
+    "Filter": ["N<24000"],
+    "SortBy": [""],
+    "Count": "0",
+    "ComputerID": "F0.C0"
+  },
+  "HasGraph": "1",
+  "Xasix": "N",
+  "Yaxes": ["*.Y"],
+  "GraphTypes": ["line"]
+}}

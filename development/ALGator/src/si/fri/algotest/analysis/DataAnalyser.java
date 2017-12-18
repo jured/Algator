@@ -455,7 +455,7 @@ public class DataAnalyser {
 
   public static TableData runQuery_NO_COUNT(EProject eProject, EQuery query, String computerID, Map<String, TableData> queryResults) {
 
-    TableData td = (TableData) Cache.get(eProject.getName() + query.getCacheKey() + computerID);
+      TableData td = (TableData) Cache.get(eProject.getName() + query.getCacheKey() + computerID);
 
     if (td != null && (queryResults == null || queryResults.size() == 0)) {
       TableData tdCache = new TableData();
@@ -595,7 +595,7 @@ public class DataAnalyser {
       td.numberOfInputParameters = inPars.length + 4;
 
       for (NameAndAbrev inPar : inPars) {
-        td.header.add(inPar.getAbrev());
+          td.header.add(inPar.getAbrev());
       }
       for (NameAndAbrev outPar : outPars) {
         String abrev = outPar.getAbrev();

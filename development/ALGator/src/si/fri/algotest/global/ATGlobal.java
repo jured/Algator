@@ -32,6 +32,7 @@ public class ATGlobal {
   public static final String AT_FILEEXT_testset    = "atts";
   public static final String AT_FILEEXT_resultdesc = "atrd";
   public static final String AT_FILEEXT_query      = "atqd";
+  public static final String AT_FILEEXT_presenter  = "atpd";
 
   // For the structure of the Project folder see ALGator.docx documentation
   private static final String ATDIR_data_local     = "data_local";
@@ -46,6 +47,7 @@ public class ATGlobal {
   private static final String ATDIR_algsDir        = "algs";
   private static final String ATDIR_algDir         = "ALG-%s";
   private static final String ATDIR_queryDir       = "queries";
+  private static final String ATDIR_presenterDir   = "presenters";
   private static final String ATDIR_queryOutput    = "output";
   
   private static final String ATDIR_logDir         = "log";
@@ -260,8 +262,8 @@ public class ATGlobal {
 
   public static String getQUERIESroot(String projectRoot) {
     return projectRoot + File.separator + ATDIR_queryDir;
-  }
-
+  }  
+  
   public static String getQUERYfilename(String projectRoot, String query) {
     return getQUERIESroot(projectRoot) + File.separator + query + "." + AT_FILEEXT_query;
   }
@@ -281,6 +283,14 @@ public class ATGlobal {
     
     return folderName + File.separator + fileName;
   }
+  
+  
+  /************* presenters  *+++++++++++++++++++++*/
+
+  public static String getPRESENTERSroot(String projectRoot) {
+    return projectRoot + File.separator + ATDIR_presenterDir;
+  }
+
 
   /************* doc folders   *+++++++++++++++++++++*/
   public static String getPROJECTdocFolder(String projectRoot) {

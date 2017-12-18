@@ -1,5 +1,5 @@
 /**
- *
+ * A dummy always n-square BubbleSort algorithm
  * @author tomaz
  */
 public class BubbleSortAlgorithm extends BasicSortAbsAlgorithm {

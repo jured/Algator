@@ -50,6 +50,9 @@ public class Admin {
 	    "create a new project");
     options.addOption("ca", "create_algorithm", false,
 	    "create a new algorithm for a given project");
+    options.addOption("ct", "create_testset", false,
+	    "create a new testset for a given project");    
+    
     options.addOption("u", "usage", false, "print usage guide");
     
     return options;
@@ -71,7 +74,7 @@ public class Admin {
   }
   
   /**
-   * Used to run the system. Parameters are given trought the arguments
+   * Used to run the system. Parameters are given through the arguments
    *
    * @param args
    */
@@ -125,6 +128,17 @@ public class Admin {
         }
       }
 
+      if (line.hasOption("create_testset")) {
+	if (curArgs.length != 2) {
+          System.out.println("Invalid project or test set name");
+          printMsg(options); 
+        } else {
+          createTestset(curArgs[0], curArgs[1]);
+          System.exit(0);
+        }
+      }
+      
+      
       printMsg(options);
     } catch (ParseException ex) {
       printMsg(options);
@@ -174,9 +188,7 @@ public class Admin {
     return true;
   }
 
-  private static boolean createAlgorithm(String proj_name, String alg_name) {
-        
-    
+  private static boolean createAlgorithm(String proj_name, String alg_name) {        
     String dataroot = ATGlobal.getALGatorDataRoot();         
     String projRoot = ATGlobal.getPROJECTroot(dataroot, proj_name);
     String algRoot = ATGlobal.getALGORITHMroot(projRoot, alg_name);
@@ -216,6 +228,58 @@ public class Admin {
 
     } catch (Exception e) {
       System.out.println("Can not create project: " + e.toString());
+      return false;
+    }    
+    return true;
+  }
+
+
+  private static boolean createTestset(String proj_name, String testset_name) {        
+    String dataroot = ATGlobal.getALGatorDataRoot();         
+    String projRoot = ATGlobal.getPROJECTroot(dataroot, proj_name);
+    String testsRoot = ATGlobal.getTESTSroot(dataroot, proj_name);
+    String docFolder = ATGlobal.getPROJECTdocFolder(projRoot);
+
+    
+    HashMap<String,String> substitutions = getSubstitutions(proj_name);
+    substitutions.put("<TS>", testset_name);
+    
+    // first create project if it does not exist
+    File projFolderFile = new File(projRoot);
+    if (!projFolderFile.exists()) {
+      if (!createProject(proj_name))
+        System.exit(0);
+    }    
+    
+    System.out.println("Creating test set " + testset_name +  " for the project " + proj_name);
+    try {                              
+      
+      File testsetFolderFile = new File(testsRoot);
+      if (!testsetFolderFile.exists()) {
+        testsetFolderFile.mkdirs();
+      }
+      
+      File testSetFile = new File(testsRoot + File.separator + testset_name+".atts");
+      if (testSetFile.exists()) {
+        System.out.printf("\n Testset %s already exists!\n", testset_name);
+        System.exit(0);
+      }
+             
+      
+      
+      copyFile("templates/TS.atts",            testsRoot,       testset_name+".atts",             substitutions);
+      copyFile("templates/TS.txt",             testsRoot,       testset_name+".txt",              substitutions);
+      copyFile("templates/TS.html",            docFolder,       testset_name + ".html",           substitutions);
+      
+      
+      EProject eProject = new EProject(new File(ATGlobal.getPROJECTfilename(dataroot, proj_name)));
+      ArrayList ts = new ArrayList<String>(Arrays.asList(eProject.getStringArray(EProject.ID_TestSets)));
+        ts.add(testset_name);
+      eProject.set(EProject.ID_TestSets, ts.toArray());
+      eProject.saveEntity();
+
+    } catch (Exception e) {
+      System.out.println("Can not create test set: " + e.toString());
       return false;
     }    
     return true;

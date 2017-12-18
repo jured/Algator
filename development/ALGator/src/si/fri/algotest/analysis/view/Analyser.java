@@ -15,7 +15,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
+import si.fri.algotest.entities.EPresenter;
 import si.fri.algotest.entities.EQuery;
+import si.fri.algotest.entities.Entity;
 import si.fri.algotest.entities.Project;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ErrorStatus;
@@ -35,6 +37,10 @@ public class Analyser extends javax.swing.JFrame {
   ArrayList<QueryAndGraphPanel> queryAndGraphPanels;
 
   String computerID; // the ID of computer; the results are in computerID folder
+  
+  // the presenter given in the arguments; the presenter to be shown just after program starts
+  EPresenter presenter;
+  
 
   /**
    * Creates new form Analyse
@@ -83,11 +89,16 @@ public class Analyser extends javax.swing.JFrame {
     return largestScreen;
   }
 
-  public Analyser(final Project project, final String computerID) {
+  public Analyser(final Project project, final String computerID, EPresenter presenter) {
     java.awt.EventQueue.invokeLater(new Runnable() {
       public void run() {
         Analyser dialog = new Analyser(new javax.swing.JFrame(), true, computerID);
-        dialog.setProject(project, computerID);
+        dialog.setProject(project, computerID);        
+        
+        try{
+          dialog.getCurrentQAG().setPresenter(presenter);
+        }catch (Exception e) {}
+        
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
           @Override
           public void windowClosing(java.awt.event.WindowEvent e) {
@@ -134,79 +145,131 @@ public class Analyser extends javax.swing.JFrame {
     }
   }
 
-  void saveQuery() {
+  // save query (type=0) or presenter (type=1)
+  void saveQueryOrPresentation(int type) {
     if (project == null) {
       return;
     }
     JFileChooser jfc = new JFileChooser();
 
-    String queryRoot = ATGlobal.getQUERIESroot(project.getEProject().getProjectRootDir());
 
-    jfc.setCurrentDirectory(new File(queryRoot));
+    
+    String qpRoot = "";
+    String ident = "";
+    String qpExtension = ".";
+    if (type==0) {
+      qpRoot=ATGlobal.getQUERIESroot(project.getEProject().getProjectRootDir());
+      qpExtension = ATGlobal.AT_FILEEXT_query;
+      ident = "query";
+    } else if (type==1){ 
+      qpRoot=ATGlobal.getPRESENTERSroot(project.getEProject().getProjectRootDir());
+      qpExtension = ATGlobal.AT_FILEEXT_presenter;
+      ident = "presenter";
+    }
+
+    jfc.setCurrentDirectory(new File(qpRoot));
+    
+    final String fqpExtension = qpExtension;
+    final String fident = ident;
     jfc.setFileFilter(new FileFilter() {
       @Override
       public boolean accept(File f) {
-        return f.getAbsolutePath().endsWith(ATGlobal.AT_FILEEXT_query);
+        return f.getAbsolutePath().endsWith(fqpExtension);
       }
 
       @Override
       public String getDescription() {
-        return "ALGator query (*." + ATGlobal.AT_FILEEXT_query + ")";
+        return "ALGator " + fident + " (*." + fqpExtension + ")";
       }
     });
 
     int ans = jfc.showSaveDialog(this);
     if (ans == JFileChooser.APPROVE_OPTION) {
       File fileToSave = jfc.getSelectedFile();
-      if (!fileToSave.getPath().endsWith("." + ATGlobal.AT_FILEEXT_query)) {
-        fileToSave = new File(fileToSave.getPath() + "." + ATGlobal.AT_FILEEXT_query);
+      if (!fileToSave.getPath().endsWith("." + fqpExtension)) {
+        fileToSave = new File(fileToSave.getPath() + "." + fqpExtension);
       }
 
       String fileMsg = String.format("File %s exists. Overwrite?", fileToSave.getPath());
       boolean save = !fileToSave.exists()
-              || (JOptionPane.showConfirmDialog(this, fileMsg, "Save query warning", JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION);
+              || (JOptionPane.showConfirmDialog(this, fileMsg, "Save "+ fident +" warning", JOptionPane.YES_NO_CANCEL_OPTION) == JOptionPane.YES_OPTION);
 
       if (save) {
 
-        try {
-          PrintWriter pw = new PrintWriter(fileToSave);
-          pw.println(getCurrentQAG().getQuery().toJSONString(true));
-          pw.close();
+        String dataToSave="";
+        Entity entityToSave = null;
+        if (type==0)
+          entityToSave = getCurrentQAG().getQuery();
+        else if (type==1)
+          entityToSave = getCurrentQAG().getPresenter();
+        if (entityToSave != null) {
+          entityToSave.setName(fileToSave.getName().replace("."+fqpExtension, ""));
+          dataToSave = entityToSave.toJSONString(true);
+        }
+        
+        try (PrintWriter pw = new PrintWriter(fileToSave);) {
+          pw.println(dataToSave);
         } catch (FileNotFoundException ex) {
-          JOptionPane.showMessageDialog(this, ex.toString(), "Save query error", JOptionPane.OK_OPTION);
+          JOptionPane.showMessageDialog(this, ex.toString(), "Save " + fident +" error", JOptionPane.OK_OPTION);
         }
       }
     }
   }
 
-  void openQuery() {
+// open query (type=0) or presenter (type=1)
+  void openQueryOrPresentation(int type) {
     if (project == null) {
       return;
     }
     JFileChooser jfc = new JFileChooser();
 
-    String queryRoot = ATGlobal.getQUERIESroot(project.getEProject().getProjectRootDir());
-
-    jfc.setCurrentDirectory(new File(queryRoot));
+    String qpRoot="";
+    String qpExtension = ".";
+    String ident="";
+    if (type==0) {
+      qpRoot = ATGlobal.getQUERIESroot(project.getEProject().getProjectRootDir());
+      qpExtension = ATGlobal.AT_FILEEXT_query;
+      ident="query";
+    } else {
+      qpRoot = ATGlobal.getPRESENTERSroot(project.getEProject().getProjectRootDir());
+      qpExtension = ATGlobal.AT_FILEEXT_presenter;
+      ident="presenter";
+    }
+    
+    
+    jfc.setCurrentDirectory(new File(qpRoot));
+    
+    String fExtension = qpExtension;
+    String fident = ident;
     jfc.setFileFilter(new FileFilter() {
       @Override
       public boolean accept(File f) {
-        return f.getAbsolutePath().endsWith(ATGlobal.AT_FILEEXT_query);
+        return f.getAbsolutePath().endsWith(fExtension);
       }
 
       @Override
       public String getDescription() {
-        return "ALGator query (*." + ATGlobal.AT_FILEEXT_query + ")";
+        return "ALGator " + fident + " (*." + fExtension + ")";
       }
     });
 
     int ans = jfc.showOpenDialog(this);
     if (ans == JFileChooser.APPROVE_OPTION) {
       File fileToOpen = jfc.getSelectedFile();
-      EQuery query = new EQuery();
-      query.initFromFile(fileToOpen);
+      
+      Entity openEntity = new Entity();
+      if (type==0)
+        openEntity = new EQuery();
+      else if (type==1)
+        openEntity = new EPresenter();
+      openEntity.initFromFile(fileToOpen);
+      
       if (ErrorStatus.getLastErrorStatus() == ErrorStatus.STATUS_OK) {
-        getCurrentQAG().setQuery(query);
+        if (type==0)
+          getCurrentQAG().setQuery((EQuery)openEntity);
+        else if (type==1)
+          getCurrentQAG().setPresenter((EPresenter)openEntity);
+
         getCurrentQAG().run(new ActionEvent(new JCheckBox(), 0, "Re-run graph"));
       }
     }
@@ -228,7 +291,10 @@ public class Analyser extends javax.swing.JFrame {
     jMenuBar1 = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     jMenuItem1 = new javax.swing.JMenuItem();
+    jMenuItem4 = new javax.swing.JMenuItem();
+    jSeparator2 = new javax.swing.JPopupMenu.Separator();
     jMenuItem2 = new javax.swing.JMenuItem();
+    jMenuItem5 = new javax.swing.JMenuItem();
     jSeparator1 = new javax.swing.JPopupMenu.Separator();
     jMenuItem3 = new javax.swing.JMenuItem();
 
@@ -255,7 +321,7 @@ public class Analyser extends javax.swing.JFrame {
 
     jMenu1.setText("File");
 
-    jMenuItem1.setText("Open query...");
+    jMenuItem1.setText("Open query ...");
     jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         jMenuItem1ActionPerformed(evt);
@@ -263,13 +329,30 @@ public class Analyser extends javax.swing.JFrame {
     });
     jMenu1.add(jMenuItem1);
 
-    jMenuItem2.setText("Save query...");
+    jMenuItem4.setText("Open presentation ...");
+    jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItem4ActionPerformed(evt);
+      }
+    });
+    jMenu1.add(jMenuItem4);
+    jMenu1.add(jSeparator2);
+
+    jMenuItem2.setText("Save query ...");
     jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         jMenuItem2ActionPerformed(evt);
       }
     });
     jMenu1.add(jMenuItem2);
+
+    jMenuItem5.setText("Save presentation ...");
+    jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenuItem5ActionPerformed(evt);
+      }
+    });
+    jMenu1.add(jMenuItem5);
     jMenu1.add(jSeparator1);
 
     jMenuItem3.setText("Quit");
@@ -292,11 +375,11 @@ public class Analyser extends javax.swing.JFrame {
   }//GEN-LAST:event_jMenuItem3ActionPerformed
 
   private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-    saveQuery();
+    saveQueryOrPresentation(0);
   }//GEN-LAST:event_jMenuItem2ActionPerformed
 
   private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-    openQuery();
+    openQueryOrPresentation(0);
   }//GEN-LAST:event_jMenuItem1ActionPerformed
 
   private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
@@ -307,6 +390,14 @@ public class Analyser extends javax.swing.JFrame {
     }
   }//GEN-LAST:event_jTabbedPane1StateChanged
 
+  private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+    saveQueryOrPresentation(1);
+  }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+  private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+    openQueryOrPresentation(1);
+  }//GEN-LAST:event_jMenuItem4ActionPerformed
+
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenu jMenu1;
@@ -314,9 +405,12 @@ public class Analyser extends javax.swing.JFrame {
   private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JMenuItem jMenuItem2;
   private javax.swing.JMenuItem jMenuItem3;
+  private javax.swing.JMenuItem jMenuItem4;
+  private javax.swing.JMenuItem jMenuItem5;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel9;
   private javax.swing.JPopupMenu.Separator jSeparator1;
+  private javax.swing.JPopupMenu.Separator jSeparator2;
   private javax.swing.JTabbedPane jTabbedPane1;
   // End of variables declaration//GEN-END:variables
 }

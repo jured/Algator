@@ -1,0 +1,12 @@
+{
+  "Algorithm" : {	
+
+   "Name"           : "InsertionSort",
+
+   "Author"         : "td",
+   "Date"           : "12, 2017",
+
+   "ShortName"      : "InsSort",             
+   "Description"    : "Insertion sort sorts by inserting elements on correct positions"
+  }
+} 

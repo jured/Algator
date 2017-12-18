@@ -108,7 +108,7 @@ public class TableData {
     for (int i = 1; i < fields.length; i++) {
       if (fields[i].contains(":")){
         String [] stat = fields[i].trim().split(":");
-        if (stat[0].equals(field)) {
+        if (field.endsWith("."+stat[0])) { 
           defaultFunc = StatFunction.getStatFunction(stat[1]);
           break;
         }

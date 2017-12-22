@@ -1,1 +1,1 @@
-{"TestSet": {    "ShortName"        : "Test2",    "Description"      : "Test RND, INVERSED and SORTED by increasing n",    "HTMLDescFile"     : "testset2.html",    "N"                : 45,    "TestRepeat"       : "10",    "QuickTest"        : true,    "TestSetFiles"     : [],    "DescriptionFile"  : "testset2.txt"  }}
+{"TestSet": {    "Name"             : "TestSet2",    "Description"      : "Test RND, INVERSED and SORTED by increasing n",    "N"                : "33",    "TestRepeat"       : "10",    "DescriptionFile"  : "TestSet2.txt"  }}

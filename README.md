@@ -21,7 +21,7 @@ comparisons of defined algorithms.
 
 ## System instalation
 
-Instalation of the single-user version of the ALGator system on Linux system:
+A single-user version instalation of the ALGator system on Linux system:
 
 1. **Create ALGator folder**
 
@@ -53,5 +53,47 @@ Instalation of the single-user version of the ALGator system on Linux system:
 5. **To test correctness** of the instalation, type
 
   ```java algator.Version```
+
+
+## How to use ALGator - examples
+
+1. To **run** an existing algorithm on a selected testset
+
+	```java algator.Execute BasicSort -a BubbleSort -t TestSet1```
+
+2. To **run** all tests of a project
+
+	```java algator.Execute BasicSort```
+	
+3. To **analyse** the results
+
+	```java algator.Analyse BasicSort```
+	
+4. To **create** a new project
+
+	```java algator.Admin -cp <project_name>```
+
+	Note: when the project is created you have to edit the following files:
+	`<project_name>TestCase.java`, `<project_name>TestSetIterator.java` and
+	`<project_name>AbsAlgorithm.java` which are placed in the `src`folder of 
+	the project.
+	
+5. To **create** a new algorithm 
+
+	```java algator.Admin -ca <project_name> <algorithm_name>```
+
+	Note: to complete the algorthm creation process edit the file
+	`algs/ALG-<algorithm_name>/<algorithm_name>Algorithm.java`
+
+## Prerequisits 
+
+	- java >= 7.0 
+    - for windows: cygwin rsync (https://cygwin.com/install.html)
+
+
+## ALGator on GitHub
+
+  https://github.com/ALGatorDevel/Algator
+
 
 

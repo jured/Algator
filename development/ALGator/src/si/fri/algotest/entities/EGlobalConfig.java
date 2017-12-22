@@ -28,7 +28,7 @@ public class EGlobalConfig extends Entity  implements Serializable {
    super(ID_ResultParameter, 
 	 new String [] {ID_Families});
   
-   setRepresentatives(ID_ALGatorID);
+   setRepresentatives(ID_ALGatorID, ID_Families);
   }
   
   public EGlobalConfig(File fileName) {

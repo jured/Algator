@@ -10,8 +10,10 @@
   ],
   "TestSets": [
     "TestSet1",
-    "TestSet2"
+    "TestSet2",
+    "TestSet3"    
   ],
   "ProjectJARs": [],
-  "AlgorithmJARs": []
+  "AlgorithmJARs": [],
+  "EMExecFamily" : "FX"
 }}

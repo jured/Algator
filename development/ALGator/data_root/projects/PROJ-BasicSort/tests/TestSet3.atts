@@ -1,0 +1,1 @@
+{"TestSet": {    "Name"             : "TestSet3",    "Description"      : "Extended testing: RND, INVERSED and SORTED tests for n=10000 to 20000, 10 tests of each type for each n",    "N"                : 330,    "TestRepeat"       : "50",    "DescriptionFile"  : "TestSet3.txt"  }}

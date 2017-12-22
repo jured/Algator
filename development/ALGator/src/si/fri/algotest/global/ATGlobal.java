@@ -59,10 +59,8 @@ public class ATGlobal {
 
   private static final String ATDIR_docFolder      = "doc";
   
-  private static final String ATDIR_localConfigDir    = "local_config";
-  private static final String LOCAL_CONFIG_FILENAME   = "config.atlc";  
-  private static final String ATDIR_globalConfigDir   = "global_config";
-  private static final String GLOBAL_CONFIG_FILENAME  = "config.atgc";  
+  private static final String LOCAL_CONFIG_FILENAME   = "local.acfg";  
+  private static final String GLOBAL_CONFIG_FILENAME  = "global.acfg";  
   
   private static final String ATDIR_libDir         = "lib";
   
@@ -344,11 +342,11 @@ public class ATGlobal {
   
   /************* Configurations (local and global) *+++++++++++++++++++++*/
   public static String getLocalConfigFilename() {
-    return getALGatorRoot() + File.separator + ATDIR_localConfigDir + File.separator + LOCAL_CONFIG_FILENAME;
+    return getALGatorDataLocal() + File.separator + LOCAL_CONFIG_FILENAME;
   }
   
   public static String getGlobalConfigFilename() {
-    return getALGatorDataRoot() + File.separator + ATDIR_globalConfigDir + File.separator + GLOBAL_CONFIG_FILENAME;
+    return getALGatorDataRoot() + File.separator +  GLOBAL_CONFIG_FILENAME;
   }
   
   public static String getThisComputerID() {

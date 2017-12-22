@@ -1,28 +1,28 @@
 ChangeLog for project ALGator since November 2014
 
 C14 (Februar 2017, Ziga Zorman)
-Popravki za izvajanje algatorja v sistemu Windows ter dodana nova statistična funkcija (MED). 
+  - patch for the execution of the project on the Windows system 
+    (Analyser.java, ATTools.java, Execute.java, ExternalExecutor.java, RSync.java, StatFunction-java)
 
-  Spremenjene datoteke:Analyser.java, ATTools.java, Execute.java, ExternalExecutor.java, RSync.java, StatFunction-java
+C13 (August 2016, Ernest Stukelj)
+  - new query language (A-SQL) was added:
 
-C13 (Avgust 2016, Ernest Stukelj)
-Dodan nov poizvedovalni jezik (A-SQL):
+      - New files: ASqlObject.java, AlgInterpreter.java, Cache.java, CacheEntry.java, 
+        LengthComparator.java, ReadResultsInitData.java, ASQLComposer.java, ASQLComposer.form, 
+        IQueryComposer.java
 
-  Dodane datoteke:ASqlObject.java, AlgInterpreter.java, Cache.java, CacheEntry.java, LengthComparator.java, ReadResultsInitData.java, ASQLComposer.java, ASQLComposer.form, IQueryComposer.java
-
-  Spremenjene datoteke:
-  - Analyse.java: spremembe zaradi novega formata.
-  - DataAnalyser.java: veliko sprememb.
-  - TableData.java: malo spremenjen getComparator.
-  - QueryAndGraphPanel: dodan GUI za ASQL.
-  - QueryComposer: spremembe zaradi dodanih izracunljivih polj, 
-    interface IQueryComposer. Moral sem odstraniti nastavljanje ikon.
-  - Entity.java: dodana metoda public ErrorStatus initFromFile(File entityFile, 
+  Changed files:
+  - Analyse.java: new format added
+  - DataAnalyser.java
+  - TableData.java: changes in the getComparator()
+  - QueryAndGraphPanel: new GUI for A-SQL
+  - QueryComposer: new form fields
+    interface IQueryComposer. 
+  - Entity.java: new method public ErrorStatus initFromFile(File entityFile, 
     String format, Project project) in overload. ID_NAME public.
-  - EQuery.java: dodana metoda public String getCacheKey()
-  - VariableSet.java: vec sprememb, dodan iterface Iterable<EVariable>, variables v 
-    HashMap<String, EVariable>
-  - ExternalExecuter: zaradi spremembe tipa variables v VariableSet spremenjene 3 for zanke.
+  - EQuery.java: new method public String getCacheKey()
+  - VariableSet.java: added the iterator iterface Iterable<EVariable>, 
+  - ExternalExecuter: due to the change variables -> VariableSet 3 new for loops were added.
 
 
 C12 (April 2016)

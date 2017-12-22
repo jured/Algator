@@ -7,7 +7,7 @@
 ## About the ALGator
 
 ALGator facilitates automatic algorithm evaluation process by executing 
-algorithms' implementations on the given predefined sets of test cases
+implementations of the algorithms on the given predefined sets of test cases
 and analyzing various indicators of the execution.  
 To use the ALGator, user defines a project including the definition of 
 the problem to be solved, sets of test cases, parameters 

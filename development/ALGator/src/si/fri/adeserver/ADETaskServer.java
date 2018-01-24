@@ -1,9 +1,13 @@
 package si.fri.adeserver;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -296,6 +300,28 @@ public class ADETaskServer implements Runnable {
     return ADELog.getLog(n);
   }
   
+  private String getFile(ArrayList<String> params) {
+    if (params.size() < 2)
+      return ADEGlobal.getErrorString(ADEGlobal.ERROR_INVALID_NPARS);
+
+    String result = "";
+        
+    switch (params.get(0)) {
+      // parameters: txtresult projectName algorithmName compputerID  testSetName.emType
+      case "txtresult":
+        if (params.size() != 5) break;
+        String projectRoot = ATGlobal.getPROJECTroot(ATGlobal.getALGatorDataRoot(), params.get(1));
+        String resultsRoot = ATGlobal.getRESULTSroot(projectRoot, params.get(3));
+        String fileName = resultsRoot + File.separator + params.get(2)+"-"+params.get(4);
+        try {
+          for(String l : Files.readAllLines(Paths.get(fileName))) {
+            result += (result.isEmpty() ? "":"\n") + l;
+          }
+        }catch (Exception e){}
+        break;
+    }
+    return result;
+  }
   
   private String processRequest(String request) {    
     String [] parts = request.split(" ");
@@ -364,6 +390,9 @@ public class ADETaskServer implements Runnable {
                 
       case ADEGlobal.REQ_USERS:
         return users(params);
+        
+      case ADEGlobal.REQ_GETFILE:
+        return getFile(params);
         
         
       default:

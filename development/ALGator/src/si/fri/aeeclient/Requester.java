@@ -51,12 +51,18 @@ public class Requester {
             .hasArg(true)
             .withDescription("the name of the server with TaskServer")
             .create("s");
-
+    
+    Option verbose = OptionBuilder.withArgName("verbose_level")
+            .withLongOpt("verbose")
+            .hasArg(true)
+            .withDescription("print additional information (0 = OFF (default), 1 = some, 2 = all")
+            .create("v");
     
     options.addOption(data_root);
     options.addOption(data_local);
     options.addOption(algator_root);
     options.addOption(server);
+    options.addOption(verbose);
 
     options.addOption("h", "help", false,
             "print this message");
@@ -130,8 +136,17 @@ public class Requester {
       if (line.hasOption("server")) {
 	serverName = line.getOptionValue("server");
       }
-      
-      
+            
+      ATGlobal.verboseLevel = 0;
+      if (line.hasOption("verbose")) {
+        if (line.getOptionValue("verbose").equals("1")) {
+          ATGlobal.verboseLevel = 1;
+        }
+        if (line.getOptionValue("verbose").equals("2")) {
+          ATGlobal.verboseLevel = 2;
+        }
+      }
+            
       if (type == 0) {
         si.fri.aeeclient.AEETaskClient.runClient(serverName);
       } else {

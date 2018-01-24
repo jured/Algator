@@ -197,6 +197,13 @@ public class ATGlobal {
   }
 
   
+  public static String getPROJECTdoc(String data_root, String projName) {
+    return getPROJECTconfig(data_root, projName) + File.separator + ATDIR_docFolder;
+  }
+  
+  
+  
+  
   public static String getALGORITHMroot(String projectRoot, String algName) {
     return projectRoot + File.separator + ATDIR_algsDir + File.separator
             + String.format(ATDIR_algDir, algName);
@@ -210,6 +217,11 @@ public class ATGlobal {
     return getALGORITHMroot(projectRoot, algName) + File.separator + ATDIR_srcDir;
   }
 
+  public static String getALGORITHMdoc(String projectRoot, String algName) {
+    return getALGORITHMroot(projectRoot, algName) + File.separator + ATDIR_docFolder;
+  }
+  
+  
   // Algorithm's bin folder is a DATA_LOCAL subfolder
   public static String getALGORITHMbin(String projectName, String algName) {
     return getALGORITHMroot(getPROJECTroot(getALGatorDataLocal(), projectName), algName) + File.separator + ATDIR_binDir;
@@ -221,6 +233,11 @@ public class ATGlobal {
     String projectRoot = getPROJECTroot(data_root, projectName);
     return projectRoot + File.separator + ATDIR_testsDir;
   }
+  
+  public static String getTESTSdoc(String data_root, String projectName) {
+    return getTESTSroot(data_root, projectName) + File.separator + ATDIR_docFolder;
+  }
+  
   /**
    * Returns the name of a test set configuration file. This file is placed in
    * the projects tests folder
@@ -287,12 +304,6 @@ public class ATGlobal {
 
   public static String getPRESENTERSroot(String projectRoot) {
     return projectRoot + File.separator + ATDIR_presenterDir;
-  }
-
-
-  /************* doc folders   *+++++++++++++++++++++*/
-  public static String getPROJECTdocFolder(String projectRoot) {
-    return projectRoot + File.separator + ATDIR_docFolder;
   }
 
   

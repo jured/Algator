@@ -151,7 +151,7 @@ public class Admin {
     String projRoot = ATGlobal.getPROJECTroot(dataroot, proj_name);
     String projConfFolder = ATGlobal.getPROJECTconfig(dataroot, proj_name);
     String testsFolder = ATGlobal.getTESTSroot(dataroot, proj_name);
-    String docFolder = ATGlobal.getPROJECTdocFolder(projRoot);
+    String projDocFolder = ATGlobal.getPROJECTdoc(dataroot,proj_name);
     
     HashMap<String,String> substitutions = getSubstitutions(proj_name);
         
@@ -169,18 +169,19 @@ public class Admin {
       copyFile("templates/PPP.atp",            projConfFolder,  proj_name+".atp",                 substitutions);
       
       copyFile("templates/PPP-em.atrd",        projConfFolder,  proj_name+"-em.atrd",             substitutions);
+      copyFile("templates/PPP-cnt.atrd",       projConfFolder,  proj_name+"-cnt.atrd",            substitutions);      
+      copyFile("templates/PPP-jvm.atrd",       projConfFolder,  proj_name+"-jvm.atrd",            substitutions);
       
       copyFile("templates/PPPAbsAlgorithm",    projSrcFolder,   proj_name+"AbsAlgorithm.java",    substitutions);
       copyFile("templates/PPPTestCase",        projSrcFolder,   proj_name+"TestCase.java",        substitutions);
       copyFile("templates/PPPTestSetIterator", projSrcFolder,   proj_name+"TestSetIterator.java", substitutions);
       
-      copyFile("templates/TestSet1.atts",      testsFolder,     "TestSet1.atts",                  substitutions);
-      copyFile("templates/TestSet1.txt",       testsFolder,     "TestSet1.txt",                   substitutions);
+      copyFile("templates/PPP.html",           projDocFolder,   "project.html",                   substitutions);
+      copyFile("templates/P_TS.html",          projDocFolder,   "testset.html",                   substitutions);      
+      copyFile("templates/P_TC.html",          projDocFolder,   "testcase.html",                  substitutions);
+      copyFile("templates/P_AAA.html",         projDocFolder,   "algorithm.html",                 substitutions);
+      copyFile("templates/P_REF.html",         projDocFolder,   "references.html",                substitutions);
       
-      copyFile("templates/TestSet1.html",      docFolder,       "TestSet1.html",                  substitutions);
-      copyFile("templates/PPP.html",           docFolder,       proj_name + ".html",              substitutions);
-      copyFile("templates/TestSets.html",      docFolder,       "TestSets.html",                  substitutions);      
-
     } catch (Exception e) {
       System.out.println("Can not create project: " + e.toString());
       return false;
@@ -193,7 +194,7 @@ public class Admin {
     String projRoot = ATGlobal.getPROJECTroot(dataroot, proj_name);
     String algRoot = ATGlobal.getALGORITHMroot(projRoot, alg_name);
     String algSrc  = ATGlobal.getALGORITHMsrc(projRoot, alg_name);
-    String docFolder = ATGlobal.getPROJECTdocFolder(projRoot);
+    String algDocFolder = ATGlobal.getALGORITHMdoc(projRoot, alg_name);
     
     HashMap<String,String> substitutions = getSubstitutions(proj_name);
     substitutions.put("<AAA>", alg_name);
@@ -217,7 +218,8 @@ public class Admin {
       
       copyFile("templates/AAA.atal",           algRoot,         alg_name+".atal",                 substitutions);
       copyFile("templates/AAAAlgorithm",       algSrc,          alg_name+"Algorithm.java",        substitutions);
-      copyFile("templates/AAA.html",           docFolder,       alg_name + ".html",               substitutions);
+      copyFile("templates/AAA.html",           algDocFolder,    "algorithm.html",                 substitutions);
+      copyFile("templates/A_REF.html",         algDocFolder,    "references.html",                substitutions);
       
       
       EProject eProject = new EProject(new File(ATGlobal.getPROJECTfilename(dataroot, proj_name)));
@@ -238,7 +240,7 @@ public class Admin {
     String dataroot = ATGlobal.getALGatorDataRoot();         
     String projRoot = ATGlobal.getPROJECTroot(dataroot, proj_name);
     String testsRoot = ATGlobal.getTESTSroot(dataroot, proj_name);
-    String docFolder = ATGlobal.getPROJECTdocFolder(projRoot);
+    String testsDocFolder = ATGlobal.getTESTSdoc(dataroot, proj_name);
 
     
     HashMap<String,String> substitutions = getSubstitutions(proj_name);
@@ -269,9 +271,9 @@ public class Admin {
       
       copyFile("templates/TS.atts",            testsRoot,       testset_name+".atts",             substitutions);
       copyFile("templates/TS.txt",             testsRoot,       testset_name+".txt",              substitutions);
-      copyFile("templates/TS.html",            docFolder,       testset_name + ".html",           substitutions);
       
-      
+      copyFile("templates/TS.html",            testsDocFolder,  testset_name + ".html",           substitutions);
+            
       EProject eProject = new EProject(new File(ATGlobal.getPROJECTfilename(dataroot, proj_name)));
       ArrayList ts = new ArrayList<String>(Arrays.asList(eProject.getStringArray(EProject.ID_TestSets)));
         ts.add(testset_name);

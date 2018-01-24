@@ -1,4 +1,4 @@
-package si.fri.algotest.tools;
+  package si.fri.algotest.tools;
 
 import java.io.BufferedInputStream;
 import si.fri.algotest.global.ErrorStatus;

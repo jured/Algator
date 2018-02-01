@@ -53,7 +53,7 @@ public abstract class AbstractTestSetIterator  {
   public abstract void close() throws IOException;
   
   public int getNumberOfTestInstances() {
-    return (this.testSet != null) ? (Integer) testSet.getFieldAsInt(ETestSet.ID_N) : 0;
+    return (this.testSet != null) ? (Integer) testSet.getFieldAsInt(ETestSet.ID_N, 0) : 0;
   }
 
 }

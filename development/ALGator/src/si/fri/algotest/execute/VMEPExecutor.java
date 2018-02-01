@@ -68,7 +68,7 @@ public class VMEPExecutor {
     // does not  finish in this time, the execution is killed
     int timeLimit = SLOW_FACTOR * 10;
     try {
-       timeLimit = SLOW_FACTOR * Integer.parseInt((String) it.testSet.getField(ETestSet.ID_TimeLimit));
+       timeLimit = SLOW_FACTOR *  it.testSet.getFieldAsInt(ETestSet.ID_TimeLimit, 10);
     } catch (NumberFormatException e) {
         // if ETestSet.ID_TimeLimit parameter is missing, timelimit is set to 30 (sec) and exception is ignored
     }

@@ -9,13 +9,18 @@ import si.fri.algotest.global.ErrorStatus;
 
 /**
  *
- * @author ...
+ * @author tomaz
  */
 public abstract class BasicMatrixMulAbsAlgorithm extends AbsAlgorithm {
 
   BasicMatrixMulTestCase mmTestCase;
   
   int [][] resultC;
+
+  @Override
+  public TestCase getTestCase() {
+    return mmTestCase;
+  }
 
   @Override
   public ErrorStatus init(TestCase test) {

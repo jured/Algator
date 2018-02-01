@@ -107,6 +107,13 @@ public abstract class AbsAlgorithm implements Cloneable, Serializable {
   public abstract VariableSet done();
   
   
+  /**
+   * This methods returns the test case that is attached to this algorithm
+   */
+  public abstract TestCase getTestCase();
+  
+  
+  
   @Override
   public Object clone() throws CloneNotSupportedException {
    return super.clone();

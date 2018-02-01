@@ -1,1 +1,13 @@
-{"TestSet": {    "Name"             : "TestSet3",    "Description"      : "Extended testing: RND, INVERSED and SORTED tests for n=10000 to 20000, 10 tests of each type for each n",    "N"                : 330,    "TestRepeat"       : "50",    "DescriptionFile"  : "TestSet3.txt"  }}
+{
+  "TestSet": {
+    "Name"             : "TestSet3",
+
+    "ShortName"        : "TS3",
+    "Description"      : "Test set containing sorted arrays",
+    "N"                : "105",
+    "TestRepeat"       : "10",
+    "TimeLimit"        : "1",
+
+    "TestSetDescHTML"  : "TestSet3.html"
+  }
+}

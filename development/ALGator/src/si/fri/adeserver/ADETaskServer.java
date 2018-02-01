@@ -307,7 +307,7 @@ public class ADETaskServer implements Runnable {
     String result = "";
         
     switch (params.get(0)) {
-      // parameters: txtresult projectName algorithmName compputerID  testSetName.emType
+      // parameters: 'txtresult' projectName algorithmName compputerID  testSetName.emType
       case "txtresult":
         if (params.size() != 5) break;
         String projectRoot = ATGlobal.getPROJECTroot(ATGlobal.getALGatorDataRoot(), params.get(1));
@@ -319,6 +319,19 @@ public class ADETaskServer implements Runnable {
           }
         }catch (Exception e){}
         break;
+        
+      // parameters: 'testset' projectName testsetName type('atts' or 'txt')
+      case "testset":
+        if (params.size() != 4) break;
+        String testsetRoot     = ATGlobal.getTESTSroot(ATGlobal.getALGatorDataRoot(), params.get(1));
+        String testsetFilename = testsetRoot + File.separator + params.get(2)+"."+params.get(3);
+        try {
+          for(String l : Files.readAllLines(Paths.get(testsetFilename))) {
+            result += (result.isEmpty() ? "":"\n") + l;
+          }
+        }catch (Exception e){}
+        break;
+        
     }
     return result;
   }

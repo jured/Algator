@@ -342,7 +342,7 @@ public class Execute {
         for (ETestSet eTestSet : eTests) {
           for (String mtype : new String[] {"EM", "CNT", "JVM"}) {
             String resultFileName = getTaskResultFileName(projekt, eAlg.getName(), eTestSet.getName(), mtype);
-            int expectedNumberOfInstances = eTestSet.getFieldAsInt(ETestSet.ID_N);            
+            int expectedNumberOfInstances = eTestSet.getFieldAsInt(ETestSet.ID_N, 0);            
             
             boolean uptodate = ATTools.resultsAreUpToDate(projekt, eAlg.getName(), eTestSet.getName(), mtype, resultFileName);
             boolean complete = ATTools.resultsAreComplete(resultFileName, expectedNumberOfInstances);

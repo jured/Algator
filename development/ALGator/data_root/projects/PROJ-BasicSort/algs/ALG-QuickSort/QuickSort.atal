@@ -1,9 +1,14 @@
 {
   "Algorithm" : {	
-   "ShortName"      : "QS7",             
-   "Description"    : "Java7 Yaroslavski QuickSort",
-   "HTMLDescFile"   : "quicksort.html",
-   "Author"         : "Java7 and Tomaž",
-   "Date"           : "07/30/2013"
+
+   "Name"           : "QuickSort",
+
+   "Author"         : "tomaz",
+   "Date"           : "01, 2018",
+
+   "ShortName"      : "Hoare",             
+   "Description"    : "The Hoare's quicksort algorithm",
+
+   "Language"       : "Java"
   }
 } 

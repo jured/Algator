@@ -1,0 +1,15 @@
+BasicMM;TestSet1;Test-1;DONE;10;rdn;4;OK
+BasicMM;TestSet1;Test-2;DONE;10;rdn;4;OK
+BasicMM;TestSet1;Test-3;DONE;10;rdn;4;OK
+BasicMM;TestSet1;Test-4;DONE;15;rdn;3;OK
+BasicMM;TestSet1;Test-5;DONE;15;rdn;3;OK
+BasicMM;TestSet1;Test-6;DONE;15;rdn;3;OK
+BasicMM;TestSet1;Test-7;DONE;20;rdn;7;OK
+BasicMM;TestSet1;Test-8;DONE;20;rdn;7;OK
+BasicMM;TestSet1;Test-9;DONE;20;rdn;7;OK
+BasicMM;TestSet1;Test-10;DONE;25;rdn;13;OK
+BasicMM;TestSet1;Test-11;DONE;25;rdn;12;OK
+BasicMM;TestSet1;Test-12;DONE;25;rdn;13;OK
+BasicMM;TestSet1;Test-13;DONE;30;rdn;22;OK
+BasicMM;TestSet1;Test-14;DONE;30;rdn;22;OK
+BasicMM;TestSet1;Test-15;DONE;30;rdn;22;OK

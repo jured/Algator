@@ -100,13 +100,17 @@ public class VariableSet implements Serializable, Iterable<EVariable> {
     String result = "";
     
     String localOrder [] = order.clone();
-    
+
+//    prej:   če je prišlo do napake, se je kot 5. rezultat (za KILLED ali FAILED) izpisalo
+//            sporočilo o napaki; Sedaj 
+//    sedaj:  sporočilo o napaki izpišem povsem na koncu, prej pa izpišem vrednosi vseh parametrov
+//            (indikatorji bodo napačni, parametri pa bodo pravilni)
+//    int numVar = localOrder.length;
+//    if (numVar > EResult.FIXNUM && variables.values().contains(EResult.getErrorIndicator(""))) {
+//      numVar = EResult.FIXNUM;
+//      localOrder[numVar++] = EResult.errorParName;
+//    }
     int numVar = localOrder.length;
-    if (numVar > EResult.FIXNUM && variables.values().contains(EResult.getErrorIndicator(""))) {
-      numVar = EResult.FIXNUM;
-      localOrder[numVar++] = EResult.errorParName;
-    }
-    
     for (int i = 0; i < numVar; i++) {
       EVariable v = null;
     
@@ -134,7 +138,11 @@ public class VariableSet implements Serializable, Iterable<EVariable> {
     }
      
     // strip <code>delim</code> at the end of line
-    return result.substring(0,result.length()-delim.length());
+    result = result.substring(0,result.length()-delim.length());
+    if (variables.values().contains(EResult.getErrorIndicator(""))) {
+      result += delim + variables.get(EResult.errorParName).getValue();
+    }
+    return result;
   }
   
   @Override

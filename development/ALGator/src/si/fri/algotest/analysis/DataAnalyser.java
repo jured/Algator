@@ -329,9 +329,10 @@ public class DataAnalyser {
       try {
         String queryname = query;
         String projectRoot = ATGlobal.getPROJECTroot(ATGlobal.getALGatorDataRoot(), projectname);
-        String qResultFileName = ATGlobal.getQUERYOutputFilename(projectRoot, queryname, params);
-        HashSet<String> queryDepFiles = ATTools.getFilesForQuery(projectname, queryname, params);
+        //String qResultFileName = ATGlobal.getQUERYOutputFilename(projectRoot, queryname, params);
+        //HashSet<String> queryDepFiles = ATTools.getFilesForQuery(projectname, queryname, params);
 
+/*        
         if (ATTools.resultsAreUpToDate(queryDepFiles, qResultFileName)) {
           File qResultFile = new File(qResultFileName);
           String content = "";
@@ -342,12 +343,16 @@ public class DataAnalyser {
           }
           sc.close();
           return content;
-        } else {
+        } else { */
+        // mehanizem shranjevanja poizvedb ne dela prav, zato se poizvedbe ne osvežujejo!
+        // popravi mehanizem, ker zna prihraniti veliko časa!!!
+        {
           TableData td = runQuery(projectname, queryname, params, computerID);
           String result = td.toString();
-          PrintWriter pw = new PrintWriter(qResultFileName);
-          pw.print(result);
-          pw.close();
+          
+          //PrintWriter pw = new PrintWriter(qResultFileName);
+          //pw.print(result);
+          //pw.close();
 
           return result;
         }
@@ -393,7 +398,8 @@ public class DataAnalyser {
 
   public static TableData runQuery(String projectname, String queryname, String[] params, String computerID) {
     EProject project = new EProject(new File(ATGlobal.getPROJECTfilename(ATGlobal.getALGatorDataRoot(), projectname)));
-    EQuery query = new EQuery(new File(ATGlobal.getQUERYfilename(project.getProjectRootDir(), queryname)), params);
+    File qFIle = new File(ATGlobal.getQUERYfilename(project.getProjectRootDir(), queryname));    
+    EQuery query = new EQuery(qFIle, params);
 
     return runQuery(project, query, computerID);
   }
@@ -455,7 +461,7 @@ public class DataAnalyser {
 
   public static TableData runQuery_NO_COUNT(EProject eProject, EQuery query, String computerID, Map<String, TableData> queryResults) {
 
-      TableData td = (TableData) Cache.get(eProject.getName() + query.getCacheKey() + computerID);
+    TableData td = null; // (TableData) Cache.get(eProject.getName() + query.getCacheKey() + computerID);
 
     if (td != null && (queryResults == null || queryResults.size() == 0)) {
       TableData tdCache = new TableData();

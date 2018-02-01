@@ -1,6 +1,8 @@
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Random;
-import java.util.Scanner;
 import si.fri.algotest.entities.EVariable;
 import si.fri.algotest.entities.EResult;
 import si.fri.algotest.entities.VariableType;
@@ -8,17 +10,15 @@ import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.execute.DefaultTestSetIterator;
 import si.fri.algotest.global.ErrorStatus;
 
-
 /**
  *
  * @author tomaz
  */
-public class BasicSortTestSetIterator extends DefaultTestSetIterator {
-     
+public class BasicSortTestSetIterator extends DefaultTestSetIterator {     
   @Override
   public TestCase getCurrent() {
     if (currentInputLine == null) {
-      ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR, "Not a valid input!");
+      ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR, "No valid input!");
       return null;
     }
     
@@ -38,6 +38,9 @@ public class BasicSortTestSetIterator extends DefaultTestSetIterator {
       return null;
     }
     String group = fields[2];
+    
+    int rndSize = -1; // the size of the rnadom numbers used in the array (used with RND group). 
+
     
     // unique identificator of a test
     EVariable testIDPar = EResult.getTestIDParameter("Test-" + Integer.toString(lineNumber));
@@ -80,8 +83,10 @@ public class BasicSortTestSetIterator extends DefaultTestSetIterator {
 	break;
       case "RND":
 	Random rnd = new Random(System.currentTimeMillis());
+        try {rndSize = Integer.parseInt(fields[3]);} catch (Exception e) {rndSize=Integer.MAX_VALUE;}
+
 	for (i = 0; i < probSize; i++) 
-	  array[i] = rnd.nextInt(1000);
+	  array[i] = Math.abs(rnd.nextInt(rndSize));
 	break;
       case "SORTED":
 	for (i = 0; i < probSize; i++) 
@@ -91,25 +96,40 @@ public class BasicSortTestSetIterator extends DefaultTestSetIterator {
 	for (i = 0; i < probSize; i++) 
 	  array[i] = probSize-i;	
 	break;
-      case "FILE":
+      case "FILE":  // first parameter is filemane, second the offset (from where numbers are read)
 	try {
-	  if (fields.length != 4)
-	    throw new Exception("No input file");
+	  if (fields.length != 5)
+	    throw new Exception("No input file or missing offset");
 	  
 	  i=0;
 	  String testFile = filePath + File.separator + fields[3];
-	  Scanner sc = new Scanner(new File(testFile));
-	  while(i < probSize && sc.hasNextInt()) {
-	    array[i++] = sc.nextInt();
+          
+          Integer offset = 0;
+          try {
+            offset = Integer.parseInt(fields[4]);
+          } catch (Exception e){}
+          
+	  DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(testFile))));
+          
+          // skip the first "offset" numbers
+          dis.skipBytes(offset*4);
+          
+	  while(i < probSize && dis.available() > 0) {
+	    array[i++] = dis.readInt();
 	  }
-	  sc.close();
+          if (i < probSize)
+            throw new Exception("Not enough data in file");
+	  dis.close();
 	} catch (Exception e) {
 	  reportInvalidDataFormat(e.toString());
 	}
     }
-    tCase.arrayToSort = array;    
+    
+    EVariable parameter4 = new EVariable("RndSize", "The size of RND nummers",   VariableType.INT, rndSize);
+    tCase.addParameter(parameter4);
 
-    return tCase;
-  }
+    tCase.arrayToSort = array;
+    return tCase; 
+  } 
 }
  

@@ -1,0 +1,1 @@
+{"TestSet": {    "Name"             : "TestSet2",    "ShortName"        : "TS2",    "Description"      : "Matrices of dimensions from 10 to 600 (step 10)",    "N"                : 60,    "TestRepeat"       : "5",    "TestSetFiles"     : ["testset2/*"]  }}

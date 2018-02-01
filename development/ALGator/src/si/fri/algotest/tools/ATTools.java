@@ -393,7 +393,7 @@ private static HashSet<String> getFilesForAlgorithm(Project project, String algN
     int expectedNumberOfLines = 0;
     ETestSet testset = project.getTestSets().get(testsetName);
     if (testset != null) try {
-      expectedNumberOfLines = Integer.parseInt((String) testset.getField(ETestSet.ID_N));
+      expectedNumberOfLines = testset.getFieldAsInt(ETestSet.ID_N,0);
     } catch (Exception e) {}
     
     String firstNonEmptyFile = "", firstCompleteFile = "";

@@ -1,10 +1,10 @@
 {
   "Result":
   { 
-    "ParameterOrder"   : ["Test", "Group", "N"],    	
-    "IndicatorOrder"   : ["Tmax", "Tmin", "Tavg", "Tsum", "Check"],    	
+    "ParameterOrder"   : ["Test", "Group", "N"],      
+    "IndicatorOrder"   : ["Tfirst", "Tmin", "Tavg", "Tmax", "Tsum", "Check"],     
   
-    "Parameters":   [	
+    "Parameters":   [     
       {
        "Name":        "Test",             
        "Description": "The name of the test", 
@@ -19,9 +19,17 @@
        "Name":        "N",             
        "Description": "The size of the test (number of elements to be sorted)", 
        "Type":        "int"       
-      }
-    ], 
-    "Indicators":   [    
+      }      
+    ],
+
+    "Indicators":   [ 
+      {
+       "Name"         : "Tfirst",             
+       "Description"  : "Sorting FIRST time",             
+       "Type"         : "timer",          
+       "Subtype"      : "0 FIRST"    
+      },
+    
       {
        "Name"         : "Tmax",             
        "Description"  : "Sorting MAX time",             
@@ -42,7 +50,7 @@
       },
       {
        "Name"        : "Tsum",             
-       "Description" : "Sorting SUM	 time",             
+       "Description" : "Sorting SUM  time",             
        "Type"        : "timer",          
        "Subtype"     : "0 SUM"    
       },
@@ -50,7 +58,7 @@
        "Name"        : "Check",             
        "Description" : "The correctness of the algorithm (OK or NOK)", 
        "Type"        : "string"       
-      }    
+      }
     ]
   }
 }

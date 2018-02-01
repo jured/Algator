@@ -1,25 +1,55 @@
 {
   "Result":
   { 
-    "IndicatorOrder" : ["CMP", "SWAP", "CALL"],    	
+    "ParameterOrder"   : ["N", "Group"],
+    "IndicatorOrder" : ["CMP", "SWAP", "CALL", "W", "R", "CMPL"],     
   
-    "Indicators":   [	    
+    "Parameters":   [ 
+      {
+       "Name":        "N",             
+       "Description": "The size of the test (number of elements to be sorted)", 
+       "Type":        "int"       
+      },
+
+      {
+       "Name":        "Group",             
+       "Description": "The group of a test (FILE, RND, SORTED, INVERSED)", 
+       "Type":        "string"       
+      }
+    ],
+
+    "Indicators":   [     
       {
        "Name":        "CMP",             
-       "Description": "The number of compares", 
-       "Type":        "counter"       
+       "Description": "Number of global COMPs", 
+       "Type":        "counter"   
       },
       {
        "Name":        "SWAP",             
-       "Description": "The number of swaps", 
+       "Description": "Number of SWAPs", 
        "Type":        "counter"       
       },
       {
        "Name":        "CALL",             
-       "Description": "The number of recursive calls", 
+       "Description": "Number of CALLs", 
        "Type":        "counter"       
-      }
+      },
+      {
+       "Name":        "R",             
+       "Description": "Number of memory reads", 
+       "Type":        "counter"       
+      },
+      {
+       "Name":        "W",             
+       "Description": "Number of memory writes", 
+       "Type":        "counter"       
+      },
+      {
+       "Name":        "CMPL",             
+       "Description": "Number of local COMPs", 
+       "Type":        "counter"   
+      }      
     ]
   }
 }
- 
+

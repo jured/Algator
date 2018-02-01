@@ -5,7 +5,6 @@
    "HTMLDescFile"   : "BasciMM.html", 
    "Author"         : "td",
    "Date"           : "March 2014",
-   "Classes"        : ["BasicMMAlgorithm.java"],
-   "MainClassName"  : "BasicMMAlgorithm"
+   "Language"       : "Java"
   }
 } 

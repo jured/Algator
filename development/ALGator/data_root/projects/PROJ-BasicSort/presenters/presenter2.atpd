@@ -1,0 +1,17 @@
+{"Presenter":
+  { 
+    "Title"       : "Minimum time of execution for the fast algorithms on TestSet2",
+    "ShortTitle"  : "Tmin - fast",
+    "Description" : "Minimal time of execution",
+    "Query"       : "query2",
+    "HasGraph"    : "true",
+    "Xaxis"       : "N",
+    "Yaxes"       : ["JavaSort.Tmin", "QuickSort.Tmin"],
+    "GraphTypes"  : "line",
+    "XaxisLabel"  : "[The size of the input array (n)]",
+    "YaxisLabel"  : "[Minimal time of execution (micro seconds)]",
+    "HasTable"    : "true",
+    "Columns"     : ["N", "*.Tmin"]
+  }
+}
+

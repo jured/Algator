@@ -1,0 +1,17 @@
+{"Presenter":
+  { 
+    "Title"       : "Sorting sorted arrays",
+    "ShortTitle"  : "Tmin - sorted",
+    "Description" : "Minimal time of execution for the TestSet3 (sorted arrays)",
+    "Query"       : "query3",
+    "HasGraph"    : "true",
+    "Xaxis"       : "N",
+    "Yaxes"       : ["JavaSort.Tmin", "QuickSort.Tmin", "InsertionSort.Tmin"],
+    "GraphTypes"  : "line",
+    "XaxisLabel"  : "[The size of the input array (n)]",
+    "YaxisLabel"  : "[Minimal time of execution (micro seconds)]",
+    "HasTable"    : "true",
+    "Columns"     : ["N", "*.Tmin"]
+  }
+}
+

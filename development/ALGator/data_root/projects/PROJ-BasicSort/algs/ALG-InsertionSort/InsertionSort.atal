@@ -3,10 +3,14 @@
 
    "Name"           : "InsertionSort",
 
-   "Author"         : "td",
-   "Date"           : "12, 2017",
+   "Author"         : "tomaz",
+   "Date"           : "01, 2018",
 
-   "ShortName"      : "InsSort",             
-   "Description"    : "Insertion sort sorts by inserting elements on correct positions"
+   "ShortName"      : "InsSort",
+   "Description"    : "Simple algorithm that sorts by inserting elements on right place",
+
+   "Language"       : "Java", 
+
+   "Presenters"     : ["presenter1"]
   }
 } 

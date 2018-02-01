@@ -278,9 +278,28 @@ public class ATGlobal {
   public static String getQUERIESroot(String projectRoot) {
     return projectRoot + File.separator + ATDIR_queryDir;
   }  
+
+  // the root for the algorithm's querier  
+  public static String getALGQUERIESroot(String projectRoot, String algorthmName) {
+    return projectRoot + File.separator + ATDIR_algsDir + File.separator + 
+            String.format(ATDIR_algDir, algorthmName) + File.separator + ATDIR_queryDir;
+  }  
+
   
+  /**
+    Queries are of two types: the queries belonging to the project and the queries belonging 
+    to the algorithm. The first are located in the PROJ-name/query folder while the latest in
+    the ALG-name/query folder. When requesting the query filename, the query could be eithen
+    'name' (in this case this is a project's query) of algorithm_name/name (for algorithm's queries)
+  */
   public static String getQUERYfilename(String projectRoot, String query) {
-    return getQUERIESroot(projectRoot) + File.separator + query + "." + AT_FILEEXT_query;
+    String [] parts = query.split(":");
+    if (parts.length == 1) // return projects's query filename
+      return getQUERIESroot(projectRoot) + File.separator + query + "." + AT_FILEEXT_query;
+    else { // return algorithm's query filename
+      return getALGQUERIESroot(projectRoot, parts[0]) + File.separator + parts[1] + "." + AT_FILEEXT_query;
+    }
+      
   }
   
   public static String getQUERYOutputFilename(String projectRoot, String query, String [] params) {

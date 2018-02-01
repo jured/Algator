@@ -1,11 +1,10 @@
+
 import si.fri.algotest.entities.EVariable;
 import si.fri.algotest.entities.VariableSet;
 import si.fri.algotest.entities.VariableType;
 import si.fri.algotest.entities.TestCase;
 import si.fri.algotest.execute.AbsAlgorithm;
 import si.fri.algotest.global.ErrorStatus;
-import si.fri.algotest.tools.ATTools;
-
 
 /**
  *
@@ -14,44 +13,40 @@ import si.fri.algotest.tools.ATTools;
 public abstract class BasicSortAbsAlgorithm extends AbsAlgorithm {
 
   BasicSortTestCase sortTestCase;
+  
+  @Override
+  public TestCase getTestCase() {
+    return sortTestCase;
+  }
 
   @Override
   public ErrorStatus init(TestCase test) {
     if (test instanceof BasicSortTestCase) {
       sortTestCase = (BasicSortTestCase) test;
       return ErrorStatus.STATUS_OK;
-    } else
+    } else {
       return ErrorStatus.setLastErrorMessage(ErrorStatus.ERROR_CANT_PERFORM_TEST, "Invalid test:" + test);
+    }
   }
-  
+
   @Override
   public void run() {
     execute(sortTestCase.arrayToSort);
   }
 
-  
   @Override
   public VariableSet done() {
     VariableSet result = new VariableSet(sortTestCase.getParameters());
+     
+    // for details about the basicsort.Tools class see a comment in the method BasicSortTestCase.toString()
+    boolean checkOK = basicsort.Tools.isArraySorted(sortTestCase.arrayToSort, 1);
     
-    EVariable passPar = new EVariable("Check", "", VariableType.STRING, 
-	 ATTools.isArraySorted(sortTestCase.arrayToSort, 1) ? "OK" : "NOK");
+    EVariable passPar = new EVariable("Check", "", VariableType.STRING, checkOK ? "OK" : "NOK");
     result.addVariable(passPar, true);
-        
+
     return result;
-  }   
+  }  
+  
 
-  protected abstract void execute(int [] tabela);
+  protected abstract void execute(int[] numbers);
 }
-
-
-
-/*
- * A version of this class that is given to the end-user
- 
-public abstract class SortAbsAlgorithm {
-  protected abstract void execute(int [] tabela);
-}
-
-* 
-*/

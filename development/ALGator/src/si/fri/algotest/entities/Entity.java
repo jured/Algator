@@ -248,8 +248,8 @@ public class Entity implements Cloneable, Serializable {
     return result; 
   }   
     
-  public int getFieldAsInt(String fieldKey) {
-    int result = 0;    
+  public int getFieldAsInt(String fieldKey, int default_value) {
+    int result = default_value;    
     if (new TreeSet(Arrays.asList(fieldNames)).contains(fieldKey)) {
       try {
         result = (Integer) fields.get(fieldKey);
@@ -257,10 +257,13 @@ public class Entity implements Cloneable, Serializable {
         try {
           result = Integer.parseInt((String) fields.get(fieldKey));
         } catch (Exception e2) {}
-      }
-      
+      }      
     }
-    return result; 
+    return result;   
+  }
+  
+  public int getFieldAsInt(String fieldKey) {
+    return getFieldAsInt(fieldKey, 0);
   }
   
   /**

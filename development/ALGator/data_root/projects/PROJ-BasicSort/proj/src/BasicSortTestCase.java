@@ -1,9 +1,8 @@
-
 import si.fri.algotest.entities.TestCase;
-import si.fri.algotest.tools.ATTools;
 
 /**
- * A TestCase subclass for the sorting problem
+ * A sort-project specific TestCase
+ * @author tomaz
  */
 public class BasicSortTestCase extends TestCase {
 
@@ -12,9 +11,12 @@ public class BasicSortTestCase extends TestCase {
    */
   public int [] arrayToSort;
   
-  
   @Override
   public String toString() {
-    return super.toString() + ", Data: " + ATTools.intArrayToString(arrayToSort);
+    // Note that we use a method intArrayToString that was defined in the basicsort.Tools
+    // class; this class was attached to the project using the "ProjectJARs" property
+    // in the BasicSort.atp configuration file.
+    // For the details about basicsort.Tools class see proj/lib folder.
+    return super.toString() + ", Data: " + basicsort.Tools.intArrayToString(arrayToSort);
   }
 }

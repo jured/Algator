@@ -93,7 +93,7 @@ public class ExternalExecutor {
     int timesToExecute = 1;
     if (mType.equals(MeasurementType.EM)) {
       try {
-        timesToExecute = Integer.parseInt((String) testSet.getField(ETestSet.ID_TestRepeat));
+        timesToExecute = testSet.getFieldAsInt(ETestSet.ID_TestRepeat, 1);
       } catch (Exception e) {
         // if ETestSet.ID_TestRepeat parameter is missing, timesToExecute is set to 1 and exception is ignored
       }
@@ -104,7 +104,7 @@ public class ExternalExecutor {
     // does not  finish in this time, the execution is killed
     int timeLimit = 10;
     try {      
-      timeLimit = testSet.getField(ETestSet.ID_TimeLimit);
+      timeLimit = testSet.getFieldAsInt(ETestSet.ID_TimeLimit, 10);
     } catch (Exception e) {
       try {
         timeLimit = Integer.parseInt(testSet.getField(ETestSet.ID_TimeLimit).toString());
@@ -196,6 +196,13 @@ public class ExternalExecutor {
             executionStatusParameter = failedErr;
           }
         } else { // the execution did not perform succesfully          
+          try {
+            // if possible, obtain parameters from the algorithm (here the test case parameters are set)
+            algResultParams = curAlg.getTestCase().getParameters();
+          } catch (Exception e) {
+            algResultParams = new VariableSet();
+          }  
+          
           if (executionStatus == ErrorStatus.PROCESS_KILLED) {
             algResultParams.addVariable(EResult.getErrorIndicator(
               String.format("Process killed after %d seconds.", timeLimit)), true);

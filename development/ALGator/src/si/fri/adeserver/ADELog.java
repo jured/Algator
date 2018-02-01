@@ -17,7 +17,7 @@ public class ADELog {
   private static String logFileName = null;
   
   // maximal error size in bytes (to truncate very long error messages)
-  private static int MAX_ERROR_SIZE = 2048;
+  private static int MAX_ERROR_SIZE = 1024;
   
   
   public static void log(String msg) {

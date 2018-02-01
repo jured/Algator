@@ -150,7 +150,7 @@ public class ExecuteOne {
       }
 
       // Test the testID
-      int noInst = eTestSet.getFieldAsInt(ETestSet.ID_N);            
+      int noInst = eTestSet.getFieldAsInt(ETestSet.ID_N, 0);            
       if (testID >= noInst) {
         System.out.println("Invalid testID (test does not exist).");
         System.exit(0);
@@ -168,7 +168,7 @@ public class ExecuteOne {
           MeasurementType mType, int testID, int verboseLevel) {
     
     String qTestSetFIleName = ATGlobal.getTESTSETfilename(ATGlobal.getALGatorDataLocal(), project.getName(), "QTestSet");
-    eTestSet.set(ETestSet.ID_N, 1);  // only one test
+    eTestSet.set(ETestSet.ID_N, 1);           // only one test
     eTestSet.set(ETestSet.ID_TimeLimit,  0);  // no time limit  
     eTestSet.set(ETestSet.ID_TestRepeat, 1);  // repeate only once
     

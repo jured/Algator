@@ -2,6 +2,7 @@ package si.fri.algotest.entities;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 
 /**
  *
@@ -77,8 +78,11 @@ public enum StatFunction {
 //    }
 //  }
   public static Object getFunctionValue(StatFunction function, ArrayList<? extends Comparable> values) {
+    Iterator it = values.iterator();
+    while (it.hasNext()) if (it.next().equals("null")) it.remove();    
+    
     if (values == null || values.size() == 0) {
-      return -1;
+      return null;
     }
 
     // For non-numbers only FIRST and LAST are exceptable; FIRST is default.
@@ -122,7 +126,7 @@ public enum StatFunction {
           }
         } catch (Exception e) {
           // this exception will probably occur only if values are not Numbers
-          return -1;
+          return null;
         }
       // added by Ziga Zorman
       case MED:

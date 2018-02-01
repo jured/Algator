@@ -2,7 +2,7 @@ import si.fri.algotest.entities.TestCase;
 
 /**
  * 
- * @author ...
+ * @author tomaz
  */
 public class BasicMatrixMulTestCase extends TestCase {
 

@@ -1,19 +1,26 @@
 {"Project": {
   "Name": "BasicSort",
-  "Description": "Testing several sorting methods",
-  "Author": "Tomaz",
-  "Date": "30/07/2013",
+  "Description": "Basic sorting algorithms",
+  "Author": "tomaz",
+  "Date": "01, 2018",
   "Algorithms": [
-    "QuickSort",
     "BubbleSort",
-    "InsertionSort"
+    "InsertionSort",
+    "JavaSort",
+    "QuickSort"
   ],
   "TestSets": [
     "TestSet1",
     "TestSet2",
-    "TestSet3"    
+    "TestSet3"
   ],
-  "ProjectJARs": [],
-  "AlgorithmJARs": [],
-  "EMExecFamily" : "FX"
+  "ProjectJARs": ["basicsort.jar"],
+  "ProjPresenters": [
+    "presenter1",
+    "presenter2",
+    "presenter3"    
+  ],
+  "AlgPresenters": ["apresenter1"],
+  "MainProjPresenters": ["ppresenter.atpd"],
+  "MainAlgPresenters": ["apresenter.atpd"]
 }}

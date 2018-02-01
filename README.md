@@ -2,8 +2,6 @@
 <h4 align="center">An automatic algorithm evaluation system </h4>
 <br>
 
-
-
 ## About the ALGator
 
 ALGator facilitates automatic algorithm evaluation process by executing 
@@ -54,6 +52,24 @@ A single-user version instalation of the ALGator system on Linux system:
 
   ```java algator.Version```
 
+
+6. **Install local web server to show ALGator's results**
+
+  To show the results of ALGator's execution in a web browser, you need to 
+  
+  a. Install the docker (see https://docs.docker.com/install/ for details) 
+  
+  b. Run the command
+  
+    ```docker run --mount type=bind,source=$ALGATOR_ROOT/data_root,target=/home/algator/ALGATOR_ROOT/data_root -p 8081:8081 algator/algatorweb```
+
+  c. Open a web browser and type in the following address
+  
+    http://localhost:8081/
+  
+
+  Note: in the ALGator.zip there are two example projects: BasicSort and BasicMatrixMul.
+  You can browse the results of these projects before creating your own project.
 
 ## How to use ALGator - examples
 

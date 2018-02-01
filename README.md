@@ -57,15 +57,15 @@ A single-user version instalation of the ALGator system on Linux system:
 
   To show the results of ALGator's execution in a web browser, you need to 
   
-  a. Install the docker (see https://docs.docker.com/install/ for details) 
+   - Install the docker (see https://docs.docker.com/install/ for details) 
   
-  b. Run the command
+   - Run the command
   
-    ```docker run --mount type=bind,source=$ALGATOR_ROOT/data_root,target=/home/algator/ALGATOR_ROOT/data_root -p 8081:8081 algator/algatorweb```
+     ```docker run --mount type=bind,source=$ALGATOR_ROOT/data_root,target=/home/algator/ALGATOR_ROOT/data_root -p 8081:8081 algator/algatorweb```
 
-  c. Open a web browser and type in the following address
+   - Open a web browser and type in the following address
   
-    http://localhost:8081/
+     http://localhost:8081/
   
 
   Note: in the ALGator.zip there are two example projects: BasicSort and BasicMatrixMul.

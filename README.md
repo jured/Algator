@@ -55,7 +55,7 @@ A single-user version instalation of the ALGator system on Linux system:
 
 6. **Install local web server to show ALGator's results**
 
-  To show the results of ALGator's execution in a web browser, you need to 
+   To show the results of ALGator's execution in a web browser, you need to 
   
    - Install the docker (see https://docs.docker.com/install/ for details) 
   
@@ -68,7 +68,7 @@ A single-user version instalation of the ALGator system on Linux system:
      http://localhost:8081/
   
 
-  Note: in the ALGator.zip there are two example projects: BasicSort and BasicMatrixMul.
+   Note: in the ALGator.zip there are two example projects: BasicSort and BasicMatrixMul.
   You can browse the results of these projects before creating your own project.
 
 ## How to use ALGator - examples

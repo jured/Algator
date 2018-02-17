@@ -39,21 +39,21 @@ A single-user version instalation of the ALGator system on Linux system:
  
 4. **Set environment variables** 
   
-  Add the following lines to `~/.bash_profile`:
+   Add the following lines to `~/.bash_profile`:
   
-  ```
-  export ALGATOR_ROOT=<algator_root>
-  export ALGATOR_DATA_ROOT=$ALGATOR_ROOT/data_root
-  export ALGATOR_DATA_LOCAL=$ALGATOR_ROOT/data_local
-  export CLASSPATH=$CLASSPATH:$ALGATOR_ROOT/app/ALGator/ALGator.jar
-  ```
+	```
+	 export ALGATOR_ROOT=<algator_root>
+	 export ALGATOR_DATA_ROOT=$ALGATOR_ROOT/data_root
+	 export ALGATOR_DATA_LOCAL=$ALGATOR_ROOT/data_local
+	 export CLASSPATH=$CLASSPATH:$ALGATOR_ROOT/app/ALGator/ALGator.jar
+	```
 
-  Note: in the first line change the `<algator_root>` with the name of 
-  your ALGator folder.
+   Note: in the first line change the `<algator_root>` with the name of 
+   your ALGator folder.
 
 5. **To test correctness** of the instalation, type
 
-  ```java algator.Version```
+    ```java algator.Version```
 
 
 6. **Install local web server to show ALGator's results**
@@ -69,10 +69,11 @@ A single-user version instalation of the ALGator system on Linux system:
    - Open a web browser and type in the following address
   
      http://localhost:8081/
-  
+ 
+   To login into web page use the following username/password: admin/admin.
 
    Note: in the ALGator.zip there are two example projects: BasicSort and BasicMatrixMul.
-  You can browse the results of these projects before creating your own project.
+   You can browse the results of these projects before creating your own project.
 
 ## How to use ALGator - examples
 

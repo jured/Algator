@@ -25,9 +25,12 @@ A single-user version instalation of the ALGator system on Linux system:
 
     We will refere to this folder as `<algator_root>` folder
 
-2. **Download ALGator.zip** file from
+2. **Download ALGator.zip** file from GitHub
 
-    https://raw.githubusercontent.com/ALGatorDevel/Algator/ALGator.zip
+    ```
+    curl -L -O https://raw.github.com/ALGatorDevel/Algator/master/ALGator.zip
+    ```
+    
 
 3. **Unpack ALGator.zip** file to `<algator_root>`
 

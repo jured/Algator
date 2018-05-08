@@ -21,6 +21,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FilenameUtils;
 import si.fri.algotest.entities.EProject;
 import si.fri.algotest.global.ATGlobal;
+import si.fri.algotest.users.PermTools;
 
 /**
  *
@@ -182,6 +183,7 @@ public class Admin {
       copyFile("templates/P_AAA.html",         projDocFolder,   "algorithm.html",                 substitutions);
       copyFile("templates/P_REF.html",         projDocFolder,   "references.html",                substitutions);
       
+      PermTools.setProjectPermissions(proj_name);
     } catch (Exception e) {
       System.out.println("Can not create project: " + e.toString());
       return false;
@@ -228,8 +230,9 @@ public class Admin {
       eProject.set(EProject.ID_Algorithms, a.toArray());
       eProject.saveEntity();
 
+      PermTools.setAlgorithmPermissions(proj_name, alg_name);
     } catch (Exception e) {
-      System.out.println("Can not create project: " + e.toString());
+      System.out.println("Can not create algorithm: " + e.toString());
       return false;
     }    
     return true;

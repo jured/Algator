@@ -67,6 +67,16 @@ public class ATGlobal {
   public static final String COUNTER_CLASS_EXTENSION = "_COUNT"; 
   
   
+  /**
+   * Normally ALGator executes algorithms in a separate JVM which enables ALGator to control 
+   * the execution time (and kill process in it last for too long). This functionality 
+   * disables debuging (in Netbeans, for example), since the algorithm does not run in 
+   * the current JVM.
+   * By setting debugMode = true, the algorithm is executed in the same JVM and it can be debuged. 
+   */
+  public static boolean debugMode = false;
+  
+  
   
   public static String getALGatorRoot() {
     String result = ALGatorRoot;
@@ -154,6 +164,21 @@ public class ATGlobal {
   }
 
   /**
+   * Returns folder path where all projects are located
+   **/
+  public static String getPROJECTSfolder(String data_root) {
+    return data_root + File.separator + ATDIR_projects;
+  }
+  
+  public static String getALGORITHMpath(String data_root, String projName) {
+    return data_root + File.separator + ATDIR_projects + File.separator + String.format(ATDIR_projRootDir, projName)+ File.separator + ATDIR_algsDir;
+  }
+  public static String getTESTSETpath(String data_root, String projName) {
+    return data_root + File.separator + ATDIR_projects + File.separator + String.format(ATDIR_projRootDir, projName)+ File.separator + ATDIR_testsDir;
+  }
+  
+  
+  /**
    * Return the name of the project's configuration folder 
    */
   public static String getPROJECTconfig(String data_root, String projName) {
@@ -200,7 +225,6 @@ public class ATGlobal {
   public static String getPROJECTdoc(String data_root, String projName) {
     return getPROJECTconfig(data_root, projName) + File.separator + ATDIR_docFolder;
   }
-  
   
   
   

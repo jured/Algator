@@ -12,6 +12,7 @@ import si.fri.algotest.timer.Timer;
 import java.io.File;
 import si.fri.algotest.entities.ELocalConfig;
 import si.fri.algotest.entities.MeasurementType;
+import si.fri.algotest.global.ATGlobal;
 
 /**
  * This class is used to execute a given algorithm. The main method in this class is the run() method, which
@@ -111,17 +112,25 @@ public class ExternalExecute {
    * @param verbose
    * @return 
    */
-  public static Object runWithExternalJVM(String folderName, MeasurementType mType, boolean verbose) {    
+  public static Object runWithExternalJVM(String folderName, MeasurementType mType, boolean verbose) { 
     try {
+      // when debugMode is true, algorithm is executed with current JVM (to enable debuging)
+      if (ATGlobal.debugMode) {
+        String [] args = new String [] {folderName};
+        main(args);
+        return (new ProcessBuilder( new String[] {"true"} )).start();       
+      }
+            
       ///* For real-time execution (classPath=..../ALGator.jar)
       String classPath = Version.getClassesLocation();
       //*/
     
-      //*   In debug mode (when running ALGator with NetBeans) getClassLocation() returns
+      //*   When running ALGator with NetBeans, getClassLocation() returns
          // a path to "classes" folder which is not enough to execute ALGator.
-         // To run ALGator in debug mode, we add local ALGator distribution
+         // To enable running ALGator in Netbeans, we add local ALGator distribution to classpath
       if (!classPath.contains("ALGator.jar"))
         classPath += File.pathSeparator +  "dist/ALGator.jar";
+        classPath += File.pathSeparator +  "dist/lib/commons-cli-1.2.jar";
       //*/
     
       String jvmCommand = "java";

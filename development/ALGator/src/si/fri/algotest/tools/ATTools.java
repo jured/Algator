@@ -145,6 +145,9 @@ public class ATTools {
     options.add(sb.toString());
     options.add("-d");          // -d <directory>         Specify where to place generated class files
     options.add(destPath);
+
+    options.add("-g");          // debug option
+
     
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     Writer wos = new OutputStreamWriter(os);

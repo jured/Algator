@@ -1,10 +1,10 @@
 package algator;
 
 import com.google.gson.Gson;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
-import java.io.PrintStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,11 +12,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 import jline.console.ConsoleReader;
 import jline.console.completer.Completer;
 import jline.console.completer.StringsCompleter;
-import org.apache.commons.lang3.math.NumberUtils;
 import si.fri.algotest.global.ATGlobal;
 import si.fri.algotest.global.ATLog;
 import si.fri.algotest.users.DatabaseInit;
@@ -28,18 +28,12 @@ import si.fri.algotest.users.Owner;
 import si.fri.algotest.users.PermTools;
 import si.fri.algotest.users.Permission;
 import si.fri.algotest.users.User;
-import si.fri.algotest.tools.ATTools;
-import static si.fri.algotest.users.PermTools.getID;
 
 /**
  *
  * @author Gregor
  */
 public class Users {
-  
-  static final int ALL_ENTITIES_ID = -3;
-  static final int ALL_PROJECTS_ID = -2;
-  static final int INVALID_ID      = -1;
 
   private static Connection conn;
 
@@ -55,88 +49,59 @@ public class Users {
 
   private static String format = "json";
 
-  private static String help_msg =
-              "init \n"
-            + "   Inits database and creates tables.\n\n"
-          
-            + "adduser username password\n"
-            + "   Creates new user, requires username and password.\n\n"
-
-            + "addgroup groupname\n"
-            + "   Creates new group, requires name.\n\n"
-          
-            + "moduser groupname username\n"
-            + "   Adds/removes user to group, requires groupname and username\n\n"
-
-            + "userperm username [entity]\n"
-            + "   Returns premissions for username on specified enitity, where entity is:\n"
-            + "     -all         ... return permissions for all entities\n"
-            + "     <empty>      ... return permissions for all projects\n"
-            + "     name | id    ... return permissions for the given entity and all subentites\n\n"
-
-            + "canuser username permission enitity\n"           
-            + "     Return true or false if username has specific permission on entity. \n\n"
-
-            + "chmod perm who entity\n"
-            + "      Changes permission for user (or group)\n"
-            + "        perm:   +/- permission (e.g. +can_write or -can_read)\n"
-            + "        who:    user or group (e.g. algator or :algator)\n"
-            + "        entity: project (proj_name) or \n"
-            + "                algorithm (proj_name/alg_name) or\n"
-            + "                testset (proj_name//testset_name)\n"
-            + "        Example: chmod +can_write joe Sorting/QuickSort\n\n"
-          
-            + "getentityid entity\n"
-            + "       Prints the id of a given entity, -1 if not found.\n\n"
-          
-            + "setowner user entity\n"
-            + "     Set  the ownership of the entity to the user.\n\n"
-          
-            + "set_default_owner\n"
-            + "     Checks all the files (proj, alg, test) in system directory. If file\n"
-            + "     has no owner, commands sets it on user id 1 - algator.\n\n"          
-          
-            + "showowner entity  \n"
-            + "     Shows the owner owner of the entity.\n\n"
-          
-            + "showusers [username]\n"
-            + "     Show all active users in the system. If arg <username> is passed to \n"
-            + "     command, it shows only that specific user.\n\n"
-
-            + "showgroups\n"
-            + "     Show all active groups in the system.\n\n"
-
-            + "showpermissions\n"
-            + "     Show all permissions in the system.\n\n"
-          
-            + "listentities [-all] | [project_name] | [project_id]\n"
-            + "     List the entities of the system. Parameter can be:\n"
-            + "     -all                      ... list all entities\n"
-            + "     <no parameter>            ... list all projects\n"
-            + "     project_name | project_id ... list all entities of the project\n\n"          
-          
-            + "changeuserstatus username status\n"
-            + "     Changes status of user active/inactive. Status must be int (0/1)\n\n"
-          
-            + "changegroupstatus groupname status\n"
-            + "     Changes staus of group active/inactive. Status must be int (0/1)\n\n" 
-          
-            + "setformat json | string\n"
-            + "     Sets the output print format";
-
-  
   public static void help() {
-    System.out.println(help_msg);
+    System.out.println("[] - optional args for command\n"
+            + "- init \n"
+            + "     Inits database and creates tables.\n"
+            + "- adduser <username><password>\n"
+            + "     Creates new user, requires username and password.\n"
+            + "- addgroup <groupname>\n"
+            + "     Creates new group, requires name.\n"
+            + "- moduser <groupname><username>\n"
+            + "     Adds user to group, requires groupname and username\n"
+            + "- userperms <username>\n"
+            + "     Outputs all premissions for all entities in the system for username.\n"
+            + "- userperm [-id] <username> <id_enitity>/<projectname>/<projectname:::algorithmname>/<projectname;;;testsetname>\n"
+            + "     Outputs all premissions for username on specific enitity. Requires username and id entity if [-id] switch is on. If switch is not set"
+            + "it requires <projectname> or <projectname:::algorithname> or <projectname;;;testsetname> instead.\n"
+            + "- canuser [-id] <username><permission> <id_enitity>/<projectname>/<projectname:::algorithmname>/<projectname;;;testsetname>\n"
+            + "     Return true or false if username has specific permission on entity. Requeires username, permission code and id enitity if [-id] is on"
+            + "if switch [-id] is not set, it requires <projectname> or <projectname:::algorithname> or <projectname;;;testsetname> instead.\n"
+            + "- setowner\n"
+            + "     Checks all the files (proj, alg, test) in system directory. If file has no owner, commands sets it on user id 1 - algator.\n"
+            + "- showowner [-p] <projectname> / [-a] <projectname><algorithmname> / [-t] <projectname><testsetname>  \n"
+            + "     Shows who is owner of project, algorithm or testset. Requires switch (-p for projects, -a for algorithms, -t for testsets)."
+            + "     Also requires projectname and/or algorithmname or testset.\n"
+            + "- addpermproj [-g] <name><permission_code><projectname>\n"
+            + "     Adds permission for project to user or group. -g stands for group\n"
+            + "- rmvpermproj [-g] <name><permission_code><projectname>\n"
+            + "     Removes permission for project from user or group. -g stands for group\n"
+            + "- addpermalg [-g] <name><permission_code><projectname><algorithmname>\n"
+            + "     Adds permission for algorithm in project to user or group. -g stands for group\n"
+            + "- rmvpermalg [-g] <name><permission_code><projectname><algorithmname>\n"
+            + "     Removes permission for algorithm in project to user or group. -g stands for group\n"
+            + "- showusers [<username>]\n"
+            + "     Show all active users in the system. If arg <username> is passed to command, it shows only that specific user.\n"
+            + "- showgroups\n"
+            + "     Show all active groups in the system.\n"
+            + "- showpermissions\n"
+            + "     Show all permissions in the system.\n"
+            + "- showentities\n"
+            + "     Show all entities in the system.\n"
+            + "- changeuserstatus <username><status>\n"
+            + "     Changes status of user active/inactive. Status must be int (0/1)\n"
+            + "- changegroupstatus <groupname><status>\n"
+            + "     Changes staus of group active/inactive. Status must be int (0/1)");
   }
 
   public static boolean adduser(String username, String password) {
     try {
       Statement stmt = (Statement) conn.createStatement();
 
-      int id_user  = INVALID_ID;
-      int id_group = INVALID_ID;
+      int id_user = -1;
+      int id_group = -1;
 
-      if (getUserID(username, true) < 0) {
+      if (userExists(username, true) < 0) {
         String insert = "INSERT INTO algator.users(name,password) VALUES ('" + username + "','" + password + "')";
 
         int result = stmt.executeUpdate(insert, stmt.RETURN_GENERATED_KEYS);
@@ -179,7 +144,7 @@ public class Users {
     try {
       Statement stmt = (Statement) conn.createStatement();
 
-      if (getGroupID(name, true) < 0) {
+      if (groupExists(name, true) < 0) {
         String insert = "INSERT INTO algator.groups(name) VALUES ('" + name + "')";
 
         int result = stmt.executeUpdate(insert);
@@ -203,8 +168,8 @@ public class Users {
     try {
       Statement stmt = (Statement) conn.createStatement();
       //init
-      int id_group = getGroupID(groupname, false);
-      int id_user  = getUserID(username, false);
+      int id_group = groupExists(groupname, false);
+      int id_user = userExists(username, false);
 
       if (id_group < 0) {
         System.out.println(">>> Group with this name does not exist!");
@@ -220,17 +185,8 @@ public class Users {
       ResultSet rs = stmt.executeQuery(select);
 
       if (rs.next()) {
-        String delete = "DELETE FROM algator.group_users WHERE id_group=" + id_group + " and id_user=" + id_user;
-        int result = stmt.executeUpdate(delete);
-
-        if (result > 0) {
-          System.out.println(">>> User removed from group!");
-          return true;
-        } else {
-          System.out.println(">>> Error while deleting user from group!");
-          return false;
-        }
-
+        System.out.println(">>> User is already member of this group!");
+        return false;
       } else {
         String insert = "INSERT INTO algator.group_users(id_group,id_user) VALUES ('" + id_group + "','" + id_user + "')";
         int result = stmt.executeUpdate(insert);
@@ -249,107 +205,248 @@ public class Users {
     }
   }
 
-  
-  /**
-   * Entity can be either a project (Sorting), algorithm (Sorting/BubbleSort)
-   * or a testset (Sorting//TestSet0)
-   */
-  public static int findEntityId(String entity) {
+  public static boolean addPermProj(String name, String permission, String entityname, String type) {
     try {
-      String [] parts = entity.split("[/]");
-      
-      String projectName = parts[0];
-      int id_project = getProjectID(projectName, false);
-      
-      // looking for project?
-      if (parts.length == 1)
-        return id_project;
-      
-      // invalid project?
-      if (id_project <= 0) return INVALID_ID;
-      
-      if (parts.length==2) { // looking for algorithm
-        return getID(String.format(
-          "SELECT * from algator.entities WHERE name='%s' AND type=2 AND id_parent=%d", parts[1], id_project));
-      } else { //looking for testset
-        return getID(String.format(
-          "SELECT * from algator.entities WHERE name='%s' AND type=3 AND id_parent=%d", parts[2], id_project));      
-      }
-    } catch (Exception e) {
-      return INVALID_ID;
-    }      
-  }
-  
-  /**
-   * Returns empty string if no error, error message otherwise.
-   */
-  public static String chmod(String perm, String user, String entity) {   
-    try {
-      boolean addPermission = true;
-      int id_perm           = INVALID_ID;
-      if (perm.startsWith("+") || perm.startsWith("-")) {
-        addPermission = perm.startsWith("+");
-        perm = perm.substring(1);
-        id_perm = getID(String.format("SELECT * from algator.permissions WHERE permission_code='%s'", perm));            
-        if (id_perm <= 0) return "Invalid permission code";
-      } else return "Invalid permission format";
-          
-      String usergroup;
-      int id_usergroup;
-      if (user.startsWith(":")) {
-        usergroup = "group";
-        user=user.substring(1);
-        id_usergroup = getGroupID(user, false);
-      } else {
-        usergroup = "user";
-        id_usergroup = getUserID(user, false);
-      }
-      if (id_usergroup <= 0)
-        return String.format("Invalid %s name (%s).", usergroup, user);
-          
-      int id_entity = findEntityId(entity);
-      if (id_entity <= 0)
-        return String.format("Entity %s does not exist.", entity);    
-      
-      
-      String select = String.format(
-         "SELECT * FROM algator.permissions_%ss WHERE id_%s=%d AND id_entity=%d AND id_permission=%d",
-         usergroup,usergroup,id_usergroup,id_entity,id_perm
-      );
-      conn = PermTools.connectToDatabase();
       Statement stmt = (Statement) conn.createStatement();
-      ResultSet rs = stmt.executeQuery(select);
-            
-      boolean permExists = rs.next();
-  
-      
-      String sql;
-      if (addPermission) {
-        if (permExists) return "Permission already exists.";
-        sql = String.format(
-          "INSERT INTO algator.permissions_%ss (id_%s,id_entity,id_permission) VALUES (%d,%d,%d)",
-          usergroup, usergroup, id_usergroup, id_entity, id_perm
-        );         
+      int id = -1;
+
+      if (type.equals("group")) {
+        id = groupExists(name, false);
+        if (id < 0) {
+          System.out.println(">>> Group with this name does not exist!");
+          return false;
+        }
       } else {
-        if (!permExists) return "Permission does not exist.";
-        sql = String.format(
-          "DELETE FROM algator.permissions_%ss WHERE id_%s=%d AND id_entity=%d AND id_permission=%d",
-          usergroup, usergroup, id_usergroup, id_entity, id_perm
-        );    
-      }
-      int result = stmt.executeUpdate(sql);
-      if (result <= 0) {
-        return "Error adding/removing permission";
+        type = "users";
+        id = userExists(name, false);
+        if (id < 0) {
+          System.out.println(">>> User with this name does not exist!");
+          return false;
+        }
       }
 
-      
-    } catch (Exception e) {
-      return e.toString();
+      int permExists = permExists(permission, true);
+      int projExists = projExists(entityname, true);
+
+      if (permExists < 0) {
+        return false;
+      }
+      if (projExists < 0) {
+        return false;
+      }
+
+      String insert = "INSERT INTO algator.permissions_" + type + "(id_" + type.substring(0, type.length() - 1) + ",id_entity,id_permission) VALUES (" + id + "," + projExists + "," + permExists + ")";
+
+      int result = stmt.executeUpdate(insert);
+
+      if (result > 0) {
+        System.out.println(">>> Permission " + permission + " for project " + entityname + " added to " + name + "!");
+        return true;
+      } else {
+        System.out.println(">>> Error while adding user!");
+        return false;
+      }
+
+    } catch (SQLException e) {
+      System.err.println(e);
+      return false;
     }
-      
-    return "";
   }
 
+  public static boolean addPermAlg(String name, String permission, String projectname, String algorithmname, String type) {
+    load_entites();
+    try {
+      Statement stmt = (Statement) conn.createStatement();
+      int id = -1;
+      int proj_id = -1;
+      if (type.equals("group")) {
+        id = groupExists(name, false);
+        if (id < 0) {
+          System.out.println(">>> Group with this name does not exist!");
+          return false;
+        }
+      } else {
+        type = "users";
+        id = userExists(name, false);
+        if (id < 0) {
+          System.out.println(">>> User with this name does not exist!");
+          return false;
+        }
+      }
+      int permExists = permExists(permission, true);
+
+      if (permExists < 0) {
+        return false;
+      }
+      for (Entity proj : project_list) {
+        if (proj.name.equals(projectname)) {
+          proj_id = proj.id;
+        }
+      }
+      if (proj_id < 0) {
+        System.out.println(">>> Project with this name does not exist!");
+        return false;
+      }
+      List<Entity> alg_list = alg_map.get(Integer.toString(proj_id));
+
+      for (Entity alg : alg_list) {
+        if (alg.name.equals(algorithmname)) {
+          String select = "SELECT * FROM algator.permissions_" + type + " WHERE id_" + type.substring(0, type.length() - 1) + "=" + id + " AND id_entity=" + alg.id + " AND id_permission=" + permExists + "";
+          ResultSet rs = stmt.executeQuery(select);
+
+          if (rs.next()) {
+            System.out.println("Permission " + permission + " for algorithm " + alg.name + " already added to " + name + "");
+            return false;
+          }
+
+          //else add perm
+          String insert = "INSERT INTO algator.permissions_" + type + "(id_" + type.substring(0, type.length() - 1) + ",id_entity,id_permission) VALUES (" + id + "," + alg.id + "," + permExists + ")";
+
+          int result = stmt.executeUpdate(insert);
+
+          if (result > 0) {
+            System.out.println(">>> Permission " + permission + " for algorithm " + alg.name + " added to " + name + "!");
+            return true;
+          } else {
+            System.out.println(">>> Error while adding user!");
+            return false;
+          }
+        }
+      }
+      System.out.println(">>> Algorithm " + algorithmname + " in project " + projectname + " does not exist!");
+      return false;
+    } catch (SQLException ex) {
+      ATLog.log(ex.toString(), 0);
+      return false;
+    }
+  }
+
+  public static boolean rmvPermProj(String name, String permission, String projectname, String type) {
+    try {
+      Statement stmt = (Statement) conn.createStatement();
+      int id = -1;
+
+      if (type.equals("group")) {
+        id = groupExists(name, false);
+        if (id < 0) {
+          System.out.println(">>> Group with this name does not exist!");
+          return false;
+        }
+      } else {
+        type = "users";
+        id = userExists(name, false);
+        if (id < 0) {
+          System.out.println(">>> User with this name does not exist!");
+          return false;
+        }
+      }
+
+      int permExists = permExists(permission, true);
+      int projExists = projExists(projectname, true);
+
+      if (permExists < 0) {
+        return false;
+      }
+      if (projExists < 0) {
+        return false;
+      }
+
+      //check if this permission even exists on this user
+      String select = "SELECT * FROM algator.permissions_" + type + " WHERE id_" + type.substring(0, type.length() - 1) + "=" + id + " AND id_entity=" + projExists + " AND id_permission=" + permExists + "";
+      ResultSet rs = stmt.executeQuery(select);
+
+      if (!rs.next()) {
+        System.out.println("Permission " + permission + " for project " + projectname + " does not exist for " + name + "");
+        return false;
+      }
+
+      String delete = "DELETE FROM algator.permissions_" + type + " WHERE id_" + type.substring(0, type.length() - 1) + "=" + id + " AND id_entity=" + projExists + " AND id_permission=" + permExists + "";
+      int result = stmt.executeUpdate(delete);
+
+      if (result > 0) {
+        System.out.println(">>> Permission " + permission + " for project " + projectname + " removed from " + name + "!");
+        return true;
+      } else {
+        System.out.println(">>> Error while removing!");
+        return false;
+      }
+
+    } catch (SQLException e) {
+      System.err.println(e);
+      return false;
+    }
+  }
+
+  public static boolean rmvPermAlg(String name, String permission, String projectname, String algorithmname, String type) {
+    load_entites();
+
+    try {
+      Statement stmt = (Statement) conn.createStatement();
+      int id = -1;
+      int proj_id = -1;
+
+      if (type.equals("group")) {
+        id = groupExists(name, false);
+        if (id < 0) {
+          System.out.println(">>> Group with this name does not exist!");
+          return false;
+        }
+      } else {
+        type = "users";
+        id = userExists(name, false);
+        if (id < 0) {
+          System.out.println(">>> User with this name does not exist!");
+          return false;
+        }
+      }
+
+      int permExists = permExists(permission, true);
+
+      if (permExists < 0) {
+        return false;
+      }
+      for (Entity proj : project_list) {
+        if (proj.name.equals(projectname)) {
+          proj_id = proj.id;
+        }
+      }
+      if (proj_id < 0) {
+        System.out.println(">>> Project with this name does not exist!");
+        return false;
+      }
+      List<Entity> alg_list = alg_map.get(Integer.toString(proj_id));
+
+      for (Entity alg : alg_list) {
+        if (alg.name.equals(algorithmname)) {
+          String select = "SELECT * FROM algator.permissions_" + type + " WHERE id_" + type.substring(0, type.length() - 1) + "=" + id + " AND id_entity=" + alg.id + " AND id_permission=" + permExists + "";
+          ResultSet rs = stmt.executeQuery(select);
+
+          if (!rs.next()) {
+            System.out.println("Permission " + permission + " for algorithm " + alg.name + " does not exist for " + name + "");
+            return false;
+          }
+
+          //else remove perm
+          String delete = "DELETE FROM algator.permissions_" + type + " WHERE id_" + type.substring(0, type.length() - 1) + "=" + id + " AND id_entity=" + alg.id + " AND id_permission=" + permExists + "";
+          int result = stmt.executeUpdate(delete);
+
+          if (result > 0) {
+            System.out.println(">>> Permission " + permission + " for algorithm " + alg.name + " removed from " + name + "!");
+            return true;
+          } else {
+            System.out.println(">>> Error while removing!");
+            return false;
+          }
+        }
+      }
+      System.out.println(">>> Algorithm " + algorithmname + " in project " + projectname + " does not exist!");
+      return false;
+
+    } catch (SQLException e) {
+      System.err.println(e);
+      return false;
+    }
+  }
 
   private static void showUsers(String username) {
     String statement = "";
@@ -374,13 +471,12 @@ public class Users {
         System.out.println(">>> User with this username does not exist!");
         return;
       }
-      System.out.printf("%1$-5s %2$-20s %3$10s", "id", "Username", "Status");
+      System.out.printf("%1$-20s %2$10s", "Username", "Status");
       System.out.println("");
       while (rs.next()) {
         String lastName = rs.getString("name");
-        String status   = rs.getString("status");
-        String id       = rs.getString("id");
-        System.out.printf("%1$-5s %2$-20s %3$8s", id, lastName, status);
+        String status = rs.getString("status");
+        System.out.printf("%1$-20s %2$8s", lastName, status);
         System.out.println("");
       }
     } catch (SQLException e) {
@@ -441,11 +537,12 @@ public class Users {
     }
   }
 
-  public static void listEntities() {    
-    System.out.println("");
+  public static void showEntities() {
     String[] types = {"Proj", "Alg", "Test"};
-    System.out.printf("%1$-6s %2$-16s %3$s\n", "ID", "Type", "Entity name");    
-    System.out.println("-------------------------------------------");
+    System.out.printf("%1$-6s %2$-16s %3$s", "ID", "Type", "Entity name");
+    System.out.println("");
+    System.out.printf("___________________________________________");
+    System.out.println("");
 
     for (Entity project : project_list) {
       System.out.printf("%1$-6s %2$-16s %3$s", project.id, types[project.type - 1], project.name);
@@ -473,7 +570,7 @@ public class Users {
       System.out.println("Status number must be 0 or 1!");
       return;
     }
-    if (getUserID(username, false) > 0) {
+    if (userExists(username, false) > 0) {
       try {
         Statement stmt = (Statement) conn.createStatement();
         String insert = "UPDATE algator.users SET status = " + status + " WHERE name = '" + username + "'";
@@ -498,7 +595,7 @@ public class Users {
       System.out.println("Status number must be 0 or 1!");
       return;
     }
-    if (getGroupID(groupname, false) > 0) {
+    if (groupExists(groupname, false) > 0) {
       try {
         Statement stmt = (Statement) conn.createStatement();
         String insert = "UPDATE algator.groups SET status = " + status + " WHERE name = '" + groupname + "'";
@@ -515,7 +612,7 @@ public class Users {
     }
   }
 
-  private static int getUserID(String username, boolean output) {
+  private static int userExists(String username, boolean output) {
     try {
       Statement stmt = (Statement) conn.createStatement();
 
@@ -529,15 +626,15 @@ public class Users {
         }
         return id_user;
       } else {
-        return INVALID_ID;
+        return -1;
       }
     } catch (SQLException e) {
       System.err.println(e);
-      return INVALID_ID;
+      return -1;
     }
   }
 
-  private static int getGroupID(String groupname, boolean output) {
+  private static int groupExists(String groupname, boolean output) {
     try {
       Statement stmt = (Statement) conn.createStatement();
 
@@ -551,15 +648,15 @@ public class Users {
         }
         return id_group;
       } else {
-        return INVALID_ID;
+        return -1;
       }
     } catch (SQLException e) {
       System.err.println(e);
-      return INVALID_ID;
+      return -1;
     }
   }
 
-  private static int getPermID(String permname, boolean output) {
+  private static int permExists(String permname, boolean output) {
     try {
       Statement stmt = (Statement) conn.createStatement();
 
@@ -573,15 +670,15 @@ public class Users {
         if (output) {
           System.out.println(">>> Permission with this name does not exist!");
         }
-        return INVALID_ID;
+        return -1;
       }
     } catch (SQLException e) {
       System.err.println(e);
-      return INVALID_ID;
+      return -1;
     }
   }
 
-  private static int getProjectID(String entityname, boolean output) {
+  private static int projExists(String entityname, boolean output) {
     try {
       Statement stmt = (Statement) conn.createStatement();
 
@@ -595,11 +692,11 @@ public class Users {
         if (output) {
           System.out.println(">>> Project with this name does not exist!");
         }
-        return INVALID_ID;
+        return -1;
       }
     } catch (SQLException e) {
       System.err.println(e);
-      return INVALID_ID;
+      return -1;
     }
   }
 
@@ -619,15 +716,8 @@ public class Users {
       return alg_ids;
     }
   }
-  
-  public static void load_entites() {
-    load_entites("-all");
-  }
 
-  /**
-   * param: "-all" ... load all entities, "" ... load all projects, "proj_name" ... load all entities of the given project
-   */
-  public static void load_entites(String param) {
+  public static void load_entites() {
     project_list = new ArrayList<Entity>();
     alg_list = new ArrayList<Entity>();
     test_list = new ArrayList<Entity>();
@@ -635,23 +725,8 @@ public class Users {
     test_map = new HashMap<String, List<Entity>>();
 
     try {
-      String where = "";
-      int proj_id = INVALID_ID;
-      if (!param.isEmpty() && !param.equals("-all")) { // param is proj_name or project_id        
-        try {
-          proj_id = Integer.parseInt(param);          
-        } catch (Exception e) {}
-        if (proj_id == INVALID_ID) {
-          proj_id = findEntityId(param);
-        }       
-        where = " where id_parent="+proj_id+" or id="+proj_id;  // only entities whose parent is proj_id
-
-      } else if (param.isEmpty()) {
-        where = " where id_parent IS NULL";  // only projects
-      }
-      
       Statement stmt = (Statement) conn.createStatement();
-      String select = "SELECT * from algator.entities" + where;
+      String select = "SELECT * from algator.entities";
       ResultSet rs = stmt.executeQuery(select);
       while (rs.next()) {
         int id = rs.getInt("id");
@@ -682,22 +757,142 @@ public class Users {
             test_list.add(new Entity(id, name, type, id_parent));
             break;
         }
-      }      
+      }
+
     } catch (SQLException e) {
       System.err.println(e);
     }
   }
 
-  public static void load_perm(String username) {
+  public static void init_perm(String username) {
     project_permissions = new ArrayList<Entity_permission>();
     algorithm_permissions = new ArrayList<Entity_permission>();
     test_permissions = new ArrayList<Entity_permission>();
     try {
       Statement stmt = (Statement) conn.createStatement();
-    
-      String selectProj=String.format(ATTools.getResourceFile("sql/project_permissions.sql"), username);
-      String selectAlg = String.format(ATTools.getResourceFile("sql/algorithm_permissions.sql"), username);
-      String selectTest = String.format(ATTools.getResourceFile("sql/testset_permissions.sql"), username);
+      String selectProj = "SELECT * FROM (SELECT DISTINCT ent.id,ent.name, 1 as 'type', 'all' as 'permissions', -1 as 'parent_id','' as 'parent_name'\n"
+              + "FROM algator.entities as ent\n"
+              + "JOIN algator.owners as own ON ent.id = own.id_entity\n"
+              + "JOIN algator.users as usr ON own.id_owner=usr.id\n"
+              + "WHERE usr.name=\"" + username + "\" AND ent.type=1) as a\n"
+              + "UNION\n"
+              + "(SELECT DISTINCT ent.id,ent.name, 1 as 'type', perm.permission_code as 'permissions', -1 as 'parent_id','' as 'parent_name'  \n"
+              + "FROM algator.entities as ent\n"
+              + "JOIN algator.permissions_users as pu ON ent.id=pu.id_entity\n"
+              + "JOIN algator.users as usr ON usr.id=pu.id_user\n"
+              + "JOIN algator.permissions as perm ON perm.id=pu.id_permission\n"
+              + "WHERE ent.type=1 AND usr.name=\"" + username + "\")\n"
+              + "UNION\n"
+              + "(SELECT DISTINCT ent.id,ent.name, 1 as 'type', perm.permission_code as 'permissions', -1 as 'parent_id','' as 'parent_name'\n"
+              + "FROM algator.users as usr\n"
+              + "JOIN algator.group_users as gu ON usr.id=gu.id_user\n"
+              + "JOIN algator.groups as grp ON gu.id_group=grp.id\n"
+              + "JOIN algator.permissions_group as pg ON pg.id_group=grp.id\n"
+              + "JOIN algator.permissions as perm ON perm.id=pg.id_permission\n"
+              + "JOIN algator.entities as ent ON ent.id=pg.id_entity\n"
+              + "WHERE ent.type=1 AND usr.name=\"" + username + "\");";
+
+      String selectAlg = "SELECT * FROM\n"
+              + "(SELECT ent2.id,ent2.name, 2 as \"type\", \"all\" as \"permissions\" , ent.id as \"parent_id\", ent.name as \"parent_name\"\n"
+              + "FROM algator.entities as ent\n"
+              + "JOIN algator.owners as own ON ent.id = own.id_entity\n"
+              + "JOIN algator.users as usr ON own.id_owner=usr.id\n"
+              + "JOIN algator.entities as ent2 ON ent2.id_parent=ent.id\n"
+              + "WHERE usr.name=\"" + username + "\" AND ent.type=1 AND ent2.type=2) as e\n"
+              + "UNION\n"
+              + "(SELECT ent.id,ent.name, 2 as \"type\", \"all\" as \"permissions\", pent.id as \"parent_id\", pent.name as \"parent_name\"\n"
+              + "FROM algator.entities as ent\n"
+              + "JOIN algator.owners as own ON ent.id = own.id_entity\n"
+              + "JOIN algator.users as usr ON own.id_owner=usr.id\n"
+              + "JOIN algator.entities as pent ON ent.id_parent=pent.id\n"
+              + "WHERE ent.type=2 AND usr.name=\"" + username + "\")\n"
+              + "UNION\n"
+              + "(SELECT ent2.id,ent2.name, 2 as \"type\", perm.permission_code as \"permissions\", ent.id as \"parent_id\", ent.name as \"parent_name\"\n"
+              + "FROM algator.entities as ent\n"
+              + "JOIN algator.permissions_users as pu ON ent.id = pu.id_entity\n"
+              + "JOIN algator.users as usr ON pu.id_user=usr.id\n"
+              + "JOIN algator.entities as ent2 ON ent2.id_parent=ent.id\n"
+              + "JOIN algator.permissions as perm ON perm.id=pu.id_permission\n"
+              + "WHERE usr.name=\"" + username + "\" AND ent.type=1 AND ent2.type=2)\n"
+              + "UNION\n"
+              + "(SELECT DISTINCT ent.id,ent.name, 2 as \"type\", perm.permission_code as \"permissions\", pent.id as \"parent_id\", pent.name as \"parent_name\"\n"
+              + "FROM algator.entities as ent\n"
+              + "JOIN algator.permissions_users as pu ON ent.id=pu.id_entity\n"
+              + "JOIN algator.users as usr ON usr.id=pu.id_user\n"
+              + "JOIN algator.permissions as perm ON perm.id=pu.id_permission\n"
+              + "JOIN algator.entities as pent ON ent.id_parent=pent.id\n"
+              + "WHERE ent.type=2 AND usr.name=\"" + username + "\")\n"
+              + "UNION\n"
+              + "(SELECT distinct ent2.id,ent2.name, 2 as \"type\", perm.permission_code as \"permissions\", ent.id as \"parent_id\", ent.name as \"parent_name\"\n"
+              + "FROM algator.users as usr\n"
+              + "JOIN algator.group_users as gu ON usr.id=gu.id_user\n"
+              + "JOIN algator.groups as grp ON gu.id_group=grp.id\n"
+              + "JOIN algator.permissions_group as pg ON pg.id_group=grp.id\n"
+              + "JOIN algator.permissions as perm ON perm.id=pg.id_permission\n"
+              + "JOIN algator.entities as ent ON ent.id=pg.id_entity\n"
+              + "JOIN algator.entities as ent2 ON ent.id=ent2.id_parent\n"
+              + "WHERE ent.type=1 AND ent2.type=2 AND usr.name=\"" + username + "\")\n"
+              + "UNION\n"
+              + "(SELECT distinct ent.id,ent.name, 2 as \"type\", perm.permission_code as \"permissions\", pent.id as \"parent_id\", pent.name as \"parent_name\"\n"
+              + "FROM algator.users as usr\n"
+              + "JOIN algator.group_users as gu ON usr.id=gu.id_user\n"
+              + "JOIN algator.groups as grp ON gu.id_group=grp.id\n"
+              + "JOIN algator.permissions_group as pg ON pg.id_group=grp.id\n"
+              + "JOIN algator.permissions as perm ON perm.id=pg.id_permission\n"
+              + "JOIN algator.entities as ent ON ent.id=pg.id_entity\n"
+              + "JOIN algator.entities as pent ON ent.id_parent=pent.id\n"
+              + "WHERE ent.type=2 AND usr.name=\"" + username + "\");";
+
+      String selectTest = "SELECT * FROM\n"
+              + "(SELECT ent2.id,ent2.name, 3 as \"type\", \"all\" as \"permissions\", ent.id as \"parent_id\", ent.name as \"parent_name\"\n"
+              + "FROM algator.entities as ent\n"
+              + "JOIN algator.owners as own ON ent.id = own.id_entity\n"
+              + "JOIN algator.users as usr ON own.id_owner=usr.id\n"
+              + "JOIN algator.entities as ent2 ON ent2.id_parent=ent.id\n"
+              + "WHERE usr.name=\"" + username + "\" AND ent.type=1 AND ent2.type=3) as e\n"
+              + "UNION\n"
+              + "(SELECT ent.id,ent.name, 3 as \"type\", \"all\" as \"permissions\", pent.id as \"parent_id\", pent.name as \"parent_name\"\n"
+              + "FROM algator.entities as ent\n"
+              + "JOIN algator.owners as own ON ent.id = own.id_entity\n"
+              + "JOIN algator.users as usr ON own.id_owner=usr.id\n"
+              + "JOIN algator.entities as pent ON ent.id_parent=pent.id\n"
+              + "WHERE ent.type=3 AND usr.name=\"" + username + "\")\n"
+              + "UNION\n"
+              + "(SELECT ent2.id,ent2.name, 3 as \"type\", perm.permission_code as \"permissions\", ent.id as \"parent_id\", ent.name as \"parent_name\"\n"
+              + "FROM algator.entities as ent\n"
+              + "JOIN algator.permissions_users as pu ON ent.id = pu.id_entity\n"
+              + "JOIN algator.users as usr ON pu.id_user=usr.id\n"
+              + "JOIN algator.entities as ent2 ON ent2.id_parent=ent.id\n"
+              + "JOIN algator.permissions as perm ON perm.id=pu.id_permission\n"
+              + "WHERE usr.name=\"" + username + "\" AND ent.type=1 AND ent2.type=3)\n"
+              + "UNION\n"
+              + "(SELECT DISTINCT ent.id,ent.name, 2 as \"type\", perm.permission_code as \"permissions\", pent.id as \"parent_id\", pent.name as \"parent_name\"  \n"
+              + "FROM algator.entities as ent\n"
+              + "JOIN algator.permissions_users as pu ON ent.id=pu.id_entity\n"
+              + "JOIN algator.users as usr ON usr.id=pu.id_user\n"
+              + "JOIN algator.permissions as perm ON perm.id=pu.id_permission\n"
+              + "JOIN algator.entities as pent ON ent.id_parent=pent.id\n"
+              + "WHERE ent.type=3 AND usr.name=\"" + username + "\")\n"
+              + "UNION\n"
+              + "(SELECT distinct ent2.id,ent2.name, 3 as \"type\", perm.permission_code as \"permissions\", ent.id as \"parent_id\", ent.name as \"parent_name\"\n"
+              + "FROM algator.users as usr\n"
+              + "JOIN algator.group_users as gu ON usr.id=gu.id_user\n"
+              + "JOIN algator.groups as grp ON gu.id_group=grp.id\n"
+              + "JOIN algator.permissions_group as pg ON pg.id_group=grp.id\n"
+              + "JOIN algator.permissions as perm ON perm.id=pg.id_permission\n"
+              + "JOIN algator.entities as ent ON ent.id=pg.id_entity\n"
+              + "JOIN algator.entities as ent2 ON ent.id=ent2.id_parent\n"
+              + "WHERE ent.type=1 AND ent2.type=3 AND usr.name=\"" + username + "\")\n"
+              + "UNION\n"
+              + "(SELECT distinct ent.id,ent.name, 3 as \"type\", perm.permission_code as \"permissions\", pent.id as \"parent_id\", pent.name as \"parent_name\"\n"
+              + "FROM algator.users as usr\n"
+              + "JOIN algator.group_users as gu ON usr.id=gu.id_user\n"
+              + "JOIN algator.groups as grp ON gu.id_group=grp.id\n"
+              + "JOIN algator.permissions_group as pg ON pg.id_group=grp.id\n"
+              + "JOIN algator.permissions as perm ON perm.id=pg.id_permission\n"
+              + "JOIN algator.entities as ent ON ent.id=pg.id_entity\n"
+              + "JOIN algator.entities as pent ON ent.id_parent=pent.id\n"
+              + "WHERE ent.type=3 AND usr.name=\"" + username + "\");";
 
       ResultSet rs_proj = stmt.executeQuery(selectProj);
       while (rs_proj.next()) {
@@ -720,8 +915,7 @@ public class Users {
   }
 
   public static void print_permissions(String username) {
-    load_perm(username);
-    
+    init_perm(username);
     if (format.equals("json")) {
       Gson gson = new Gson();
       List<Entity_permission> combined = new ArrayList<Entity_permission>();
@@ -752,45 +946,116 @@ public class Users {
 
   }
 
-  public static void userperm(String username, int entity_id) {
+  public static void user_permission(String username, int entity_id) {
     String[] types = {"Proj", "Alg", "Test"};
-    load_perm(username);
-    
-    List<Entity_permission> perms = new ArrayList<Entity_permission>(project_permissions);
-    perms.addAll(algorithm_permissions);
-    perms.addAll(test_permissions);
-    
-    if (entity_id != ALL_ENTITIES_ID) {    
-      if (entity_id == ALL_PROJECTS_ID) // retain only projects
-        perms.removeIf(value -> value.parent_id != 0);      
-      else // retain only entity and its children
-        perms.removeIf(value -> (value.id != entity_id && value.parent_id != entity_id));      
-    }
-    
+    init_perm(username);
     if (format.equals("json")) {
-      System.out.println(new Gson().toJson(perms));      
-    } else {
-      System.out.printf("%1$-6s %2$-6s %3$-26s %4$-14s %5$-10s %6$-10s", "ID", "Type", "Entity name", "Permission", "P ID", "P name");
-      System.out.println("");
-      System.out.printf("___________________________________________________________________________");
-      System.out.println("");
-      for (Entity_permission project : perms) {        
+      Gson gson = new Gson();
+      List<Entity_permission> perms = new ArrayList<Entity_permission>();
+      for (Entity_permission project : project_permissions) {
+        if (project.id == entity_id) {
+          perms.add(project);
+        }
+      }
+      for (Entity_permission algorithm : algorithm_permissions) {
+        if (algorithm.id == entity_id) {
+          perms.add(algorithm);
+        }
+      }
+      for (Entity_permission test : test_permissions) {
+        if (test.id == entity_id) {
+          perms.add(test);
+        }
+      }
+      System.out.println(gson.toJson(perms));
+      return;
+    }
+    System.out.printf("%1$-6s %2$-6s %3$-26s %4$-14s %5$-10s %6$-10s", "ID", "Type", "Entity name", "Permission", "P ID", "P name");
+    System.out.println("");
+    System.out.printf("___________________________________________________________________________");
+    System.out.println("");
+    for (Entity_permission project : project_permissions) {
+      if (project.id == entity_id) {
         System.out.printf("%1$-6s %2$-6s %3$-26s %4$-14s %5$-10s %6$-10s", project.id, types[project.type - 1], project.name, project.permission, project.parent_id, project.parent_name);
+        System.out.println("");
+      }
+    }
+    for (Entity_permission algorithm : algorithm_permissions) {
+      if (algorithm.id == entity_id) {
+        System.out.printf("%1$-6s %2$-6s %3$-26s %4$-14s %5$-10s %6$-10s", algorithm.id, types[algorithm.type - 1], algorithm.name, algorithm.permission, algorithm.parent_id, algorithm.parent_name);
+        System.out.println("");
+      }
+    }
+    for (Entity_permission test : test_permissions) {
+      if (test.id == entity_id) {
+        System.out.printf("%1$-6s %2$-6s %3$-26s %4$-14s %5$-10s %6$-10s", test.id, types[test.type - 1], test.name, test.permission, test.parent_id, test.parent_name);
         System.out.println("");
       }
     }
   }
 
-  public static void user_permission(String username, String entity) {
-    userperm(username, findEntityId(entity));
+  public static void user_permission2(String username, String entity) {
+    String[] types = {"Proj", "Alg", "Test"};
+    init_perm(username);
+    String proj = entity;
+    String alg = "";
+    String test = "";
+
+    if (entity.contains(":::")) {
+      proj = entity.split(":::")[0];
+      alg = entity.split(":::")[1];
+    } else if (entity.contains(";;;")) {
+      proj = entity.split(";;;")[0];
+      test = entity.split(";;;")[1];
+    }
+
+    if (format.equals("json")) {
+      Gson gson = new Gson();
+      List<Entity_permission> perms = new ArrayList<Entity_permission>();
+      for (Entity_permission project : project_permissions) {
+        if (project.name == proj) {
+          perms.add(project);
+        }
+      }
+      for (Entity_permission algorithm : algorithm_permissions) {
+        if (algorithm.name == alg) {
+          perms.add(algorithm);
+        }
+      }
+      for (Entity_permission test_set : test_permissions) {
+        if (test_set.name == test) {
+          perms.add(test_set);
+        }
+      }
+      System.out.println(gson.toJson(perms));
+      return;
+    }
+    System.out.printf("%1$-6s %2$-6s %3$-26s %4$-14s %5$-10s %6$-10s", "ID", "Type", "Entity name", "Permission", "P ID", "P name");
+    System.out.println("");
+    System.out.printf("___________________________________________________________________________");
+    System.out.println("");
+    for (Entity_permission project : project_permissions) {
+      if (project.name == proj) {
+        System.out.printf("%1$-6s %2$-6s %3$-26s %4$-14s %5$-10s %6$-10s", project.id, types[project.type - 1], project.name, project.permission, project.parent_id, project.parent_name);
+        System.out.println("");
+      }
+    }
+    for (Entity_permission algorithm : algorithm_permissions) {
+      if (algorithm.name == alg) {
+        System.out.printf("%1$-6s %2$-6s %3$-26s %4$-14s %5$-10s %6$-10s", algorithm.id, types[algorithm.type - 1], algorithm.name, algorithm.permission, algorithm.parent_id, algorithm.parent_name);
+        System.out.println("");
+      }
+    }
+    for (Entity_permission test_set : test_permissions) {
+      if (test_set.name == test) {
+        System.out.printf("%1$-6s %2$-6s %3$-26s %4$-14s %5$-10s %6$-10s", test_set.id, types[test_set.type - 1], test_set.name, test_set.permission, test_set.parent_id, test_set.parent_name);
+        System.out.println("");
+      }
+    }
   }
 
-  public static boolean can_user(String username, String permission, String entity) {
-    return can_user(username, permission, findEntityId(entity));
-  }
-  
   public static boolean can_user(String username, String permission, int entity_id) {
-    load_perm(username);
+    init_perm(username);
     for (Entity_permission project : project_permissions) {
       if (project.id == entity_id) {
         if (project.permission.equals("all") || project.permission.equals(permission)) {
@@ -815,11 +1080,49 @@ public class Users {
     return false;
   }
 
+  public static boolean can_user2(String username, String permission, String entity) {
+    init_perm(username);
+    String proj = entity;
+    String alg = "";
+    String test = "";
+    if (entity.contains(":::")) {
+      proj = entity.split(":::")[0];
+      alg = entity.split(":::")[1];
+      for (Entity_permission algorithm : algorithm_permissions) {
+        if (algorithm.parent_name.equals(proj) && algorithm.name.equals(alg)) {
+          if (algorithm.permission.equals("all") || algorithm.permission.equals(permission)) {
+            return true;
+          }
+        }
+      }
+    } else if (entity.contains(";;;")) {
+      proj = entity.split(";;;")[0];
+      test = entity.split(";;;")[1];
+
+      for (Entity_permission testset : test_permissions) {
+        if (testset.parent_name.equals(proj) && testset.name.equals(test)) {
+          if (testset.permission.equals("all") || testset.permission.equals(permission)) {
+            return true;
+          }
+        }
+      }
+    } else {
+      for (Entity_permission project : project_permissions) {
+        if (project.name.equals(proj)) {
+          if (project.permission.equals("all") || project.permission.equals(permission)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   public static boolean showOwnerProj(String projectName) {
     try {
       Statement stmt = (Statement) conn.createStatement();
 
-      int projExists = getProjectID(projectName, true);
+      int projExists = projExists(projectName, true);
 
       if (projExists < 0) {
         return false;
@@ -865,8 +1168,8 @@ public class Users {
   public static boolean showOwnerAlg(String projectName, String algorithmName) {
     load_entites();
     try {
-      int id      = INVALID_ID;
-      int proj_id = INVALID_ID;
+      int id = -1;
+      int proj_id = -1;
       Statement stmt = (Statement) conn.createStatement();
 
       for (Entity proj : project_list) {
@@ -940,16 +1243,15 @@ public class Users {
     //za popravit
     load_entites();
     try {
-      int id      = INVALID_ID;
-      int proj_id = INVALID_ID;
-      int alg_id  = INVALID_ID;
+      int id = -1;
+      int proj_id = -1;
+      int alg_id = -1;
 
       Statement stmt = (Statement) conn.createStatement();
 
       for (Entity proj : project_list) {
         if (proj.name.equals(projectName)) {
           proj_id = proj.id;
-          break;
         }
       }
       if (proj_id < 0) {
@@ -987,7 +1289,7 @@ public class Users {
               System.out.println(">>> Owner for " + testName + " is user " + username + ".");
             }
             return true;
-          
+
           } else {
             if (format.equals("json")) {
               Gson gson = new Gson();
@@ -997,14 +1299,15 @@ public class Users {
             }
             return false;
           }
-        }
-        if (format.equals("json")) {
+        } else {
+          if (format.equals("json")) {
             Gson gson = new Gson();
             System.out.println(gson.toJson("Does not exist"));
-        } else {
+          } else {
             System.out.println(">>> Project " + projectName + " does not have any TestSets!");
+          }
+          return false;
         }
-          return false;        
       }
       return false;
     } catch (SQLException e) {
@@ -1013,36 +1316,7 @@ public class Users {
     }
   }
 
-  public static void setowner(String id_owner, String id_entity) {
-    if (!NumberUtils.isNumber(id_owner))  id_owner = Integer.toString(getUserID(id_owner, false));
-    if (!NumberUtils.isNumber(id_entity)) id_entity = Integer.toString(findEntityId(id_entity)); 
-    try {
-      Statement stmt = (Statement) conn.createStatement();
-      String owner_find = String.format(
-         "SELECT * FROM algator.owners where id_entity=%s",  id_entity
-      );
-      boolean result = stmt.execute(owner_find);  
-
-      String sql;
-      ResultSet rst = stmt.getResultSet();
-      if (rst.next()) 
-        sql = String.format(
-             "UPDATE algator.owners SET id_owner=%s WHERE id_entity=%s", id_owner, id_entity
-        );
-      else
-        sql = String.format(
-             "INSERT INTO algator.owners(id_owner,id_entity) VALUES (%s,%s)", id_owner, id_entity
-        );        
-      
-      stmt.executeUpdate(sql);
-      
-      System.out.println(">> OK");
-    } catch (Exception e) {
-      System.out.println("Error: " + e.toString());
-    }
-  }
-  
-  public static void setDefaultOwnerForAllEntities() {
+  public static void setowner() {
     load_entites();
     boolean exists;
     String dataroot = ATGlobal.getALGatorDataRoot();
@@ -1059,7 +1333,7 @@ public class Users {
     });
     for (String proj : projects) {
       exists = false;
-      id_project = INVALID_ID;
+      id_project = -1;
       String projName = proj.split("-")[1];
       for (Entity pl : project_list) {
         if (pl.name.equals(projName)) {
@@ -1253,42 +1527,8 @@ public class Users {
     System.out.println("ADDED OWNERS: " + count);
   }
 
-  private static void help_for_command(String command) {
-    help_for_command("Missing arguments", command);
-  }  
-  private static void help_for_command(String eMsg, String command) {
-    if (!eMsg.isEmpty())
-      System.out.println(">>> Error: " + eMsg + "\n");
-    
-    String [] msgs = help_msg.split("\n\n");
-    for (String msg : msgs) {
-      if (msg.trim().toUpperCase().startsWith(command.toUpperCase() + " "))
-        System.out.println(msg);
-    }
-    System.out.println("");
-  }
-  
-  public static String do_users(String[] sinput) {    
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    PrintStream ps = new PrintStream(baos);
-    PrintStream old = System.out;
-    System.setOut(ps);
-
-    main(sinput);
-
-    System.out.flush();
-    System.setOut(old);    
-    return baos.toString();
-  }
-  
   public static boolean main_switch(String[] sinput) {
     boolean result = true;
-    
-    if (sinput.length > 1 && sinput[1].equals("?")) {
-      System.out.println("");
-      help_for_command("", sinput[0]);
-      return true;
-    }
     
     switch (sinput[0]) {
       case "exit":
@@ -1303,21 +1543,21 @@ public class Users {
         try {
           adduser(sinput[1], sinput[2]);
         } catch (ArrayIndexOutOfBoundsException e) {
-          help_for_command("adduser");
+          System.out.println(">>> Error: Missing arguments");
         }
         break;
       case "addgroup":
         try {
           addgroup(sinput[1]);
         } catch (ArrayIndexOutOfBoundsException e) {
-          help_for_command("addgroup");
+          System.out.println(">>> Error: Missing arguments");
         }
         break;
       case "moduser":
         try {
           moduser(sinput[1], sinput[2]);
-        } catch (ArrayIndexOutOfBoundsException e) {          
-          help_for_command("moduser");
+        } catch (ArrayIndexOutOfBoundsException e) {
+          System.out.println(">>> Error: Missing arguments");
         }
         break;
       case "showusers":
@@ -1333,9 +1573,7 @@ public class Users {
       case "showpermissions":
         showPermissions();
         break;
-      case "listentities":
-        load_entites(sinput.length > 1 ? sinput[1] : "");
-        
+      case "showentities":
         if (format.equals("json")) {
           Gson gson = new Gson();
           List<Entity> combined = new ArrayList<Entity>();
@@ -1344,101 +1582,122 @@ public class Users {
           combined.addAll(test_list);
           System.out.println(gson.toJson(combined));
         } else {
-          listEntities();
+          showEntities();
         }
         break;
-      case "chmod":
-        try {
-          String errorMsg = chmod(sinput[1], sinput[2], sinput[3]);
-          if (!errorMsg.isEmpty())
-            help_for_command(errorMsg, "chmod");          
-        } catch (ArrayIndexOutOfBoundsException e) {          
-          help_for_command("chmod");
-        }        
-        break;
-      case "getentityid":
-        try {
-          System.out.println(findEntityId(sinput[1]));
-        } catch (ArrayIndexOutOfBoundsException e) {          
-          help_for_command("chmod");
-        }        
-        break;                
       case "changeuserstatus":
         try {
           changeUserStatus(sinput[1], sinput[2]);
-        } catch (ArrayIndexOutOfBoundsException e) {          
-          help_for_command("changeuserstatus");
+        } catch (ArrayIndexOutOfBoundsException e) {
+          System.out.println(">>> Error: Missing arguments");
         }
         break;
       case "changegroupstatus":
         try {
           changeGroupStatus(sinput[1], sinput[2]);
-        } catch (ArrayIndexOutOfBoundsException e) {          
-          help_for_command("changegroupstatus");
+        } catch (ArrayIndexOutOfBoundsException e) {
+          System.out.println(">>> Error: Missing arguments");
+        }
+        break;
+      case "addpermproj":
+        try {
+          if (sinput[1].equals("-g")) {
+            addPermProj(sinput[2], sinput[3], sinput[4], "group");
+          } else {
+            addPermProj(sinput[1], sinput[2], sinput[3], "user");
+          }
+        } catch (ArrayIndexOutOfBoundsException e) {
+          System.out.println(">>> Error: Missing arguments");
+        }
+        break;
+      case "rmvpermproj":
+        try {
+          if (sinput[1].equals("-g")) {
+            rmvPermProj(sinput[2], sinput[3], sinput[4], "group");
+          } else {
+            rmvPermProj(sinput[1], sinput[2], sinput[3], "user");
+          }
+        } catch (ArrayIndexOutOfBoundsException e) {
+          System.out.println(">>> Error: Missing arguments");
+        }
+        break;
+      case "addpermalg":
+        try {
+          if (sinput[1].equals("-g")) {
+            addPermAlg(sinput[2], sinput[3], sinput[4], sinput[5], "group");
+          } else {
+            addPermAlg(sinput[1], sinput[2], sinput[3], sinput[4], "user");
+          }
+        } catch (ArrayIndexOutOfBoundsException e) {
+          System.out.println(">>> Error: Missing arguments");
+        }
+        break;
+      case "userperms":
+        try {
+          print_permissions(sinput[1]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+          System.out.println(">>> Error: Missing arguments");
         }
         break;
       case "userperm":
-        try {          
-          int entity_id=ALL_PROJECTS_ID;   // default
-          
-          if (sinput.length > 2) { 
-            if (sinput[2].equals("-all"))
-              entity_id = ALL_ENTITIES_ID; // all entities
-            else if (NumberUtils.isNumber(sinput[2])) 
-              entity_id = Integer.parseInt(sinput[2]);
-            else
-              entity_id = findEntityId(sinput[2]);
-          }                    
-          userperm(sinput[1], entity_id);
-          
+        try {
+          if (sinput[1].equals("-id")) {
+            user_permission(sinput[2], Integer.parseInt(sinput[3]));
+          } else {
+            user_permission2(sinput[1], sinput[2]);
+          }
         } catch (ArrayIndexOutOfBoundsException e) {
-          help_for_command("userperm");
+          System.out.println(">>> Error: Missing arguments");
         }
         break;
       case "canuser":
         try {
-          if (format.equals("json")) 
-            System.out.println(new Gson().toJson(can_user(sinput[1], sinput[2], sinput[3])));
-          else
-            System.out.println(can_user(sinput[1], sinput[2], sinput[3]));
+          if (sinput[1].equals("-id")) {
+            if (format.equals("json")) {
+              Gson gson = new Gson();
+              System.out.println(gson.toJson(can_user(sinput[2], sinput[3], Integer.parseInt(sinput[4]))));
+              return true;
+            }
+            System.out.println(can_user(sinput[2], sinput[3], Integer.parseInt(sinput[4])));
+          } else {
+            if (format.equals("json")) {
+              Gson gson = new Gson();
+              System.out.println(gson.toJson(can_user2(sinput[1], sinput[2], sinput[3])));
+              return true;
+            }
+            System.out.println(can_user2(sinput[1], sinput[2], sinput[3]));
+          }
         } catch (ArrayIndexOutOfBoundsException e) {
-          help_for_command("canuser");
-          System.out.println(e);
+          System.out.println(">>> Error: Missing arguments");
         }
         break;
       case "setowner":
         try {
-          setowner(sinput[1], sinput[2]);
+          setowner();
         } catch (ArrayIndexOutOfBoundsException e) {
           System.out.println(e.toString());
-          help_for_command("setowner");
-        }
-        break;
-        
-      case "set_default_owner":
-        try {
-          setDefaultOwnerForAllEntities();
-        } catch (ArrayIndexOutOfBoundsException e) {
-          System.out.println(e.toString());
-          help_for_command("set_default_owner");
+          System.out.println(">>> Error: Missing arguments");
         }
         break;
       case "showowner":
         try {
-          String [] parts = sinput[1].split("/");
-          if (parts.length == 1)
-            showOwnerProj(parts[0]);
-          else if (parts.length == 2)
-            showOwnerAlg(parts[0], parts[1]);
-          else if (parts.length == 3)
-            showOwnerTest(parts[0], parts[2]);
+          switch (sinput[1]) {
+            case "-p":
+              showOwnerProj(sinput[2]);
+              break;
+            case "-a":
+              showOwnerAlg(sinput[2], sinput[3]);
+              break;
+            case "-t":
+              showOwnerTest(sinput[2], sinput[3]);
+              break;
+            default:
+              help();
+              break;
+          }
         } catch (ArrayIndexOutOfBoundsException e) {
-          help_for_command("showowner");
+          System.out.println(">>> Error: Missing arguments");
         }
-        break;
-        
-      case "setformat":
-        if (sinput[1].equals("json")) format="json"; else format="string";
         break;
         
       default:
@@ -1474,11 +1733,12 @@ public class Users {
       reader.setPrompt(">>> ");
 
       List<Completer> completors = new LinkedList<Completer>();
-      completors.add(new StringsCompleter("cls", "quit", "exit", "chmod", "getentityid",
+      completors.add(new StringsCompleter("cls", "quit", "exit", 
               "help","init","adduser","addgroup","moduser","showusers",
-              "showgroups","showpermissions","listentities","changeuserstatus",
-              "changegroupstatus",
-              "userperm","canuser","set_default_owner","setowner", "showowner", "setformat"
+              "showgroups","showpermissions","showentities","changeuserstatus",
+              "changegroupstatus","addpermproj","rmvpermproj","addpermalg",
+              "userperms","userperm","canuser","setowner","showowner",
+              "help init", "help canuser"
       ));
 
       for (Completer c : completors) {
@@ -1514,9 +1774,6 @@ public class Users {
   }
 
   public static void main(String[] args) {
-    // !!! DEBUG; comment next line for production !!!
-    // ATGlobal.setALGatorRoot("/Users/Tomaz/ALGATOR_ROOT");
-    
     ATGlobal.logTarget = ATLog.LOG_TARGET_STDOUT;
     ATLog.setLogTarget(ATGlobal.logTarget);
 
@@ -1525,7 +1782,7 @@ public class Users {
       return;
     }
 
-    // load_entites();
+    load_entites();
 
     // execute action defined with arguments or ...
     if (args.length > 0) {
@@ -1537,13 +1794,13 @@ public class Users {
     // ... open a console
     format = "string";
     System.out.println(
-              "    ___     __    ______        __              \n"
+            "    ___     __    ______        __              \n"
             + "   /   |   / /   / ____/____ _ / /_ ____   _____\n"
             + "  / /| |  / /   / / __ / __ `// __// __ \\ / ___/\n"
             + " / ___ | / /___/ /_/ // /_/ // /_ / /_/ // /    \n"
             + "/_/  |_|/_____/\\____/ \\__,_/ \\__/ \\____//_/     \n"
             + "                                                ");
-    System.out.println(">>> Welcome to Algator Users panel!");
+    System.out.println(">>> Welcome to Algator admin panel!");
     doConsoleInputWithJLIne();
     System.out.println(">>> Goodbye!");
   }

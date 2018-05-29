@@ -1,5 +1,6 @@
 package si.fri.adeserver;
 
+import algator.Users;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -414,7 +415,12 @@ public class ADETaskServer implements Runnable {
   }
   
   private String users(ArrayList<String> params) {
-    return "Odgovor";
+    String [] args = new String[params.size()];
+    for (int i=0; i<params.size(); i++) args[i]=params.get(i);
+    String response = Users.do_users(args).trim();
+    while (response.endsWith("\n")) response=response.substring(0,response.length()-1);
+    
+    return response;
   }
 
   @Override

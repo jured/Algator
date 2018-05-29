@@ -22,12 +22,13 @@ public class PermTools {
   private static String PASSWORD = "";
   private static String CONN_STRING = "";
   
-    
+  protected static String DATABASE = "algator";
+  private   static String OPTIONS  = "?autoReconnect=true&useSSL=false";
+
+  
   public static Connection connectToDatabase() {
-    return connectToDatabase("");
-  }
-  public static Connection connectToDatabase(String suffix) {
     Connection conn = null;
+    
     try {
       if (USERNAME.isEmpty() || PASSWORD.isEmpty() || CONN_STRING.isEmpty()) {
         load_prop();
@@ -38,7 +39,7 @@ public class PermTools {
         return conn;
       }
 
-      conn = DriverManager.getConnection(CONN_STRING+suffix, USERNAME, PASSWORD);
+      conn = DriverManager.getConnection(CONN_STRING + "/" + DATABASE + OPTIONS, USERNAME, PASSWORD);
     } catch (SQLException e) {
       ATLog.log(e.toString(), 1);
     }
@@ -59,6 +60,18 @@ public class PermTools {
     } catch (IOException e1) {
       ATLog.log(e1.toString(), 1);
     }
+  }
+  
+  public static int getID(String sql) {
+    Connection conn = connectToDatabase();
+    try {
+      Statement stmt = (Statement) conn.createStatement();    
+      ResultSet rs = stmt.executeQuery(sql);
+        if (rs.next()) {
+          return rs.getInt(1);
+        }
+    } catch (Exception e) {}
+    return -1;
   }
 
   public static boolean setProjectPermissions(String proj_name) {
@@ -83,32 +96,20 @@ public class PermTools {
           id_project = rs.getInt(1);
         }
 
-        String select = "SELECT * from algator.groups WHERE name='Everyone'";
-        rs = stmt.executeQuery(select);
-        if (rs.next()) {
-          id_group = rs.getInt(1);
-        }
-
-        select = "SELECT * from algator.permissions WHERE permission_code='can_read'";
-        rs = stmt.executeQuery(select);
-        if (rs.next()) {
-          id_permission = rs.getInt(1);
-        }
-
+        id_group      = getID("SELECT * from algator.groups WHERE name='Everyone'");
+        id_permission = getID("SELECT * from algator.permissions WHERE permission_code='can_read'");
+        
         String insert = "INSERT INTO algator.permissions_group(id_group,id_entity,id_permission) VALUES (" + id_group + "," + id_project + "," + id_permission + ")";
-        result = stmt.executeUpdate(insert);
+        stmt.executeUpdate(insert);
 
         insert = "INSERT INTO algator.owners(id_owner,id_entity) VALUES (1," + id_project + ")";
         result = stmt.executeUpdate(insert);
-
-        String testset_insert = "INSERT INTO algator.entities(name,type,id_parent) VALUES ('TestSet1',3," + id_project + ")";
-        result = stmt.executeUpdate(testset_insert);
 
         if (result > 0) {
           ATLog.log("Project added to database", 1);
           return true;
         } else {
-          ATLog.log("Error while adding TestSet", 1);
+          ATLog.log("Error while adding project to database", 1);
           return true;
         }
 

@@ -213,7 +213,7 @@ public class Admin {
       
       File algFolderFile = new File(algRoot);
       if (algFolderFile.exists()) {
-        System.out.printf("\n Algorithm %s already exists!\n", proj_name);
+        System.out.printf("\n Algorithm %s already exists!\n", alg_name);
         System.exit(0);
       }       
       algFolderFile.mkdirs();

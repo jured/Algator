@@ -5,7 +5,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import si.fri.algotest.users.PermTools;
 
 /**
  *
@@ -15,11 +14,8 @@ public class DatabaseInit {
 
   private static Connection conn;
 
-  private static String DATABASE = "algator";
-  private static String OPTIONS = "?autoReconnect=true&useSSL=false";
-
   public static void init() {
-    System.out.println("ALGator will now check for database and tables...");
+    System.out.println("ALGator will now check for permission database and tables...");
     conn = PermTools.connectToDatabase();
 
     createDatabase();
@@ -52,24 +48,24 @@ public class DatabaseInit {
 
       while (rs.next()) {
         String databaseName = rs.getString(1);
-        if (databaseName.equals(DATABASE)) {
+        if (databaseName.equals(PermTools.DATABASE)) {
           System.out.println("Database already exists...");
 
-          conn = PermTools.connectToDatabase(DATABASE + OPTIONS);
+          conn = PermTools.connectToDatabase();
 
           return false;
         }
       }
       rs.close();
 
-      String sql = "CREATE DATABASE IF NOT EXISTS " + DATABASE.toUpperCase();
+      String sql = "CREATE DATABASE IF NOT EXISTS " + PermTools.DATABASE.toUpperCase();
 
       //try to insert
       int result = stmt.executeUpdate(sql);
 
-      System.out.println("Database " + DATABASE + " sucessfully created!");
+      System.out.println("Database " + PermTools.DATABASE + " sucessfully created!");
 
-      conn = PermTools.connectToDatabase(DATABASE + OPTIONS);
+      conn = PermTools.connectToDatabase();
 
       return true;
     } catch (SQLException e) {
@@ -407,7 +403,7 @@ public class DatabaseInit {
       Statement stmt = (Statement) conn.createStatement();
 
       //check if user exists
-      String select = "SELECT * from " + DATABASE + ".users WHERE id=1";
+      String select = "SELECT * from " + PermTools.DATABASE + ".users WHERE id=1";
       ResultSet rs = stmt.executeQuery(select);
 
       if (rs.next()) {
@@ -433,7 +429,7 @@ public class DatabaseInit {
     try {
       Statement stmt = (Statement) conn.createStatement();
 
-      String select = "SELECT * from " + DATABASE + ".groups WHERE name='Everyone'";
+      String select = "SELECT * from " + PermTools.DATABASE + ".groups WHERE name='Everyone'";
       ResultSet rs = stmt.executeQuery(select);
 
       if (rs.next()) {
@@ -459,7 +455,7 @@ public class DatabaseInit {
     try {
       Statement stmt = (Statement) conn.createStatement();
 
-      String select = "SELECT * from " + DATABASE + ".permissions WHERE permission_code='" + permission_code + "'";
+      String select = "SELECT * from " + PermTools.DATABASE + ".permissions WHERE permission_code='" + permission_code + "'";
       ResultSet rs = stmt.executeQuery(select);
 
       if (rs.next()) {

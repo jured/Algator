@@ -1,0 +1,11 @@
+import si.fri.algotest.entities.TestCase;
+
+/**
+ * 
+ * @author ...
+ */
+public class <PPP>TestCase extends TestCase {
+
+  // TODO: define test specific data structures and fields
+    
+}

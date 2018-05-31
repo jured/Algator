@@ -1,0 +1,13 @@
+/**
+ *
+ * @author ...
+ */
+public class <AAA>Algorithm extends <PPP>AbsAlgorithm {
+
+  // TODO: write adequate signiture of the execute method 
+  //       (as defined in <PPP>AbsAlgorithm.java)   
+  //@Override
+  //public void execute(...) {
+  //  .... write method body
+  //} 
+}

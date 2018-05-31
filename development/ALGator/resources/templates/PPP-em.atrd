@@ -1,0 +1,29 @@
+{
+  "Result":
+  { 
+    "ParameterOrder" : ["N"],
+    "Parameters":   [	    
+      {
+       "Name":        "N",             
+       "Description": "The size of the test", 
+       "Type":        "int"       
+      }
+    ], 
+
+    "IndicatorOrder" : ["Tmin", "Check"],
+    "Indicators":   [	    
+      {
+       "Name"        : "Tmin",             
+       "Description" : "MIN time of execution",             
+       "Type"        : "timer",          
+       "Subtype"     : "0 MIN"    
+      },
+      {
+       "Name"        : "Check",             
+       "Description" : "The correctness of the algorithm (OK or NOK)", 
+       "Type"        : "string"       
+      }
+    ]
+  }
+}
+ 

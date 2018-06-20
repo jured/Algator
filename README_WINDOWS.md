@@ -89,6 +89,10 @@ A single-user version instalation of the ALGator system on Windows system:
    Note: in the ALGator.zip there are two example projects: BasicSort and BasicMatrixMul.
    You can browse the results of these projects before creating your own project.
 
+   When facing a problem with shared drives, try <a href="http://peterjohnlightfoot.com/docker-for-windows-on-hyper-v-fix-the-host-volume-sharing-issue/">this.</a>
+   
+   
+
 
 ## How to use ALGator - examples
 

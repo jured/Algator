@@ -2,24 +2,7 @@
 <h4 align="center">An automatic algorithm evaluation system </h4>
 <br>
 
-## About the ALGator
-
-ALGator facilitates automatic algorithm evaluation process by executing 
-implementations of the algorithms on the given predefined sets of test cases
-and analyzing various indicators of the execution.  
-To use the ALGator, user defines a project including the definition of 
-the problem to be solved, sets of test cases, parameters 
-of the input and indicators of the output data  and the criteria for the 
-algorithm quality evaluation. When a project is defined, any number of 
-algorithm implementations can be added. When requested, system 
-executes all the implemented algorithms, checks for the correctness 
-and compares the quality of their results. Using the ALGator user can 
-add additional quality criteria, draw graphs and perform evaluations and 
-comparisons of defined algorithms. 
-
-## System instalation
-
-A single-user version instalation of the ALGator system on Windows system:
+## System instalation for Windows system
 
 1. **Create ALGator folder**
 
@@ -57,8 +40,9 @@ A single-user version instalation of the ALGator system on Windows system:
     into command prompt
 
 6. **Install Cygwin and rsync**
+    - From https://cygwin.com/install.html install cygwin and rsync.
 
-    Add ```C:\cygwin64\bin\``` to PATH in system environment. To test it run rsync in command prompt
+    - Add ```C:\cygwin64\bin\``` to PATH in system environment. To test it run ```rsync``` in command prompt.
 
 7. **Install local web server to show ALGator's results**
 
@@ -125,9 +109,7 @@ A single-user version instalation of the ALGator system on Windows system:
 	`algs/ALG-<algorithm_name>/<algorithm_name>Algorithm.java`
 
 ## Prerequisits 
-
 	- java >= 7.0 
-	- for windows: cygwin rsync (https://cygwin.com/install.html)
 
 ## ALGator on GitHub
 

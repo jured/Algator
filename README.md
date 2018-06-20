@@ -108,7 +108,6 @@ A single-user version instalation of the ALGator system on Linux system (see als
 ## Prerequisits 
 
 	- java >= 7.0 
-    - for windows: cygwin rsync (https://cygwin.com/install.html)
 
 
 ## ALGator on GitHub

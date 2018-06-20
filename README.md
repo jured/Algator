@@ -19,7 +19,7 @@ comparisons of defined algorithms.
 
 ## System instalation
 
-A single-user version instalation of the ALGator system on Linux system:
+A single-user version instalation of the ALGator system on Linux system (see also a <a href="README_WINDOWS.md">Windows version</a> of this document):
 
 1. **Create ALGator folder**
 

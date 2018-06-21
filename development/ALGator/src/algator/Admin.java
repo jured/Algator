@@ -1,8 +1,9 @@
 package algator;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,16 +63,25 @@ public class Admin {
   private static void printMsg(Options options) {    
     HelpFormatter formatter = new HelpFormatter();
     formatter.printHelp("algator.Admin [options] <project_name> <algorithm_name>", options);
-
-    System.exit(0);
   }
 
   private static void printUsage() {
     Scanner sc = new Scanner((new Analyse()).getClass().getResourceAsStream("/data/AdminUsage.txt")); 
     while (sc.hasNextLine())
-      System.out.println(sc.nextLine());
-    
-    System.exit(0);
+      System.out.println(sc.nextLine());    
+  }
+  
+  public static String do_admin(String[] sinput) {    
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    PrintStream ps = new PrintStream(baos);
+    PrintStream old = System.out;
+    System.setOut(ps);
+
+    main(sinput);
+
+    System.out.flush();
+    System.setOut(old);    
+    return baos.toString();
   }
   
   /**
@@ -99,6 +109,7 @@ public class Admin {
       if (line.hasOption("v")) {
         Version.printVersion();
         System.out.println();
+        return;
       }
       
       String[] curArgs = line.getArgs();
@@ -115,7 +126,7 @@ public class Admin {
           printMsg(options); 
         } else {
           createProject(curArgs[0]);
-          System.exit(0);
+          return;
         }
       }
 
@@ -125,7 +136,7 @@ public class Admin {
           printMsg(options); 
         } else {
           createAlgorithm(curArgs[0], curArgs[1]);
-          System.exit(0);
+          return;
         }
       }
 
@@ -135,7 +146,7 @@ public class Admin {
           printMsg(options); 
         } else {
           createTestset(curArgs[0], curArgs[1]);
-          System.exit(0);
+          return;
         }
       }
       
@@ -162,7 +173,7 @@ public class Admin {
       File projFolderFile = new File(projRoot);
       if (projFolderFile.exists()) {
         System.out.printf("\n Project %s already exists!\n", proj_name);
-        System.exit(0);
+        return false;
       } 
       
       projFolderFile.mkdirs();
@@ -205,7 +216,7 @@ public class Admin {
     File projFolderFile = new File(projRoot);
     if (!projFolderFile.exists()) {
       if (!createProject(proj_name))
-        System.exit(0);
+        return false;
     }    
     
     System.out.println("Creating algorithm " + alg_name +  " for the project " + proj_name);
@@ -214,7 +225,7 @@ public class Admin {
       File algFolderFile = new File(algRoot);
       if (algFolderFile.exists()) {
         System.out.printf("\n Algorithm %s already exists!\n", alg_name);
-        System.exit(0);
+        return false;
       }       
       algFolderFile.mkdirs();
       
@@ -253,7 +264,7 @@ public class Admin {
     File projFolderFile = new File(projRoot);
     if (!projFolderFile.exists()) {
       if (!createProject(proj_name))
-        System.exit(0);
+        return true;
     }    
     
     System.out.println("Creating test set " + testset_name +  " for the project " + proj_name);
@@ -267,7 +278,7 @@ public class Admin {
       File testSetFile = new File(testsRoot + File.separator + testset_name+".atts");
       if (testSetFile.exists()) {
         System.out.printf("\n Testset %s already exists!\n", testset_name);
-        System.exit(0);
+        return false;
       }
              
       

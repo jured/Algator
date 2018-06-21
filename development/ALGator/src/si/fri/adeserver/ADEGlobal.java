@@ -29,7 +29,8 @@ public class ADEGlobal {
   public static final String REQ_QUERY_RES        = "GETQUERYRESULT"; // parameters: projectName
   public static final String REQ_ADMIN_PRINTPATHS = "PRINTPATHS";     // no parameters
   public static final String REQ_ADMIN_PRINTLOG   = "PRINTLOG";       // parameters: numberOfLogs (default: 10)
-  public static final String REQ_USERS            = "USERS";      // users
+  public static final String REQ_USERS            = "USERS";          // users (povezava do programa algator.Users)
+  public static final String REQ_ADMIN            = "ADMIN";          // admin (povezava do programa algator.Admin)  
   public static final String REQ_GETFILE          = "GETFILE";        // parameters: type projectName  [some more]
   
   

@@ -1,5 +1,6 @@
 package si.fri.adeserver;
 
+import algator.Admin;
 import algator.Users;
 import java.io.File;
 import java.io.IOException;
@@ -404,6 +405,9 @@ public class ADETaskServer implements Runnable {
                 
       case ADEGlobal.REQ_USERS:
         return users(params);
+
+      case ADEGlobal.REQ_ADMIN:
+        return admin(params);
         
       case ADEGlobal.REQ_GETFILE:
         return getFile(params);
@@ -422,6 +426,16 @@ public class ADETaskServer implements Runnable {
     
     return response;
   }
+  
+  private String admin(ArrayList<String> params) {
+    String [] args = new String[params.size()];
+    for (int i=0; i<params.size(); i++) args[i]=params.get(i);
+    String response = Admin.do_admin(args).trim();
+    while (response.endsWith("\n")) response=response.substring(0,response.length()-1);
+    
+    return response;
+  }
+  
 
   @Override
   public void run() {

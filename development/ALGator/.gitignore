@@ -3,3 +3,17 @@ build.xml
 nbproject
 build/*
 manifest.mf
+
+
+# IntelliJ
+.idea
+*.iml
+
+# maven
+target/
+
+# javac stuff
+out/
+
+# ALgator
+data_local

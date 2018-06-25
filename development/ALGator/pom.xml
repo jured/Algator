@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.fri.algator</groupId>
+  <artifactId>ALGator-parent</artifactId>
+  <version>1.1</version>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.build.local.libs>~/Algator/development/lib</project.build.local.libs>
+
+    <java.version.source>1.8</java.version.source>
+    <java.version.target>1.8</java.version.target>
+
+    <slf4j.version>1.7.25</slf4j.version>
+    <junit.version>4.12</junit.version>
+  </properties>
+  <!-- library dependencies -->
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-cli</groupId>
+      <artifactId>commons-cli</artifactId>
+      <version>1.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-exec</artifactId>
+      <version>1.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.3.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.objecthunter</groupId>
+      <artifactId>exp4j</artifactId>
+      <version>0.4.8</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.2.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jline</groupId>
+      <artifactId>jline</artifactId>
+      <version>2.14.5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.41</version>
+    </dependency>
+
+    <!-- Dependencies from local jars.
+         They should be put in ${project.build.local.libs} directory and listed down here -->
+    <dependency>
+      <groupId>org.jamvm</groupId>
+      <artifactId>jamvm</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${project.build.local.libs}/jamvm.zip</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jmathplot</groupId>
+      <artifactId>jmathplot</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${project.build.local.libs}/jmathplot.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>org.spring.custom</groupId>
+      <artifactId>org-jdesktop-application</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${project.build.local.libs}/appframework-1.0.3.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>org.spring.custom</groupId>
+      <artifactId>org-jdesktop-layout</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${project.build.local.libs}/swing-layout-1.0.3.jar</systemPath>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.7.0</version>
+        <configuration>
+          <source>${java.version.source}</source>
+          <target>${java.version.target}</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.1.1</version>
+        <configuration>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>
+
